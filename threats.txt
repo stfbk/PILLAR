@@ -1,0 +1,131 @@
+1
+LINKED USER REQUESTS
+User requests can be linked because they contain a unique identifier.
+
+1
+LINKABLE USER REQUESTS
+User requests can be linked because they contain attributes that can be combined into quasi-identifiers.
+
+1
+LINKING THROUGH DISTINGUISHABLE PATTERNS
+Patterns in the (meta)data contained in user requests can be used to link them to each other.
+
+1
+LINKABLE DATASET
+Stored personal data can be linked to individuals.
+
+1
+PROFILING USERS
+Users can be profiled by analyzing their data for patterns.
+
+2
+IDENTIFIED USER REQUESTS
+The incoming user requests contain data that directly reveals the user identity.
+
+2
+IDENTIFIABLE USER REQUESTS
+The user can be identified because the data in their requests can be used to infer who they are.
+
+2
+IDENTIFIABLE DATA FLOWS
+Data sent to the system is sufficiently revealing to identify the user.
+
+2
+IDENTIFIERS IN DATA REQUESTS
+Communication contains (quasi-)identifiers.
+
+2
+IDENTIFIABLE DATASET
+Stored data can be used to identify individuals.
+
+3
+NON-REPUDIATION OF SERVICE USAGE
+Users cannot deny having used a service because of authentication or logged access.
+
+3
+NON-REPUDIATION OF SENDING
+Users cannot deny having sent a message.
+
+3
+NON-REPUDIATION OF RECEIPT
+Users cannot deny having received a message.
+
+3
+NON-REPUDIATION OF STORAGE
+Users cannot deny claims about data stored in non-repudiable storage.
+
+3
+NON-REPUDIATION OF HIDDEN DATA OR METADATA
+Hidden or metadata in a document prevent users from denying claims associated with it.
+
+4
+DETECTABLE USERS
+Inferring the existence of a user from the system’s response.
+
+4
+DETECTABLE SERVICE USAGE
+Detecting communication between a service and its users.
+
+4
+DETECTABLE EVENTS
+Detecting side effects or communications triggered by application events.
+
+4
+DETECTABLE RECORDS
+Detecting the existence of records in a system.
+
+5
+EXCESSIVELY SENSITIVE DATA COLLECTED
+The system acquires more sensitive or finegrained data than strictly necessary for its functionality.
+
+5
+EXCESSIVE AMOUNT OF DATA COLLECTED
+The system acquires more data than strictly needed for its functionality.
+
+5
+UNNECESSARY DATA ANALYSIS
+Data is further processed, analyzed, or enriched in a way that is not strictly necessary for the functionality.
+
+5
+UNNECESSARY DATA RETENTION
+Data is stored for longer than needed.
+
+5
+OVEREXPOSURE OF PERSONAL DATA
+Personal data is shared with more services or external parties than necessary.
+
+6
+INSUFFICIENT TRANSPARENCY
+Data subjects are insufficiently informed about the collection and processing of their personal data.
+
+6
+INSUFFICIENT INFORMATION WHEN SHARING DATA OF OTHERS
+When sharing personal data of others, users are insufficiently informed about the further data processing.
+
+6
+INSUFFICIENT PRIVACY CONTROLS
+Data subjects have insufficient controls to manage their preferences.
+
+6
+INSUFFICIENT ACCESS
+Data subjects do not have access to their personal data.
+
+6
+INSUFFICIENT RECTIFICATION OR ERASURE
+Data subjects cannot rectify or erase their personal data.
+
+7
+NON-COMPLIANCE OF PROCESSING WITH APPLICABLE REGULATIONS
+The processing of personal data by the system is not compliant with applicable privacy regulations.
+
+7
+NON-ADHERENCE TO PRIVACY STANDARDS
+The system is not compliant with privacy standards and best practices.
+
+7
+IMPROPER DATA LIFECYCLE MANAGEMENT
+Data is not properly managed throughout its entire lifecycle within the system.
+
+7
+INSUFFICIENT SECURITY OF PROCESSING
+Data security measures and processes do not adhere to risk and security management best practices and standards.

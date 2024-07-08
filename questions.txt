@@ -1,0 +1,98 @@
+Is there an identifier (unique in system/session) or dataset?
+Is there other data associated with that identifier?
+Is there previous data with the same identifier to which new data can be linked?
+
+Is there a set of attributes that can serve as an identifier?
+Is there other data sent together with that quasi-identifier?
+Is there existing data to link it to?
+
+Is the data from different individuals distinguishable?
+Is it possible to query data using distinguishable attributes?
+
+Is there a set of attributes that can serve as an identifier?
+Is there other data sent together with that quasi-identifier?
+Is there existing data to link it to?
+
+Are there patterns derivable from the data?
+Can (new) personal data be inferred from the linked data points?
+
+Does data sent to the system (potentially) contain identity data?
+
+Are requests or records sufficiently unique to differentiate them from those of a speciﬁc individual?
+
+Is there free-form user provided data that is received of processed by the system?
+Is data collected that may reveal the identifying information?
+
+Is there a distinctive identifier used during interactions or when referring to an individual’s data?
+Can multiple attributes be combined to create a unique reference to an individual or their data?
+
+Is there a distinctive identifier used during interactions or when referring to an individual’s data?
+Can multiple attributes be combined to create a unique reference to an individual or their data?
+
+Does the system record data affecting deniability?
+Does the data itself impact deniability claims?
+
+Is the data digitally signed?
+Which keys are used for signing? Who has access to these keys to verify signatures?
+
+Do (passive) interactions with the system (e.g., receiving a message) have side-effects (e.g., trigger transmissions, logging)?
+Is deniability of receipt a desired feature for the system?
+
+Is the data digitally signed?
+Which keys are used for signing? Who has access to these keys to verify signatures?
+
+Does stored or transmitted data have associated metadata?
+Are there embedded data or hidden patterns in the data or transmissions?
+Does this data lead to undesirable deniability issues?
+
+Does the system show status messages (informational, warnings, errors) when retrieving data?
+Are the status messages distinct when an item (a file, user, . . .) does not exist compared to not having access rights?
+
+Can the communication be observed?
+Can information be inferred from the observed communications?
+
+Do actions in the system have side effects (e.g., saving a file, writing to a log, triggering other transmissions)?
+Are these side effects observable?
+
+Does the system show status messages (informational, warnings, errors) when retrieving data?
+Are the status messages distinct when an item (a file, user, . . .) does not exist compared to not having access rights?
+
+Is the data more sensitive than strictly necessary?
+Is the data more ﬁne-grained than strictly necessary?
+Does the data encoding include additional (meta)data?
+
+Is the amount of collected data necessary for the correct functioning of the system?
+Is the processing frequency necessary?
+Are there more data subjects involved than necessary?
+
+Is the data enrichment/analysis necessary for the system’s functionality?
+
+Is the data stored for longer time than necessary?
+
+Is the data necessary for the recipient?
+Are there more parties involved than necessary?
+How accessible is the data (public/limited/private)?
+
+Are data subjects infufficiently informed about the processing of personal data, including the purposes and methods of the processing involved?
+
+If a user shares personal data of others, is it clear what, why, and how that data is further processed?
+
+Does the system enable the data subject to configure which personal data is processed and for what purposes?
+Can the data subject alter their preferences afterwards?
+
+Do data subjects lack the ability to access the personal data being collected, processed, stored, or disclosed about them?
+
+Do data subjects have the ability to correct or delete their personal data?
+
+Will the system be used in jurisdictions with specific rules for personal data processing (e.g., the EU)?
+Does the system, or its processing activities, violate one or more rules in these applicable regulation(s)?
+
+Are there any (industry) specific privacy standards that are applicable to the system?
+Does the system adequately implement the principles and controls outlined in these standards?
+
+Is there a data lifecycle management policy defined for the data processed within the system?
+Does the policy outline clear principles for each phase of the data lifecycle (creation, storage, sharing and usage, archival, and destruction)?
+
+Is there an established process to manage security risks and identify the required countermeasures?
+Does the system incorporate the required countermeasures?
+Are the countermeasures aligned with industry standards and best practices?

@@ -1,0 +1,2323 @@
+LINDDUN
+GO
+
+www.linddun.org
+
+Introducing LINDDUN GO
+
+Your Privacy Threat Modeling Companion
+
+LINDDUN GO revolutionizes privacy threat modeling with a
+lean card game approach.
+
+Derived from LINDDUN, GO simpliﬁes the identiﬁcation of
+privacy threats using 7 key LINDDUN threat types: Linking,
+Identifying, Non-Repudiation, Detecting, Data Disclosure,
+Unawareness and Unintervenability, and Non-Compliance.
+With 33 threat cards highlighting the most common privacy
+threats and system hotspots, this game transforms the
+privacy assessment process into an engaging, collaborative
+experience.
+
+Designed for structured brainstorming with diverse teams,
+LINDDUN GO requires only the card deck and a system sketch
+to kickstart your dynamic journey. Whether you’re a seasoned
+pro or new to threat modeling, it offers an accessible and
+engaging way to address privacy concerns.
+
+Gather your team, shuﬄe the cards, and let the adventure in
+privacy threat modeling begin.
+
+Visit our website to learn more: www.linddun.org
+
+© 2024 DistriNet, KU Leuven. This work is licensed under
+a Creative Commons Attribution 4.0 International License:
+https://creativecommons.org/licenses/by/4.0/.
+
+v240118
+
+THREAT CARDS
+
+Title: the name
+of the threat card
+
+Hotspot: where
+the threat occurs
+in the system
+
+Elicitation
+questions: to
+determine if the
+threat applies
+
+Consequences:
+why the threat
+is important
+
+TITLE
+
+Hotspot
+
+Threat Src
+
+Threat source:
+origin of the threat
+
+Description.
+
+Description:
+brief explanation
+of the threat
+
+Examples:
+illustrating the threat
+
+(cid:242)
+
+Additional
+information
+
+?
+
+(cid:17)
+
+.
+
+L0
+
+LINDDUN
+
+Card identiﬁer
+
+INSTRUCTIONS
+
+Gather a diverse group of privacy enthusiasts, and bring
+a simple sketch or diagram of the software system
+under analysis. Game dynamics:
+
+1. The ﬁrst participant picks a random threat card and
+puts it on the table so that everyone can see it.
+
+2. Assess if the illustrated privacy threat forms a
+
+relevant risk in the system. For each hotspot in your
+system, consider the card’s elicitation questions.
+
+3. If the threat is possible, you have identiﬁed a threat.
+
+Make sure to document the threat.
+
+4. Other participants can join in and report any
+
+overlooked threats.
+
+5. When no one can discover any new threats, the next
+
+participant draws a card and starts over.
+
+6. The exercise is ﬁnished when all threat cards have
+
+been discussed.
+
+LINKING
+
+What?
+Learning more about an individual or a group by associating data
+items or user actions. Linking may lead to unwanted privacy
+implications, even if it does not reveal one’s identity.
+
+Tell me more!
+Linking refers to the process of associating different data
+items (incl. metadata) in a manner that results in undesirable
+privacy implications. Combining related data items may reveal
+(additional) information about a data subject or groups of data
+subjects.
+
+So what?
+Linking becomes problematic when it can result in inference
+(learning more about individuals), singling out individuals,
+aggregating additional data to build proﬁles, etc. This may
+subsequently give rise to other threats, such as identifying.
+
+LINDDUN
+
+Hotspots
+
+Inbound user with
+personal data
+
+P
+
+(cid:211)(cid:160)
+
+Inbound personal data
+
+P
+
+(cid:211)
+
+Inbound user
+
+(cid:211)(cid:160)
+
+Storing/retrieving
+
+ı
+
+Processing
+
+(cid:211)
+
+There is an inbound ﬂow
+from the user to the
+system in which personal
+data is transferred.
+
+There is an inbound
+ﬂow to the system in
+which personal data is
+transferred.
+
+There is an inbound ﬂow
+from the user to the
+system.
+
+The system stores
+incoming data or
+retrieves stored data.
+
+The system processes
+incoming data and
+provides this to another
+entity.
+
+IDENTIFYING
+
+What?
+Identifying threats arise when the identity of individuals can be
+revealed through leaks, deduction, or inference in cases where
+this is not desired.
+
+Tell me more!
+A key distinction is made between threats in the context of
+identiﬁed data (where there is an explicit link), and identiﬁable
+data (where the link can be derived based on a pseudonym,
+identity-revealing content, or a small set of potential subjects,
+known as the anonymity set, that allow (re-)identiﬁcation).
+
+So what?
+It can be undesirable to know the identity. Working with
+identiﬁed data records requires additional protective measures
+and can lead to other threats such as unawareness and non-
+compliance.
+
+LINDDUN
+
+Hotspots
+
+Inbound user with
+personal data
+
+P
+
+(cid:211)(cid:160)
+
+Inbound user
+
+(cid:211)(cid:160)
+
+Inbound personal data
+
+P
+
+(cid:211)
+
+Storage
+
+ı
+
+There is an inbound ﬂow
+from the user to the
+system in which personal
+data is transferred.
+
+There is an inbound ﬂow
+from the user to the
+system.
+
+There is an inbound
+ﬂow to the system in
+which personal data is
+transferred.
+
+The system has a data
+store.
+
+NON-REPUDIATION
+
+What?
+Non-repudiation threats pertain to situations where an individual
+can no longer deny speciﬁc claims.
+
+Tell me more!
+The system retains evidence related to a particular action or fact,
+inﬂuencing the ability to deny claims. Examples of this evidence
+include log ﬁles, digital signatures, document metadata, and
+watermarked data, all of which can be attributed to an individual.
+
+So what?
+Non-repudiation threats impact the plausible deniability of
+individuals, rendering them unable to refute speciﬁc actions
+or involvements, such as submitting a whistleblower report or
+casting a vote for someone.
+
+LINDDUN
+
+Hotspots
+
+In/outbound user
+
+(cid:211)(cid:160)
+
+Inbound user
+
+(cid:211)(cid:160)
+
+Outbound user
+
+(cid:211) (cid:160)
+
+Storage
+
+ı
+
+Processing
+
+(cid:211)
+
+There are inbound ﬂows
+from and outbound ﬂows
+to a user.
+
+There is an inbound ﬂow
+from the user to the
+system.
+
+The system has an
+outgoing ﬂow to the user.
+
+The system has a data
+store.
+
+The system processes
+incoming data and
+provides this to another
+entity.
+
+DETECTING
+
+What?
+Detecting threats pertain to situations where the involvement,
+participation, or membership of an individual can be deduced
+through observation.
+
+Tell me more!
+Detecting can be done by observing communication
+ﬂows, including interactions with a system or service, and
+communication between systems. Detecting can also be achieved
+by observing application side effects or system responses, where
+the existence of certain data may be inadvertently revealed by
+the system.
+
+So what?
+Observing or ascertaining the existence can be suﬃcient to learn
+sensitive information about individuals. Furthermore, detecting
+also facilitates linking and identifying, allowing for the inference of
+additional information about individuals.
+
+LINDDUN
+
+Hotspots
+
+Outbound ﬂows
+
+(cid:211)
+
+In/outbound user
+
+(cid:211)(cid:160)
+
+In/outbound ﬂows
+
+(cid:211)
+
+Retrieving
+
+ı
+
+There are outbound
+ﬂows from the system
+to external entities (e.g.,
+third parties).
+
+There are inbound ﬂows
+from and outbound ﬂows
+to a user.
+
+The system has in- and
+outbound ﬂows to
+external entities (e.g.,
+third parties).
+
+The system responds to
+data requests.
+
+DATA DISCLOSURE
+
+What?
+Data disclosure threats represent cases in which disclosures of
+personal data to, within, and from the system are considered
+problematic.
+
+Tell me more!
+Disclosures should consider the best interests of the involved
+data subjects, with the minimization principle playing a crucial
+role. The system should be designed to only collect, process,
+store, and share the minimum amount of personal data
+necessary for the required functionality.
+
+So what?
+In addition to legal implications (non-compliance), this also raises
+the likelihood and impact of theft, data leaks, and unwanted or
+accidental disclosure to unintended parties. The more data is
+disclosed to and by the system, the more likely it can be abused
+for detecting, linking, identifying, or non-repudiation threats by
+any of the threat sources considered.
+
+LINDDUN
+
+Hotspots
+
+Inbound personal data
+
+P
+
+(cid:211)
+
+Processing personal data
+
+P
+
+P
+
+(cid:211)
+
+Storage
+
+ı
+
+Outbound personal data
+
+p
+
+(cid:211)
+
+There is an inbound
+ﬂow to the system in
+which personal data is
+transferred.
+
+The system processes
+incoming personal data
+and shares this with
+external entities.
+
+The system has a data
+store.
+
+There are outbound
+ﬂows of personal data
+from the system to
+external entities (e.g.,
+third parties).
+
+UNAWARENESS AND
+UNINTERVENABILITY
+
+What?
+Unawareness and unintervenability threats occur when
+individuals are insuﬃciently informed, involved, or empowered
+with respect to the processing of their personal data.
+
+Tell me more!
+These threats may arise when there is (1) insuﬃcient transparency
+(individuals are not aware of the collection or processing of their
+personal data or the personal data of others), (2) insuﬃcient
+feedback (individuals are insuﬃciently informed about the privacy
+impact they may cause to others by using the system), and (3)
+insuﬃcient intervenability (individuals cannot access or manage
+their personal data).
+
+So what?
+Unawaress and unintervenability are problematic because
+individuals are not informed about the potential implications of
+sharing personal data and cannot access or manage, withdraw,
+correct, or limit the processing.
+
+LINDDUN
+
+Hotspots
+
+Inbound user with
+personal data
+
+P
+
+(cid:211)(cid:160)
+
+Inbound personal data
+
+P
+
+(cid:211)
+
+Inbound user
+
+(cid:211)(cid:160)
+
+Storing
+
+ı
+
+Retrieving
+
+ı
+
+There is an inbound ﬂow
+from the user to the
+system in which personal
+data is transferred.
+
+There is an inbound
+ﬂow to the system in
+which personal data is
+transferred.
+
+There is an inbound ﬂow
+from the user to the
+system.
+
+The system stores
+incoming data.
+
+The system responds to
+data requests.
+
+NON-COMPLIANCE
+
+What?
+Non-compliance threats arise when the system deviates from
+legislation, regulation, or standards and best practices, leading
+to the incomplete management of risk.
+
+Tell me more!
+When addressing potential privacy issues, also consider regulatory
+compliance, data lifecycle management, and cybersecurity risk.
+Pay speciﬁc attention to cases in which these aspects lead to
+privacy problems.
+
+So what?
+Violation of regulatory compliance obligations can lead to severe
+ﬁnes for the organization.
+
+LINDDUN
+
+Hotspots
+
+Processing personal data
+
+P
+
+P
+
+(cid:211)
+
+Processing
+
+(cid:211)
+
+The system processes
+incoming personal data
+and shares this with
+external entities.
+
+The system processes
+incoming data and
+provides this to another
+entity.
+
+LINKED USER REQUESTS
+
+Hotspot
+
+INBOUND USER WITH
+
+PERSONAL DATA
+
+P
+
+(cid:211)(cid:160)
+
+Threat Source
+
+ORGANIZATIONAL,
+
+EXTERNAL
+
+User requests can be linked because
+they contain a unique identiﬁer.
+
+? Is there an identiﬁer (unique in system/session) or dataset?
+? Is there other data associated with that identiﬁer?
+? Is there previous data with the same identiﬁer to which new data can
+
+be linked?
+
+(cid:17) Using an email address as an identiﬁer enables the linking of all
+activities to the same individual, even across multiple services.
+
+(cid:17) An IP address can be used to link multiple visits to the same individual.
+(cid:17) All product views in a web shop are linked to the same user because
+
+they are logged in.
+
+. Unique identiﬁers facilitate the
+linking of new data items to a
+user proﬁle, accumulating growing
+amounts of personal data associated
+with this proﬁle. This can later lead
+to ‘Identifying’ threats.
+
+(cid:242) Linking is especially easy
+for authenticated users,
+as all requests in the
+same session are linked.
+
+L1
+
+LINDDUN
+
+LINDDUN
+
+GO
+
+LINKABLE USER REQUESTS
+
+Hotspot
+
+INBOUND PERSONAL
+
+DATA
+
+P
+
+(cid:211)
+
+Threat Source
+
+ORGANIZATIONAL,
+
+EXTERNAL
+
+User requests can be linked because
+they contain attributes that can
+be combined into quasi-identiﬁers.
+
+? Is there a set of attributes that can serve as an identiﬁer?
+? Is there other data sent together with that quasi-identiﬁer?
+? Is there existing data to link it to?
+
+(cid:17) A small set of locations can be used to uniquely link activity to a single
+
+user.
+
+(cid:17) A subset of attributes may be suﬃcient to uniquely link data to a
+
+particular individual.
+
+(cid:17) A browser ﬁngerprint combines properties (OS, browser, display size,
+
+. . . ) that together are unique to a website visitor.
+
+. The use of quasi-identiﬁers enables
+the linking of new data items to a
+user proﬁle to gather increasing
+amounts of personal data, even
+without unique identiﬁers.
+
+(cid:242) Many requests contain
+
+a lot of different
+properties that, when
+combined, are unique to
+an individual.
+
+L2
+
+LINDDUN
+
+LINDDUN
+
+GO
+
+LINKING THROUGH
+DISTINGUISHABLE PATTERNS
+
+Hotspot
+
+INBOUND USER
+
+(cid:211)(cid:160)
+
+Threat Source
+
+ORGANIZATIONAL,
+
+EXTERNAL
+
+Patterns in the (meta)data
+contained in user requests can be
+used to link them to each other.
+
+? Is the data from different individuals distinguishable?
+? Is it possible to query data using distinguishable attributes?
+
+(cid:17) Unique timing patterns could be recognized to link the use of a service
+
+to the same user.
+
+(cid:17) Messages can be analyzed for patterns (e.g., writing style, timing) to link
+
+them to the same user.
+
+. When users are distinguishable
+
+(cid:242) Even data without
+
+from one another, user proﬁles can
+be constructed to collect growing
+amounts of personal data associated
+with each proﬁle. This can later lead
+to ‘Identifying’ threats.
+
+clear attributes could
+contain patterns to allow
+distinguishing between
+different individuals.
+
+L3
+
+LINDDUN
+
+LINDDUN
+
+GO
+
+LINKABLE DATASET
+
+Hotspot
+
+STORING/RETRIEVING
+
+ı
+
+Threat Source
+
+ORGANIZATIONAL,
+
+EXTERNAL
+
+Stored personal data can
+be linked to individuals.
+
+? Is there a set of attributes that can serve as an identiﬁer?
+? Is there other data sent together with that quasi-identiﬁer?
+? Is there existing data to link it to?
+
+(cid:17) Fine-grained raw data is stored that enables linking speciﬁc entries to
+
+individuals.
+
+(cid:17) Querying the average salary with a strict set of criteria can reveal the
+
+salary of an individual employee.
+
+(cid:17) Patterns in a person’s writing style can be used to link multiple texts
+
+written by the same person.
+
+. The use of quasi-identiﬁers enables
+the linking of new data items to a
+user proﬁle to gather increasing
+amounts of personal data, even
+without unique identiﬁers.
+
+(cid:242) Many requests contain
+
+a lot of different
+properties that, when
+combined, are unique to
+an individual.
+
+L4
+
+LINDDUN
+
+LINDDUN
+
+GO
+
+PROFILING USERS
+
+Hotspot
+
+PROCESSING
+
+(cid:211)
+
+Threat Source
+
+ORGANIZATIONAL,
+
+EXTERNAL
+
+Users can be proﬁled by
+analyzing their data for patterns.
+
+? Are there patterns derivable from the data?
+? Can (new) personal data be inferred from the linked data points?
+
+(cid:17) By applying sentiment analysis to faces in pictures, the emotional state
+
+of an individual can be derived.
+
+(cid:17) The frequency of data exchanges from a health monitoring device
+
+allows an adversary to infer a patient’s medical condition.
+
+. Deriving patterns from the data can
+facilitate the linking of data that was
+not intended to be linked.
+
+. Timing patterns of messages can be
+used to link requests to construct
+proﬁles.
+
+(cid:242) The more data is
+
+collected and the more
+detailed it is, the easier
+it can become to discern
+patterns for linking.
+
+L5
+
+LINDDUN
+
+LINDDUN
+
+GO
+
+IDENTIFIED USER REQUESTS
+
+Hotspot
+
+INBOUND USER WITH
+
+PERSONAL DATA
+
+P
+
+(cid:211)(cid:160)
+
+Threat Source
+
+ORGANIZATIONAL
+
+The incoming user requests contain data
+that directly reveals the user identity.
+
+? Does data sent to the system (potentially) contain identity data?
+
+(cid:17) An online service requests full name and address during the registration
+
+process.
+
+(cid:17) The username for a service contains identity data (e.g.,
+
+“ﬁrstname.lastname”).
+
+. Identiﬁed data can severely amplify
+the impact of a future data breach.
+
+. Depending on the context, the
+
+identity may reveal very sensitive
+attributes (e.g., health records).
+
+(cid:242) Users often need to
+
+provide identiﬁed data
+even when not essential
+for the functionality.
+(cid:242) Identiﬁed data requires
+
+stronger security
+measures.
+
+I1
+
+LINDDUN
+
+LINDDUN
+
+GO
+
+IDENTIFIABLE USER REQUESTS
+
+Hotspot
+
+Threat Source
+
+INBOUND USER
+
+(cid:211)(cid:160)
+
+ORGANIZATIONAL
+
+The user can be identiﬁed because
+the data in their requests can
+be used to infer who they are.
+
+? Are requests or records suﬃciently unique to differentiate them from
+
+those of a speciﬁc individual?
+
+(cid:17) User search queries, such as looking up nearby businesses or
+
+info about a rare illness, can be highly speciﬁc and may lead to
+identiﬁcation.
+
+(cid:17) A person’s consistent access at a particular time each week could link
+
+their visits even when they are not logged into their account.
+
+. Even without identity information,
+user actions or data may be very
+speciﬁc and unintentionally reveal
+the identity.
+
+(cid:242) The likelihood depends
+on how distinguishable
+an individual is from
+others.
+
+I2
+
+LINDDUN
+
+LINDDUN
+
+GO
+
+IDENTIFIABLE DATA FLOWS
+
+Hotspot
+
+INBOUND PERSONAL
+
+DATA
+
+P
+
+(cid:211)
+
+Threat Source
+
+ORGANIZATIONAL
+
+Data sent to the system is suﬃciently
+revealing to identify the user.
+
+? Is there free-form user provided data that is received or processed by
+
+the system?
+
+? Is data collected that may reveal the identifying information?
+
+(cid:17) When an individual shares detailed data (such as location, employer,
+
+device type, etc.) in a feedback form, the provided information may be
+revealing enough to uniquely identify that person.
+
+. Inadvertently providing identiﬁable
+attributes in user-submitted data
+can lead to the unintentional
+identiﬁcation of the individual.
+
+(cid:242) The data subject is not
+
+necessarily the source of
+the provided data.
+
+I3
+
+LINDDUN
+
+LINDDUN
+
+GO
+
+IDENTIFIERS IN DATA REQUESTS
+
+Hotspot
+
+INBOUND USER WITH
+
+PERSONAL DATA
+
+P
+
+(cid:211)(cid:160)
+
+Threat Source
+
+ORGANIZATIONAL,
+
+EXTERNAL
+
+Communication contains (quasi-)identiﬁers.
+
+? Is there a distinctive identiﬁer used during interactions or when
+
+referring to an individual’s data?
+
+? Can multiple attributes be combined to create a unique reference to an
+
+individual or their data?
+
+(cid:17) The (re)use of an email address facilitates easy combination with other
+
+data, leading to the identiﬁcation of the individual.
+
+(cid:17) IP addresses in communication can be used to uniquely identify an
+
+individual.
+
+(cid:17) Browser ﬁngerprinting entails the combination of various properties to
+
+create a unique identiﬁer, serving as a pseudonym for the user.
+
+. Pseudonyms facilitate the
+
+aggregation of data on the same
+individual (see linking). Storing a
+substantial amount of data increases
+the possibility of identifying the
+individual behind it.
+
+(cid:242) Identifying individuals
+through identiﬁers
+is easy when these
+identiﬁers are reused
+across multiple services
+or in publicly available
+data.
+
+I4
+
+LINDDUN
+
+LINDDUN
+
+GO
+
+IDENTIFIABLE DATASET
+
+Hotspot
+
+STORAGE
+
+ı
+
+Threat Source
+
+ORGANIZATIONAL,
+
+EXTERNAL
+
+Stored data can be used to identify individuals.
+
+? Can multiple attributes be combined to create a unique reference to an
+
+individual or their data?
+
+? Is there a distinctive identiﬁer used during interactions or when
+
+referring to an individual’s data?
+
+(cid:17) A dataset removes names and reduces addresses to cities.
+
+Nevertheless, a combination of various attributes (city, birth date,
+language preference, etc.) could still be adequate to identify individuals.
+
+. Pseudonyms facilitate the
+
+aggregation of data on the same
+individual (see linking). Storing a
+substantial amount of data increases
+the possibility of identifying the
+individual behind it.
+
+(cid:242) Identifying individuals
+through identiﬁers
+is easy when these
+identiﬁers are reused
+across multiple services
+or in publicly available
+data.
+
+I5
+
+LINDDUN
+
+LINDDUN
+
+GO
+
+NON-REPUDIATION
+OF SERVICE USAGE
+Hotspot
+
+Threat Source
+
+IN/OUTBOUND USER
+
+(cid:211)(cid:160)
+
+ORGANIZATIONAL,
+
+EXTERNAL
+
+Users cannot deny having used a service
+because of authentication or logged access.
+
+? Does the system record data affecting deniability?
+? Does the data itself impact deniability claims?
+
+(cid:17) An account with a corporate email address eliminates the employee’s
+
+deniability of having used that service.
+
+(cid:17) System administrators can access log ﬁles linking an entry in an internal
+
+complaint system to the individual employee.
+
+. Identity information can magnify the
+
+impact.
+
+. Depending on the context (e.g.,
+medical, whistleblower), this can
+have a large impact on the data
+subject.
+
+(cid:242) If deniability is required,
+do not store the data
+at all or remove any
+attributable data.
+(cid:242) Avoid credentials with
+identity information.
+
+Nr1
+
+LINDDUN
+
+LINDDUN
+
+GO
+
+NON-REPUDIATION OF SENDING
+
+Hotspot
+
+Threat Source
+
+INBOUND USER
+
+(cid:211)(cid:160)
+
+ORGANIZATIONAL
+
+Users cannot deny having sent a message.
+
+? Is the data digitally signed?
+? Which keys are used for signing? Who has access to these keys to verify
+
+signatures?
+
+(cid:17) A digitally signed email prevents the user from later denying having
+
+written the message.
+
+(cid:17) A common spam countermeasure (DKIM) involves signing outgoing
+
+emails, this prevents users from denying the authenticity of leaked or
+stolen emails.
+
+. Signatures provide strong non-
+repudiation, as they can also be
+veriﬁed by third parties.
+
+. Append-only storage systems make
+it impossible for the data subject to
+later remove their personal data.
+
+(cid:242) Signed data applies
+
+not only to messages,
+but also to documents,
+requests, etc.
+
+Nr2
+
+LINDDUN
+
+LINDDUN
+
+GO
+
+NON-REPUDIATION OF RECEIPT
+
+Hotspot
+
+Threat Source
+
+OUTBOUND USER
+
+(cid:211) (cid:160)
+
+ORGANIZATIONAL
+
+Users cannot deny having received a message.
+
+? Do (passive) interactions with the system (e.g., receiving a message)
+
+have side-effects (e.g., trigger transmissions, logging)?
+? Is deniability of receipt a desired feature for the system?
+
+(cid:17) Read notiﬁcations serve as evidence that the user has opened/read the
+
+message.
+
+(cid:17) An individual’s browser history may be used to substantiate claims
+
+about their online activities.
+
+(cid:17) Actions can be logged as evidence.
+
+. Some actions may trigger side-
+
+(cid:242) These side-effects
+
+effects that impact deniability claims
+regarding those actions.
+
+often happen implicitly
+or without user
+intervention.
+
+Nr3
+
+LINDDUN
+
+LINDDUN
+
+GO
+
+NON-REPUDIATION OF STORAGE
+
+Hotspot
+
+Threat Source
+
+STORAGE
+
+ı
+
+ORGANIZATIONAL
+
+Users cannot deny claims about data
+stored in non-repudiable storage.
+
+? Is the data digitally signed?
+? Which keys are used for signing? Who has access to these keys to verify
+
+signatures?
+
+(cid:17) Data stored on a blockchain cannot be modiﬁed, eliminating the
+
+deniability of claims related to this data.
+
+. Signatures provide strong non-
+repudiation, as they can also be
+veriﬁed by third parties.
+
+. Append-only storage systems make
+it impossible for the data subject to
+later remove their personal data.
+
+(cid:242) Signed data applies
+
+not only to messages,
+but also to documents,
+requests, etc.
+
+Nr4
+
+LINDDUN
+
+LINDDUN
+
+GO
+
+NON-REPUDIATION OF
+HIDDEN DATA OR METADATA
+
+Hotspot
+
+Threat Source
+
+PROCESSING
+
+(cid:211)
+
+ORGANIZATIONAL
+
+Hidden or metadata in a document prevent
+users from denying claims associated with it.
+
+? Does stored or transmitted data have associated metadata?
+? Are there embedded data or hidden patterns in the data or
+
+transmissions?
+
+? Does this data lead to undesirable deniability issues?
+
+(cid:17) Author or revision metadata in documents prevents deniability.
+(cid:17) Data watermarked with hidden artifacts (uniquely linked to a person)
+can be used to track the person revealing or disclosing the data
+afterwards.
+
+(cid:17) Remote resources (e.g. image in email) are automatically loaded to track
+
+the user opening it.
+
+. The unintentional inclusion of
+
+(cid:242) This is also used as an
+
+metadata with data or transmissions
+may impact deniability claims.
+
+. Hidden/embedded data can prevent
+a user from denying claims about
+the data.
+
+explicit countermeasure
+to prevent people from
+sharing data.
+
+Nr5
+
+LINDDUN
+
+LINDDUN
+
+GO
+
+DETECTABLE USERS
+
+Hotspot
+
+Threat Source
+
+OUTBOUND FLOWS
+
+(cid:211)
+
+EXTERNAL
+
+Inferring the existence of a user
+from the system’s response.
+
+? Does the system show status messages (informational, warnings, errors)
+
+when retrieving data?
+
+? Are the status messages distinct when an item (a ﬁle, user, . . . ) does not
+
+exist compared to not having access rights?
+
+(cid:17) A ‘wrong password’ error message reveals the existence of the account.
+(cid:17) A ﬁrewall responding with ‘port closed’ reveals the existence of a device
+
+at the IP address.
+
+. Being able to detect the existence
+of certain items can be a stepping
+stone to security threats.
+
+. Simply knowing the existence of data
+may be suﬃcient to infer sensitive
+information.
+
+(cid:242) Prevent information
+
+leakage by not revealing
+the existence of items in
+system responses.
+
+D1
+
+LINDDUN
+
+LINDDUN
+
+GO
+
+DETECTABLE SERVICE USAGE
+
+Hotspot
+
+Threat Source
+
+IN/OUTBOUND USER
+
+(cid:211)(cid:160)
+
+EXTERNAL
+
+Detecting communication
+between a service and its users.
+
+? Can the communication be observed?
+? Can information be inferred from the observed communications?
+
+(cid:17) Observing communication with a service to infer that a person is a user
+
+(e.g., adult website).
+
+(cid:17) Communication with a telemedicine service implies the user is a patient.
+(cid:17) Participation in the Tor network can be determined by observing traﬃc.
+
+. In sensitive contexts (medical,
+
+(cid:242) Services like Tor conceal
+
+whistleblower) detecting service
+usage may have a severe impact on
+the user.
+
+the destination but the
+utilization of Tor can still
+be detected.
+
+D2
+
+LINDDUN
+
+LINDDUN
+
+GO
+
+ETECTABLE EVENTS
+
+Hotspot
+
+Threat Source
+
+IN/OUTBOUND FLOWS
+
+(cid:211)
+
+EXTERNAL
+
+Detecting side effects or communications
+triggered by application events.
+
+? Do actions in the system have side effects (e.g., saving a ﬁle, writing to a
+
+log, triggering other transmissions)?
+
+? Are these side effects observable?
+
+(cid:17) Log ﬁles on a shared system reveal applications used or actions taken
+
+by other users.
+
+(cid:17) Deleted applications may leave behind traces (conﬁguration, temporary
+
+ﬁles).
+
+(cid:17) When steganography is used to hide data, the increased ﬁle size may
+
+still indicate the existence of that hidden data.
+
+. Sensitive information may be
+
+deduced from observed side effects,
+such as communication.
+
+(cid:242) Dummy traﬃc can be
+used to conceal actual
+events.
+
+D3
+
+LINDDUN
+
+LINDDUN
+
+GO
+
+DETECTABLE RECORDS
+
+Hotspot
+
+Threat Source
+
+RETRIEVING
+
+ı
+
+EXTERNAL
+
+Detecting the existence of records in a system.
+
+? Does the system show status messages (informational, warnings, errors)
+
+when retrieving data?
+
+? Are the status messages distinct when an item (a ﬁle, user, . . . ) does not
+
+exist compared to not having access rights?
+
+(cid:17) An error message stating ‘insuﬃcient access rights’ may inadvertently
+
+leak the existence of a speciﬁc record.
+
+(cid:17) An error message stating ‘address already registered’ when subscribing
+
+to a political newsletter reveals a current member.
+
+. Being able to detect the existence
+of certain items can be a stepping
+stone to security threats.
+
+. Simply knowing the existence of data
+may be suﬃcient to infer sensitive
+information.
+
+(cid:242) Prevent information
+
+leakage by not revealing
+the existence of items in
+system responses.
+
+D4
+
+LINDDUN
+
+LINDDUN
+
+GO
+
+EXCESSIVELY SENSITIVE
+DATA COLLECTED
+Hotspot
+
+Threat Source
+
+INBOUND PERSONAL
+
+DATA
+
+P
+
+(cid:211)
+
+ORGANIZATIONAL
+
+The system acquires more sensitive
+or ﬁnegrained data than strictly
+necessary for its functionality.
+
+? Is the data more sensitive than strictly necessary?
+? Is the data more ﬁne-grained than strictly necessary?
+? Does the data encoding include additional (meta)data?
+
+(cid:17) Tracking a patient’s weight is pertinent for dieting apps but not for a
+
+contact tracing application.
+
+(cid:17) A smart meter shares realtime measurements rather than the
+
+aggregated consumption.
+
+(cid:17) A camera application on a smartphone does not necessarily need to
+
+record the picture’s location.
+
+. Processing excessively sensitive data
+ampliﬁes the impact of a potential
+data breach, thereby increasing
+the consequences for the affected
+individuals.
+
+(cid:242) When designing
+
+the system, assess
+whether all the data is
+genuinely necessary for
+providing the system’s
+functionality.
+
+DD1
+
+LINDDUN
+
+LINDDUN
+
+GO
+
+EXCESSIVE AMOUNT
+OF DATA COLLECTED
+Hotspot
+
+Threat Source
+
+INBOUND PERSONAL
+
+DATA
+
+P
+
+(cid:211)
+
+ORGANIZATIONAL
+
+The system acquires more data than
+strictly needed for its functionality.
+
+? Is the amount of collected data necessary for the correct functioning of
+
+the system?
+
+? Is the processing frequency necessary?
+? Are there more data subjects involved than necessary?
+
+(cid:17) A generic service that is not age-restricted should not request a user’s
+
+age.
+
+(cid:17) Recording patient weight on a weekly or monthly basis may suﬃce;
+
+collecting such information every half hour is unnecessary.
+
+(cid:17) Posts on social networks frequently include personal data about other
+
+individuals.
+
+. Regular data collection results in an
+increased dataset, potentially giving
+rise to additional privacy threats,
+such as data mining for patterns.
+
+(cid:242) Evaluate whether
+
+regular data collection
+is necessary for the
+system’s functionality.
+
+DD2
+
+LINDDUN
+
+LINDDUN
+
+GO
+
+UNNECESSARY DATA ANALYSIS
+
+Hotspot
+
+PROCESSING PERSONAL
+
+P
+
+DATA
+
+P
+
+(cid:211)
+
+Threat Source
+
+ORGANIZATIONAL
+
+Data is further processed, analyzed,
+or enriched in a way that is not
+strictly necessary for the functionality.
+
+? Is the data enrichment/analysis necessary for the system’s functionality?
+
+(cid:17) A camera application on a smartphone does not need to perform
+
+face-based recognition or emotion detection.
+
+(cid:17) Analyzing a user’s blog posts for language proﬁciency is unnecessary for
+
+blogging functionality.
+
+(cid:17) User proﬁles accumulate unnecessary details over time, tracking a
+broad range of actions or service usage that is not essential for the
+provided functionality.
+
+. Processing the data can be used
+to learn additional sensitive
+information.
+
+(cid:242) Evaluate which
+
+types of personal
+data processing
+are necessary for
+providing the system’s
+functionality.
+
+DD3
+
+LINDDUN
+
+LINDDUN
+
+GO
+
+UNNECESSARY DATA RETENTION
+
+Hotspot
+
+Threat Source
+
+STORAGE
+
+ı
+
+ORGANIZATIONAL
+
+Data is stored for longer than needed.
+
+? Is the data stored for longer time than necessary?
+
+(cid:17) Retaining the email addresses of newsletter subscribers long after they
+
+have unsubscribed.
+
+. Storing data longer than needed
+serves no further purpose and
+increases the impact of a data
+breach.
+
+(cid:242) Evaluate your storage
+policies. Consider how
+long you store personal
+data and whether
+you have a process to
+remove data you no
+longer need.
+
+DD4
+
+LINDDUN
+
+LINDDUN
+
+GO
+
+OVEREXPOSURE OF
+PERSONAL DATA
+
+Hotspot
+
+OUTBOUND PERSONAL
+
+DATA
+
+p
+
+(cid:211)
+
+Threat Source
+
+ORGANIZATIONAL,
+
+EXTERNAL
+
+Personal data is shared with more services
+or external parties than necessary.
+
+? Is the data necessary for the recipient?
+? Are there more parties involved than necessary?
+? How accessible is the data (public/limited/private)?
+
+(cid:17) Location data from a navigation application is propagated to all the
+
+other applications (e.g., calendar, mail).
+
+(cid:17) Personal data is disclosed to other users of the service.
+(cid:17) In a medical application, while collecting patient weight data is
+
+deemed necessary, making such datasets publicly available would
+be unnecessary and harmful.
+
+. Overexposure of personal data may
+lead to unintended consequences,
+as others could reuse the data for
+unforeseen purposes.
+
+(cid:242) Carefully assess the
+necessity of sharing
+personal data and
+ensure that the involved
+parties genuinely
+require access to that
+data.
+
+DD5
+
+LINDDUN
+
+LINDDUN
+
+GO
+
+INSUFFICIENT TRANSPARENCY
+
+Hotspot
+
+INBOUND USER WITH
+
+PERSONAL DATA
+
+P
+
+(cid:211)(cid:160)
+
+Threat Source
+
+ORGANIZATIONAL
+
+Data subjects are insuﬃciently
+informed about the collection and
+processing of their personal data.
+
+? Are data subjects insuﬃciently informed about the processing of
+
+personal data, including the purposes and methods of the processing
+involved?
+
+(cid:17) Data subjects are not aware of the identities of the third parties with
+
+whom their data will be shared.
+
+(cid:17) The privacy notice provided to the data subject was not presented in
+
+clear and plain language.
+
+(cid:17) Data subjects are unaware that traﬃc cameras collect not only number
+
+plates but also facial images.
+
+. Insuﬃcient transparency may lead
+
+to data subjects being unaware that
+their personal data is utilized for
+certain purposes, especially if those
+purposes are different from what
+was initially indicated.
+
+(cid:242) Data subjects must also
+be informed on any
+‘indirect’ data collection,
+i.e. from third parties.
+
+U1
+
+LINDDUN
+
+LINDDUN
+
+GO
+
+INSUFFICIENT INFORMATION
+WHEN SHARING DATA OF OTHERS
+
+Hotspot
+
+INBOUND PERSONAL
+
+DATA
+
+P
+
+(cid:211)
+
+Threat Source
+
+ORGANIZATIONAL
+
+When sharing personal data of others,
+users are insuﬃciently informed
+about the further data processing.
+
+? If a user shares personal data of others, is it clear what, why, and how
+
+that data is further processed?
+
+(cid:17) A user posting a picture on social media may not be aware that others
+in the picture are automatically tagged with a facial recognition system.
+
+(cid:17) Using a DNA testing service can entail sharing medical information
+
+about family members.
+
+(cid:17) A service invites a user to share their address book to ﬁnd contacts on
+
+a service.
+
+. Users may not realize that they are
+
+unintentionally sharing personal data
+belonging to other individuals.
+
+(cid:242) While users are often
+informed about the
+consequences of sharing
+their own data, systems
+rarely inform them
+about the impact of
+sharing data of others.
+
+U2
+
+LINDDUN
+
+LINDDUN
+
+GO
+
+INSUFFICIENT PRIVACY CONTROLS
+
+Hotspot
+
+Threat Source
+
+INBOUND USER
+
+(cid:211)(cid:160)
+
+ORGANIZATIONAL
+
+Data subjects have insuﬃcient
+controls to manage their preferences.
+
+? Does the system enable the data subject to conﬁgure which personal
+
+data is processed and for what purposes?
+
+? Can the data subject alter their preferences afterwards?
+
+(cid:17) The data subject is unable to set appropriate preferences on which data
+
+is shared and why.
+
+(cid:17) The data subject is unable to set their consent preferences for the
+
+processing of personal data.
+
+. Appropriate control mechanisms
+
+(cid:242) Privacy-friendly settings
+
+are required to record data subject
+preferences and keep track of how
+the data may be further processed.
+
+should be the default.
+
+(cid:242) Nudging can raise
+
+awareness and induce
+more privacy-preserving
+behavior.
+
+U3
+
+LINDDUN
+
+LINDDUN
+
+GO
+
+INSUFFICIENT ACCESS
+
+Hotspot
+
+Threat Source
+
+STORING
+
+ı
+
+ORGANIZATIONAL
+
+Data subjects do not have
+access to their personal data.
+
+? Do data subjects lack the ability to access the personal data being
+
+collected, processed, stored, or disclosed about them?
+
+(cid:17) It is not possible for a data subject to request access, neither directly
+
+through the system nor indirectly through a helpdesk.
+
+(cid:17) The sensor data from a wearable is transmitted to a lifestyle tracking
+
+app, but the user cannot access statistics and information derived from
+their data.
+
+. Lack of access may violate the legal
+
+rights of data subjects.
+
+(cid:242) The right to access is
+not always absolute.
+Limitations may exist
+depending on applicable
+laws (e.g., trade secrets,
+rights of other data
+subjects).
+
+U4
+
+LINDDUN
+
+LINDDUN
+
+GO
+
+INSUFFICIENT
+RECTIFICATION OR ERASURE
+
+Hotspot
+
+Threat Source
+
+RETRIEVING
+
+ı
+
+ORGANIZATIONAL
+
+Data subjects cannot rectify
+or erase their personal data.
+
+? Do data subjects have the ability to correct or delete their personal
+
+data?
+
+(cid:17) The data subject is unable to correct their personal data.
+(cid:17) When a data subject deletes their social media account, the account is
+
+disabled, but the actual data is not erased.
+
+(cid:17) A data subject is unable to update their home address after relocating.
+
+. Data subjects have the right to
+
+rectify incorrect personal data or
+request the removal of data that is
+no longer relevant or needed.
+
+(cid:242) Rectiﬁcation or erasure
+can also be performed
+indirectly (e.g., through a
+customer service ticket).
+
+U5
+
+LINDDUN
+
+LINDDUN
+
+GO
+
+NON-COMPLIANCE OF PROCESSING
+WITH APPLICABLE REGULATIONS
+
+Hotspot
+
+PROCESSING PERSONAL
+
+P
+
+DATA
+
+P
+
+(cid:211)
+
+Threat Source
+
+ORGANIZATIONAL
+
+The processing of personal data
+by the system is not compliant
+with applicable privacy regulations.
+
+? Will the system be used in jurisdictions with speciﬁc rules for personal
+
+data processing (e.g., the EU)?
+
+? Does the system, or its processing activities, violate one or more rules
+
+in these applicable regulation(s)?
+
+(cid:17) The system processes information of EU citizens without a valid legal
+
+ground under GDPR.
+
+(cid:17) The system shares user information with third parties, violating ’Do Not
+
+Sell My Data’ rights under the CCPA.
+
+. Non-compliance with local
+
+regulations may lead to hefty ﬁnes
+or other sanctions.
+
+. High-proﬁle complaint cases or
+
+lawsuits may lead to negative media
+exposure and reputational damage.
+
+(cid:242) Before processing any
+personal data, perform
+an assessment on the
+applicable regulations
+for your processing
+activities and system.
+
+Nc1
+
+LINDDUN
+
+LINDDUN
+
+GO
+
+NON-ADHERENCE TO
+PRIVACY STANDARDS
+
+Hotspot
+
+PROCESSING PERSONAL
+
+P
+
+DATA
+
+P
+
+(cid:211)
+
+Threat Source
+
+ORGANIZATIONAL
+
+The system is not compliant with
+privacy standards and best practices.
+
+? Are there any (industry) speciﬁc privacy standards that are applicable to
+
+the system?
+
+? Does the system adequately implement the principles and controls
+
+outlined in these standards?
+
+(cid:17) The system does not adhere to the best practices and principles
+
+outlined in the relevant ISO norms on data protection and privacy-
+by-design.
+
+(cid:17) Privacy risks are not classiﬁed and managed using a standardized
+
+methodology such as the NIST Privacy Framework.
+
+. Non-adherence to industry
+
+standards and best practices makes
+it more diﬃcult to demonstrate
+compliance with applicable laws.
+
+(cid:242) Check whether there
+is industry-speciﬁc
+guidance on data
+processing for your
+sector (e.g., healthcare,
+manufacturing).
+
+Nc2
+
+LINDDUN
+
+LINDDUN
+
+GO
+
+IMPROPER DATA
+LIFECYCLE MANAGEMENT
+
+Hotspot
+
+Threat Source
+
+PROCESSING
+
+(cid:211)
+
+ORGANIZATIONAL
+
+Data is not properly managed throughout
+its entire lifecycle within the system.
+
+? Is there a data lifecycle management policy deﬁned for the data
+
+processed within the system?
+
+? Does the policy outline clear principles for each phase of the
+
+data lifecycle (creation, storage, sharing and usage, archival, and
+destruction)?
+
+(cid:17) There is no clear policy or mechanism to enforce deletion of data that is
+
+no longer needed.
+
+(cid:17) The organizational roles and responsibilities surrounding data
+
+management in the system are not suﬃciently deﬁned.
+
+. Inadequate or nonexistent data
+
+(cid:242) Data lifecycle
+
+lifecycle management can result in
+a loss of overview of the data within
+the system and its maintenance,
+posing concerns not only for privacy
+and data protection but also security
+and availability.
+
+management is a
+continuous process that
+must be consistently
+carried out as long as
+the system is designed,
+developed, and used.
+
+Nc3
+
+LINDDUN
+
+LINDDUN
+
+GO
+
+INSUFFICIENT SECURITY
+OF PROCESSING
+
+Hotspot
+
+PROCESSING
+
+(cid:211)
+
+Threat Source
+
+ORGANIZATIONAL,
+
+EXTERNAL
+
+Data security measures and processes
+do not adhere to risk and security
+management best practices and standards.
+
+? Is there an established process to manage security risks and identify the
+
+required countermeasures?
+
+? Does the system incorporate the required countermeasures?
+? Are the countermeasures aligned with industry standards and best
+
+practices?
+
+(cid:17) No security assessment was performed of the software.
+(cid:17) There are no processes in place to ensure software and services are
+
+kept up to date.
+
+(cid:17) The organization does not use appropriate access control mechanisms
+
+to limit access of employees to personal data.
+
+. The security of the system plays
+a crucial role in safeguarding the
+privacy of individuals whose data is
+processed. Personal data breaches
+can result in signiﬁcant ﬁnes and
+reputational damage.
+
+(cid:242) Consider
+
+complementary
+methods like security
+threat modeling.
+(cid:242) Consider adhering
+
+to standards such as
+ISO27001 or the CIS
+Security Controls.
+
+Nc4
+
+LINDDUN
+
+LINDDUN
+
+GO
+
+
