@@ -70,7 +70,7 @@ st.set_page_config(
     page_title="LINDDUN GPT",
     page_icon=":shield:",
     layout="wide",
-    initial_sidebar_state="expanded",
+    initial_sidebar_state="collapsed",
 )
 
 # ------------------ Sidebar ------------------ #
@@ -374,6 +374,7 @@ description, the more accurate the threat model will be.
             label="How can the user act on the data collected by the application?",
             value=st.session_state["input"]["data_policy"],
             help="Please describe the data policy of the application, including how users can access, modify, or delete their data. If possible, specify the data retention policy and how data is handled after account deletion.",
+            placeholder="Enter the data policy details..."
         )
         if data_policy != st.session_state["input"]["data_policy"]:
             st.session_state["input"]["data_policy"] = data_policy
@@ -411,12 +412,51 @@ description, the more accurate the threat model will be.
     database = None if not has_database else database
     if database != st.session_state["input"]["database"]:
         st.session_state["input"]["database"] = database
+
         
 with tab2:
     st.markdown("""
 In this section, you can create a Data Flow Diagram (DFD) to visualize the flow of data within your application. Use the editor below to create a DFD for your application.
 """)
     st.markdown("""---""")
+    col1, col2 = st.columns([1,1])
+    if "dfd" not in st.session_state:
+        st.session_state["dfd"] = []
+    if "graph" not in st.session_state:
+        st.session_state["graph"] = graphviz.Digraph()
+    with col1:
+        if st.button("Update"):
+            graph = graphviz.Digraph()
+            graph.attr(
+                bgcolor=f"{st.get_option("theme.backgroundColor")}",
+            )
+            graph.node_attr.update(
+                color=f"{st.get_option("theme.primaryColor")}",
+                style="filled",
+                fillcolor="white",
+                fontcolor="black",
+            )
+            for object in st.session_state["dfd"]:
+                graph.edge(object["from"], object["to"], _attributes={"color": "white"})
+            st.session_state["graph"] = graph
+        st.graphviz_chart(st.session_state["graph"])
+
+    with col2:
+        edges = st.data_editor(
+            data=[
+                {"from": "User", "typefrom": "Entity", "to": "Application", "typeto": "Process"}
+            ],
+            column_config={
+                "from": st.column_config.TextColumn("From", help="The starting point of the edge.", width="medium", required=True),
+                "typefrom": st.column_config.SelectboxColumn("Type", help="The type of the starting element", width="medium", required=True, options=["Entity", "Data stores", "Processes"]),
+                "to": st.column_config.TextColumn("To", help="The destination of the edge.", width="medium", required=True),
+                "typeto": st.column_config.SelectboxColumn("Type", help="The type of the destination element", width="medium", required=True, options=["Entity", "Data stores", "Processes"]),
+            },
+            num_rows="dynamic",
+        )
+        if edges != st.session_state["dfd"]:
+            st.session_state["dfd"] = edges
+        
 
 
 
