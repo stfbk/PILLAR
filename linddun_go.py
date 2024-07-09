@@ -38,7 +38,7 @@ def questions_threats(questions_file="questions.txt", threats_file="threats.txt"
 
 
 
-def get_linddun_go(api_key, model_name, app_type, authentication, internet_facing, sensitive_data, app_input):
+def get_linddun_go(api_key, model_name, inputs):
     client = OpenAI(api_key=api_key)
     questions_threats_list = questions_threats()
     present_threats = []
@@ -69,11 +69,24 @@ The input is enclosed in triple quotes.
 Example input format:
 
 '''
-APPLICATION TYPE: app_type
-AUTHENTICATION METHODS: authentication
-INTERNET FACING: internet_facing
-SENSITIVE DATA: sensitive_data
-APPLICATION DESCRIPTION: app_input
+APPLICATION TYPE: Web | Mobile | Desktop | Cloud | IoT | Other application
+AUTHENTICATION METHODS: SSO | MFA | OAUTH2 | Basic | None
+APPLICATION DESCRIPTION: <text>
+DATABASE SCHEMA: [
+{
+	'data_type': 'Name',
+	'encryption': True,
+	'sensitive': True
+	'collection_frequency_minutes': 60
+},
+{
+	'data_type': 'Email',
+	'encryption': True,
+	'sensitive': False,
+	'collection_frequency_minutes': 0
+},
+]
+DATA POLICY: <text>
 QUESTIONS: question_input
 THREAT_TITLE: threat_title
 THREAT_DESCRIPTION: threat_description
@@ -89,11 +102,11 @@ Example of expected JSON response format:
                 {"role": "user", "content": 
                  f"""
 '''
-APPLICATION TYPE: {app_type}
-AUTHENTICATION METHODS: {authentication}
-INTERNET FACING: {internet_facing}
-SENSITIVE DATA: {sensitive_data}
-APPLICATION DESCRIPTION: {app_input}
+APPLICATION TYPE: {inputs["app_type"]}
+AUTHENTICATION METHODS: {inputs["authentication"]}
+APPLICATION DESCRIPTION: {inputs["app_description"]}
+DATABASE_SCHEMA: {inputs["database"]}
+DATA POLICY: {inputs["data_policy"]}
 QUESTIONS: {question}
 THREAT_TITLE: {title}
 THREAT_DESCRIPTION: {description}

@@ -4,3 +4,4 @@ openai
 streamlit
 quality-prompts
 scikit-learn
+graphviz

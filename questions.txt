@@ -73,7 +73,7 @@ Is the data necessary for the recipient?
 Are there more parties involved than necessary?
 How accessible is the data (public/limited/private)?
 
-Are data subjects infufficiently informed about the processing of personal data, including the purposes and methods of the processing involved?
+Are data subjects insufficiently informed about the processing of personal data, including the purposes and methods of the processing involved?
 
 If a user shares personal data of others, is it clear what, why, and how that data is further processed?
 
