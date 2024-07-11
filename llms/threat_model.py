@@ -5,11 +5,9 @@ from mistralai.client import MistralClient
 from mistralai.models.chat_completion import ChatMessage
 from openai import OpenAI
 from openai import AzureOpenAI
-from utils import (
+from llms.utils import (
 		match_color,
 )
-
-import streamlit as st
 
 from quality_prompts.prompt import QualityPrompt
 

@@ -1,7 +1,7 @@
 import json
 import google.generativeai as genai
 from openai import OpenAI
-from utils import (
+from llms.utils import (
     match_number_color,
     match_letter,
 )
