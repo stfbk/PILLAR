@@ -4,7 +4,6 @@ import base64
 from llms.threat_model import (
     create_threat_model_prompt,
     get_threat_model,
-    get_threat_model_quality_prompt,
     get_threat_model_azure,
     get_threat_model_google,
     get_threat_model_mistral,

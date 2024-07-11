@@ -2,7 +2,5 @@ google.generativeai
 mistralai
 openai
 streamlit
-quality-prompts
-scikit-learn
 graphviz
 csv
