@@ -5,3 +5,4 @@ streamlit
 quality-prompts
 scikit-learn
 graphviz
+csv

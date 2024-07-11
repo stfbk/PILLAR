@@ -1,0 +1,7 @@
+﻿from,typefrom,to,typeto
+Users,Entity,Portal,Process
+Portal,Process,Users,Entity
+Portal,Process,Services,Process
+Services,Process,Portal,Process
+Social network database,Data store,Services,Process
+Services,Process,Social network database,Data store
