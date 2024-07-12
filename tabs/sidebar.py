@@ -153,8 +153,34 @@ def sidebar():
         st.markdown(
             "Below is an example application description that you can use to test LINDDUN GPT:"
         )
+        st.code(
+            """
+            A web application that 
+            allows users to create, store, and share
+            personal notes. The application is built using the React frontend
+            framework and a Node.js backend with a MongoDB database. Users can
+            sign up for an account and log in using OAuth2 with Google or
+            Facebook. The notes are encrypted at rest and are only accessible
+            by the user who created them. The application also supports
+            real-time collaboration on notes with other users."
+            """,
+            language="md"
+        )
         st.markdown(
-            "> A web application that allows users to create, store, and share personal notes. The application is built using the React frontend framework and a Node.js backend with a MongoDB database. Users can sign up for an account and log in using OAuth2 with Google or Facebook. The notes are encrypted at rest and are only accessible by the user who created them. The application also supports real-time collaboration on notes with other users."
+            "Additionally, this is an example for the data policy section that works with the example application and highlights some possible issues:"
+        )
+        st.code(
+            """
+            The application stores 
+            user data in a MongoDB database. Users can
+            access, modify, or delete their data by logging into their account.
+            The data retention policy specifies that user data is stored for 2
+            years after account deletion, after which it is permanently deleted.
+            The application uses encryption to protect user data at rest and in
+            transit. User data is never shared with third parties without user
+            consent, except for advertising purposes.
+            """,
+            language="md"
         )
         st.markdown("""---""")
 

@@ -24,13 +24,13 @@ In this section, you can create a Data Flow Diagram (DFD) to visualize the flow 
                 )
                 graph.node_attr.update(
                     color=f"{st.get_option("theme.primaryColor")}",
-                    fillcolor="white",
                     fontcolor="white",
                 )
                 for object in st.session_state["input"]["dfd"]:
-                    graph.edge(object["from"], object["to"], _attributes={"color": "white"})
                     graph.node(object["from"], shape=f"{"box" if object["typefrom"] == "Entity" else "ellipse" if object["typefrom"] == "Process" else "cylinder"}")
                     graph.node(object["to"], shape=f"{"box" if object["typeto"] == "Entity" else "ellipse" if object["typeto"] == "Process" else "cylinder"}")
+                    graph.edge(object["from"], object["to"], _attributes={"color": "white"})
+                print(graph.source)
                 st.session_state["input"]["graph"] = graph
         with col12:
             uploaded_file = st.file_uploader(
@@ -59,6 +59,7 @@ In this section, you can create a Data Flow Diagram (DFD) to visualize the flow 
             num_rows="dynamic",
         )
         if edges != st.session_state["input"]["dfd"] and st.session_state["dfd_file"] is None:
+            st.session_state["input"]["dfd"] = []
             st.session_state["input"]["dfd"] = edges
     with col2:
         st.graphviz_chart(st.session_state["input"]["graph"])

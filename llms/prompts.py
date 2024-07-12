@@ -305,11 +305,6 @@ Example of expected JSON response format:
 					"Scenario": "Example Scenario 3",
 					"Potential Impact": "Example Potential Impact 3"
 				}},
-			],
-			"improvement_suggestions": [
-				"Example improvement suggestion 1.",
-				"Example improvement suggestion 2.",
-				// ... more suggestions
 			]
 		}}
 """

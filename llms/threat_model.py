@@ -12,8 +12,6 @@ from llms.prompts import (
 	THREAT_MODEL_SYSTEM_PROMPT,
 )
 
-from quality_prompts.prompt import QualityPrompt
-
 # Function to convert JSON to Markdown for display.
 def threat_model_gen_markdown(threat_model, improvement_suggestions):
 		markdown_output = "## Privacy Threat Model\n\n"
