@@ -13,7 +13,7 @@ from llms.prompts import (
 )
 
 # Function to convert JSON to Markdown for display.
-def threat_model_gen_markdown(threat_model, improvement_suggestions):
+def threat_model_gen_markdown(threat_model):
 		markdown_output = "## Privacy Threat Model\n\n"
 
 		# Start the markdown table with headers
@@ -25,10 +25,6 @@ def threat_model_gen_markdown(threat_model, improvement_suggestions):
 				color = match_color(threat["threat_type"])
 				color_html = f"<p style='background-color:{color};color:#ffffff;'>"
 				markdown_output += f"| {color_html}{threat['threat_type']}</p> | {threat['Scenario']} | {threat['Potential Impact']} |\n"
-
-		markdown_output += "\n\n## Improvement Suggestions\n\n"
-		for suggestion in improvement_suggestions:
-				markdown_output += f"- {suggestion}\n"
 
 		return markdown_output
 

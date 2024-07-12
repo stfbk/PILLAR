@@ -19,7 +19,7 @@ threats just by providing the description.
     
     c1, c2 = st.columns([1, 1])
     with c1:
-        multiagent_linddun_go = st.checkbox("Use multiple LLMS to simulate LINDDUN Go with a team of experts")
+        multiagent_linddun_go = st.checkbox("Use multiple LLM agents to simulate LINDDUN Go with a team of experts")
         rounds = st.slider("Number of rounds", 1, 5, 3, disabled=not multiagent_linddun_go)
         threats_to_analyze = st.slider("Number of threats to analyze", 1, 10, 3, disabled=not multiagent_linddun_go)
     with c2:

@@ -126,6 +126,7 @@ description, the more accurate the threat model will be.
                 label="Describe the application to be modelled",
                 value=st.session_state["input"]["app_description"],
                 help="Please provide a detailed description of the application, including the purpose of the application, the technologies used, and any other relevant information.",
+                height=500,
             )
             # Update session state only if the text area content has changed
             if app_description != st.session_state["input"]["app_description"]:
@@ -170,7 +171,8 @@ description, the more accurate the threat model will be.
             label="How can the user act on the data collected by the application?",
             value=st.session_state["input"]["data_policy"],
             help="Please describe the data policy of the application, including how users can access, modify, or delete their data. If possible, specify the data retention policy and how data is handled after account deletion.",
-            placeholder="Enter the data policy details..."
+            placeholder="Enter the data policy details...",
+            height=250,
         )
         if data_policy != st.session_state["input"]["data_policy"]:
             st.session_state["input"]["data_policy"] = data_policy

@@ -162,9 +162,7 @@ These are the LINDDUN threat types you should consider:
 6. U - Unawareness & Unintervenability: Insufficiently informing, involving, or empowering individuals in the processing of personal data.
 7. Nc - Non-Compliance: Deviating from security and data management best practices, standards, and legislation.
 
-When providing the threat model, use a JSON formatted response with the keys "threat_model" and "improvement_suggestions". Under "threat_model", include an array of objects with the keys "threat_type", "Scenario", and "Potential Impact". 
-
-Under "improvement_suggestions", include an array of strings with suggestions on how the threat modeller can improve their application description in order to allow the tool to produce a more comprehensive threat model.
+When providing the threat model, use a JSON formatted response with the key "threat_model". Under "threat_model", include an array of objects with the keys "threat_type", "Scenario", and "Potential Impact". 
 
 For each threat type, list multiple credible threats. Each threat scenario should provide a credible scenario in which the threat could occur in the context of the application. It is very important that your responses are tailored to reflect the details you are given. You MUST include all threat types at least three times, and as many times you can.
 

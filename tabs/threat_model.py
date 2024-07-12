@@ -56,13 +56,10 @@ understanding possible privacy threats and provides suggestions on how to mitiga
                             st.session_state["mistral_api_key"], st.session_state["mistral_model"], threat_model_prompt
                         )
 
-                    # Access the threat model and improvement suggestions from the parsed content
+                    # Access the threat model from the parsed content
                     threat_model = model_output.get("threat_model", [])
-                    improvement_suggestions = model_output.get(
-                        "improvement_suggestions", []
-                    )
 
-                    # Save the threat model to the session state for later use in mitigations
+                    # Save the threat model to the session state for later use.
                     st.session_state["threat_model"] = threat_model
                     break  # Exit the loop if successful
                 except Exception as e:
@@ -72,14 +69,13 @@ understanding possible privacy threats and provides suggestions on how to mitiga
                             f"Error generating threat model after {max_retries} attempts: {e}"
                         )
                         threat_model = []
-                        improvement_suggestions = []
                     else:
                         st.warning(
                             f"Error generating threat model. Retrying attempt {retry_count+1}/{max_retries}..."
                         )
 
         # Convert the threat model JSON to Markdown
-        markdown_output = threat_model_gen_markdown(threat_model, improvement_suggestions)
+        markdown_output = threat_model_gen_markdown(threat_model)
 
         # Display the threat model in Markdown
         st.markdown(markdown_output, unsafe_allow_html=True)
