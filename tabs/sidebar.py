@@ -32,7 +32,7 @@ def sidebar():
                 type="password",
                 help="You can find your OpenAI API key on the [OpenAI dashboard](https://platform.openai.com/account/api-keys).",
             )
-            openai_api_key = openai_api_key_input if openai_api_key_input else st.secrets["openai_api_key"]
+            openai_api_key = openai_api_key_input if openai_api_key_input else st.secrets["openai_api_key"] if st.secrets else None
             st.session_state["openai_api_key"] = openai_api_key
 
             # Add model selection input field to the sidebar
