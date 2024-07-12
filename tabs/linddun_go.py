@@ -20,6 +20,8 @@ threats just by providing the description.
     c1, c2 = st.columns([1, 1])
     with c1:
         multiagent_linddun_go = st.checkbox("Use multiple LLMS to simulate LINDDUN Go with a team of experts")
+        rounds = st.slider("Number of rounds", 1, 5, 3, disabled=not multiagent_linddun_go)
+        threats_to_analyze = st.slider("Number of threats to analyze", 1, 10, 3, disabled=not multiagent_linddun_go)
     with c2:
         linddun_go_submit_button = st.button(label="Simulate LINDDUN Go")
     
@@ -30,7 +32,7 @@ threats just by providing the description.
             try:
                 if st.session_state["model_provider"] == "OpenAI API":
                     if multiagent_linddun_go:
-                        present_threats = get_multiagent_linddun_go(st.session_state["openai_api_key"], st.session_state["selected_model"], inputs)
+                        present_threats = get_multiagent_linddun_go(st.session_state["openai_api_key"], st.session_state["selected_model"], inputs, rounds, threats_to_analyze)
                     else:
                         present_threats = get_linddun_go(st.session_state["openai_api_key"], st.session_state["selected_model"], inputs)
 

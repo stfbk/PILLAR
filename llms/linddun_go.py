@@ -1,5 +1,6 @@
 import json
 import google.generativeai as genai
+import random
 from openai import OpenAI
 from misc.utils import (
     match_number_color,
@@ -9,6 +10,7 @@ from llms.prompts import (
     LINDDUN_GO_SYSTEM_PROMPT,
     LINDDUN_GO_SPECIFIC_PROMPTS,
     LINDDUN_GO_PREVIOUS_ANALYSIS_PROMPT,
+    LINDDUN_GO_JUDGE_PROMPT,
 )
 
 # Function to convert JSON to Markdown for display.
@@ -87,17 +89,20 @@ THREAT_DESCRIPTION: {description}
     return present_threats
 
 
-def get_multiagent_linddun_go(api_key, model_name, inputs):
+def get_multiagent_linddun_go(api_key, model_name, inputs, rounds, threats_to_analyze):
 
     client = OpenAI(api_key=api_key)
     questions_threats_list = questions_threats()
     present_threats = []
+    random.shuffle(questions_threats_list)
 
-    previous_analysis = ["" for i in range(6)]
 
-    for round in range(3):
-        for i in range(6):
-            for question, title, description, type in questions_threats_list:
+    previous_analysis = [{} for _ in range(6)]
+
+    for question, title, description, type in questions_threats_list[1:threats_to_analyze+1]:
+        previous_analysis = [{} for _ in range(6)]
+        for round in range(rounds):
+            for i in range(6):
                 response = client.chat.completions.create(
                     model=model_name,
                     response_format={"type": "json_object"},
@@ -124,14 +129,39 @@ def get_multiagent_linddun_go(api_key, model_name, inputs):
                     max_tokens=4096,
                 )
                 response_content = json.loads(response.choices[0].message.content)
-                previous_analysis[i] = response_content
                 
-                #response_content["question"] = question
-                #response_content["threat_title"] = title
-                #response_content["threat_description"] = description
-                #response_content["threat_type"] = type
+                previous_analysis[i] = response_content
                 #print(response_content)
-                break
-        print(previous_analysis)
+        #print(previous_analysis)
+        final_verdict = judge(api_key, model_name, previous_analysis)
+        final_verdict["question"] = question
+        final_verdict["threat_title"] = title
+        final_verdict["threat_description"] = description
+        final_verdict["threat_type"] = type
+        #print(final_verdict)
+        present_threats.append(final_verdict)
+    #print(f"Present threats:\n{present_threats}")
 
     return present_threats
+
+
+def judge(api_key, model_name, previous_analysis):
+    client = OpenAI(api_key=api_key)
+    response = client.chat.completions.create(
+        model=model_name,
+        response_format={"type": "json_object"},
+        temperature=0.01,
+        messages=[
+            {
+                "role": "system",
+                "content": LINDDUN_GO_JUDGE_PROMPT,
+            },
+            {
+                "role": "user", 
+                "content": LINDDUN_GO_PREVIOUS_ANALYSIS_PROMPT(previous_analysis)
+            },
+        ],
+        max_tokens=4096,
+    )
+    response_content=json.loads(response.choices[0].message.content)
+    return response_content
