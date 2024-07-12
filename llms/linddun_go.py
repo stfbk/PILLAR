@@ -6,7 +6,9 @@ from misc.utils import (
     match_letter,
 )
 from llms.prompts import (
-    LINDDUN_GO_SYSTEM_PROMPT
+    LINDDUN_GO_SYSTEM_PROMPT,
+    LINDDUN_GO_SPECIFIC_PROMPTS,
+    LINDDUN_GO_PREVIOUS_ANALYSIS_PROMPT,
 )
 
 # Function to convert JSON to Markdown for display.
@@ -54,9 +56,8 @@ def get_linddun_go(api_key, model_name, inputs):
             messages=[
                 {
                     "role": "system",
-                    "content": LINDDUN_GO_SYSTEM_PROMPT,
-                },
-                {"role": "user", "content": 
+                    "content": LINDDUN_GO_SPECIFIC_PROMPTS[0]+LINDDUN_GO_SYSTEM_PROMPT,
+                }, {"role": "user", "content": 
                  f"""
 '''
 APPLICATION TYPE: {inputs["app_type"]}
@@ -82,5 +83,55 @@ THREAT_DESCRIPTION: {description}
         #print(response_content)
         if response_content["reply"]:
             present_threats.append(response_content)
+
+    return present_threats
+
+
+def get_multiagent_linddun_go(api_key, model_name, inputs):
+
+    client = OpenAI(api_key=api_key)
+    questions_threats_list = questions_threats()
+    present_threats = []
+
+    previous_analysis = ["" for i in range(6)]
+
+    for round in range(3):
+        for i in range(6):
+            for question, title, description, type in questions_threats_list:
+                response = client.chat.completions.create(
+                    model=model_name,
+                    response_format={"type": "json_object"},
+                    messages=[
+                        {
+                            "role": "system",
+                            "content": LINDDUN_GO_SPECIFIC_PROMPTS[i]+LINDDUN_GO_SYSTEM_PROMPT+(LINDDUN_GO_PREVIOUS_ANALYSIS_PROMPT(previous_analysis) if previous_analysis[i] else ""),
+                        },
+                        {"role": "user", "content": 
+                        f"""
+        '''
+        APPLICATION TYPE: {inputs["app_type"]}
+        AUTHENTICATION METHODS: {inputs["authentication"]}
+        APPLICATION DESCRIPTION: {inputs["app_description"]}
+        DATABASE_SCHEMA: {inputs["database"]}
+        DATA POLICY: {inputs["data_policy"]}
+        QUESTIONS: {question}
+        THREAT_TITLE: {title}
+        THREAT_DESCRIPTION: {description}
+        '''
+                        """
+                        },
+                    ],
+                    max_tokens=4096,
+                )
+                response_content = json.loads(response.choices[0].message.content)
+                previous_analysis[i] = response_content
+                
+                #response_content["question"] = question
+                #response_content["threat_title"] = title
+                #response_content["threat_description"] = description
+                #response_content["threat_type"] = type
+                #print(response_content)
+                break
+        print(previous_analysis)
 
     return present_threats

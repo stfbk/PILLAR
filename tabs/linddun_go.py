@@ -1,6 +1,7 @@
 import streamlit as st
 from llms.linddun_go import (
     get_linddun_go,
+    get_multiagent_linddun_go,
     linddun_go_gen_markdown,
 )
 
@@ -16,17 +17,22 @@ threats just by providing the description.
 """)
     st.markdown("""---""")
     
-    linddun_go_submit_button = st.button(label="Simulate LINDDUN Go")
+    c1, c2 = st.columns([1, 1])
+    with c1:
+        multiagent_linddun_go = st.checkbox("Use multiple LLMS to simulate LINDDUN Go with a team of experts")
+    with c2:
+        linddun_go_submit_button = st.button(label="Simulate LINDDUN Go")
     
     if linddun_go_submit_button and st.session_state["input"]["app_description"]:
         inputs = st.session_state["input"]
-
-
         # Show a spinner while generating the attack tree
         with st.spinner("Answering questions..."):
             try:
                 if st.session_state["model_provider"] == "OpenAI API":
-                    present_threats = get_linddun_go(st.session_state["openai_api_key"], st.session_state["selected_model"], inputs)
+                    if multiagent_linddun_go:
+                        present_threats = get_multiagent_linddun_go(st.session_state["openai_api_key"], st.session_state["selected_model"], inputs)
+                    else:
+                        present_threats = get_linddun_go(st.session_state["openai_api_key"], st.session_state["selected_model"], inputs)
 
             except Exception as e:
                 st.error(f"Error generating simulation: {e}")
