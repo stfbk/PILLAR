@@ -84,7 +84,7 @@ understanding possible privacy threats and provides suggestions on how to mitiga
         st.download_button(
             label="Download Threat Model",
             data=markdown_output,  # Use the Markdown output
-            file_name="linddun_gpt_threat_model.md",
+            file_name="privacy_threat_model.md",
             mime="text/markdown",
         )
 

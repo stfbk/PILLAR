@@ -49,7 +49,7 @@ threats just by providing the description.
         st.download_button(
             label="Download Output",
             data=markdown_output,  # Use the Markdown output
-            file_name="linddun_go_process_output.md",
+            file_name="linddun_go_output.md",
             mime="text/markdown",
         )
 
