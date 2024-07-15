@@ -17,7 +17,7 @@ def get_description():
     input_text = st.text_area(
         label="Describe the application to be modelled",
         placeholder="Enter your application details...",
-        height=150,
+        height=250,
         help="Please provide a detailed description of the application, including the purpose of the application, the technologies used, and any other relevant information.",
     )
 
@@ -127,7 +127,7 @@ description, the more accurate the threat model will be.
                 label="Describe the application to be modelled",
                 value=st.session_state["input"]["app_description"],
                 help="Please provide a detailed description of the application, including the purpose of the application, the technologies used, and any other relevant information.",
-                height=500,
+                height=250,
             )
             # Update session state only if the text area content has changed
             if app_description != st.session_state["input"]["app_description"]:
