@@ -7,12 +7,24 @@ def sidebar():
     st.sidebar.header("How to use LINDDUN GPT")
 
     with st.sidebar:
+        try:
+            openai_api_key = st.secrets["openai_api_key"]
+            st.session_state["openai_api_key"] = openai_api_key
+            google_api_key = st.secrets["google_api_key"]
+            st.session_state["google_api_key"] = google_api_key
+            mistral_api_key = st.secrets["mistral_api_key"]
+            st.session_state["mistral_api_key"] = mistral_api_key
+        except Exception as e:
+            openai_api_key = None
+            google_api_key = None
+            mistral_api_key = None
         # Add model selection input field to the sidebar
         model_provider = st.selectbox(
             "Select your preferred model provider:",
             [
                 "OpenAI API",
                 "Google AI API",
+                "Mistral API",
             ],  # ["OpenAI API", "Azure OpenAI Service", "Google AI API", "Mistral API"],
             key="model_provider",
             help="Select the model provider you would like to use. This will determine the models available for selection.",
@@ -34,11 +46,6 @@ def sidebar():
             )
             if openai_api_key_input:
                 openai_api_key = openai_api_key_input
-            else:
-                try:
-                    openai_api_key = st.secrets["openai_api_key"]
-                except FileNotFoundError:
-                    openai_api_key = None
             st.session_state["openai_api_key"] = openai_api_key
 
             # Add model selection input field to the sidebar
@@ -100,13 +107,14 @@ def sidebar():
                 type="password",
                 help="You can generate a Google AI API key in the [Google AI Studio](https://makersuite.google.com/app/apikey).",
             )
-            google_api_key = google_api_key_input if google_api_key_input else st.secrets["google_api_key"]
-
+            if google_api_key_input:
+                google_api_key = google_api_key_input
+            st.session_state["google_api_key"] = google_api_key
             # Add model selection input field to the sidebar
             google_model = st.selectbox(
                 "Select the model you would like to use:",
                 ["gemini-1.5-pro-latest"],
-                key="selected_model",
+                key="google_model",
             )
 
         if model_provider == "Mistral API":
@@ -118,17 +126,20 @@ def sidebar():
         """
             )
             # Add OpenAI API key input field to the sidebar
-            mistral_api_key = st.text_input(
+            mistral_api_key_input = st.text_input(
                 "Enter your Mistral API key:",
                 type="password",
                 help="You can generate a Mistral API key in the [Mistral console](https://console.mistral.ai/api-keys/).",
             )
+            if mistral_api_key_input:
+                mistral_api_key = mistral_api_key_input
+            st.session_state["mistral_api_key"] = mistral_api_key
 
             # Add model selection input field to the sidebar
             mistral_model = st.selectbox(
                 "Select the model you would like to use:",
                 ["mistral-large-latest", "mistral-small-latest"],
-                key="selected_model",
+                key="mistral_model",
             )
 
         st.markdown("""---""")

@@ -181,15 +181,19 @@ def get_threat_model_google(google_api_key, google_model, prompt):
 
 # Function to get threat model from the Mistral response.
 def get_threat_model_mistral(mistral_api_key, mistral_model, prompt):
-		client = MistralClient(api_key=mistral_api_key)
+	client = MistralClient(api_key=mistral_api_key)
 
-		response = client.chat(
-				model=mistral_model,
-				response_format={"type": "json_object"},
-				messages=[ChatMessage(role="user", content=prompt)],
-		)
+	response = client.chat(
+			model=mistral_model,
+			response_format={"type": "json_object"},
+			messages=[
+				ChatMessage(role="system", content=THREAT_MODEL_SYSTEM_PROMPT),
+				ChatMessage(role="user", content=prompt),
+			],
+			max_tokens=4096,
+	)
 
-		# Convert the JSON string in the 'content' field to a Python dictionary
-		response_content = json.loads(response.choices[0].message.content)
+	# Convert the JSON string in the 'content' field to a Python dictionary
+	response_content = json.loads(response.choices[0].message.content)
 
-		return response_content
+	return response_content

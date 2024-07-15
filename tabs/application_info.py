@@ -53,8 +53,9 @@ description, the more accurate the threat model will be.
 
     # If model provider is OpenAI API and the model is gpt-4-turbo or gpt-4o
     with col1:
-        selected_model = st.session_state["selected_model"]
-        openai_api_key = st.session_state["openai_api_key"]
+        if st.session_state["model_provider"] == "OpenAI API":
+            selected_model = st.session_state["selected_model"]
+            openai_api_key = st.session_state["openai_api_key"]
         if st.session_state["model_provider"] == "OpenAI API" and selected_model in [
             "gpt-4-turbo",
             "gpt-4o",
