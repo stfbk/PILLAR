@@ -179,7 +179,7 @@ def sidebar():
             sign up for an account and log in using OAuth2 with Google or
             Facebook. The notes are encrypted at rest and are only accessible
             by the user who created them. The application also supports
-            real-time collaboration on notes with other users."
+            real-time collaboration on notes with other users.
             """,
             language="md"
         )
