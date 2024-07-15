@@ -61,12 +61,12 @@ copy other’s entire answer, modify the part you believe is wrong if you think
 it is necessary, otherwise elaborate on it and why you think it is correct.
 This is the previous analysis from your team:
 '''
-The Domain Expert thinks the threat is {"" if previous_analysis[0]["reply"] else "not "} present because {previous_analysis[0]["reason"]}.
-The System Architect thinks the threat is {"" if previous_analysis[1]["reply"] else "not "} present because {previous_analysis[1]["reason"]}.
-The Software Developer thinks the threat is {"" if previous_analysis[2]["reply"] else "not "} present because {previous_analysis[2]["reason"]}.
-The Data Protection Officer thinks the threat is {"" if previous_analysis[3]["reply"] else "not "} present because {previous_analysis[3]["reason"]}.
-The Legal Expert thinks the threat is {"" if previous_analysis[4]["reply"] else "not "} present because {previous_analysis[4]["reason"]}.
-The Chief Information Security Officer thinks the threat is {"" if previous_analysis[5]["reply"] else "not "} present because {previous_analysis[5]["reason"]}.
+{f"The Domain Expert thinks the threat is {"" if previous_analysis[0]["reply"] else "not "} present because {previous_analysis[0]["reason"]}." if previous_analysis[0] else ""}
+{f"The System Architect thinks the threat is {"" if previous_analysis[1]["reply"] else "not "} present because {previous_analysis[1]["reason"]}." if previous_analysis[1] else ""}
+{f"The Software Developer thinks the threat is {"" if previous_analysis[2]["reply"] else "not "} present because {previous_analysis[2]["reason"]}." if previous_analysis[2] else ""}
+{f"The Data Protection Officer thinks the threat is {"" if previous_analysis[3]["reply"] else "not "} present because {previous_analysis[3]["reason"]}." if previous_analysis[3] else ""}
+{f"The Legal Expert thinks the threat is {"" if previous_analysis[4]["reply"] else "not "} present because {previous_analysis[4]["reason"]}." if previous_analysis[4] else ""}
+{f"The Chief Information Security Officer thinks the threat is {"" if previous_analysis[5]["reply"] else "not "} present because {previous_analysis[5]["reason"]}." if previous_analysis[5] else ""}
 '''
 	"""
 LINDDUN_GO_SYSTEM_PROMPT = """

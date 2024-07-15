@@ -30,27 +30,24 @@ def linddun_go_gen_markdown(present_threats):
 
     return markdown_output
 
-
-def questions_threats(questions_file="misc/questions.txt", threats_file="misc/threats.txt"):
-    with open(questions_file, 'r') as questions, open(threats_file, 'r') as threats:
-        questions_blocks = questions.read().split('\n\n')
-        threats_blocks = threats.read().split('\n\n')
-
-    joined_info = []
-    for i, question_block in enumerate(questions_blocks):
-        threat = threats_blocks[i] if i < len(threats_blocks) else None  # Get corresponding threat or None
-        type, title, description = threat.split('\n')
-        joined_info.extend([(question_block.strip(), title.strip(), description.strip(), int(type.strip()))])
-    return joined_info
-
+def get_deck(file="misc/deck.json"):
+    with open(file, 'r') as deck_file:
+        deck = json.load(deck_file)
+    return deck["cards"]
 
 
 def get_linddun_go(api_key, model_name, inputs):
     client = OpenAI(api_key=api_key)
-    questions_threats_list = questions_threats()
+    deck = get_deck()
+    
+
     present_threats = []
 
-    for question, title, description, type in questions_threats_list:
+    for elem in deck:
+        question = "\n".join(elem["questions"])
+        title = elem["title"]
+        description = elem["description"]
+        type = elem["type"]
         response = client.chat.completions.create(
             model=model_name,
             response_format={"type": "json_object"},
@@ -92,17 +89,19 @@ THREAT_DESCRIPTION: {description}
 def get_multiagent_linddun_go(api_key, model_name, inputs, rounds, threats_to_analyze):
 
     client = OpenAI(api_key=api_key)
-    questions_threats_list = questions_threats()
     present_threats = []
-    random.shuffle(questions_threats_list)
+    deck = get_deck()
+    random.shuffle(deck)
 
 
-    previous_analysis = [{} for _ in range(6)]
-
-    for question, title, description, type in questions_threats_list[1:threats_to_analyze+1]:
+    for elem in deck[0:threats_to_analyze]:
+        question = "\n".join(elem["questions"])
+        title = elem["title"]
+        description = elem["description"]
+        type = elem["type"]
         previous_analysis = [{} for _ in range(6)]
         for round in range(rounds):
-            for i in range(6):
+            for i in elem["competent_agents"]:
                 response = client.chat.completions.create(
                     model=model_name,
                     response_format={"type": "json_object"},

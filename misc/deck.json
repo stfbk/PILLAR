@@ -1,0 +1,334 @@
+{
+    "cards": [
+        {
+            "title": "LINKED USER REQUESTS",
+            "type": 1,
+            "description": "User requests can be linked because they contain a unique identifier.",
+            "questions": [
+                "Is there an identifier (unique in system/session) or dataset?",
+                "Is there other data associated with that identifier?",
+                "Is there previous data with the same identifier to which new data can be linked?"
+            ],
+            "competent_agents": [1, 2, 3]
+        },
+        {
+            "title": "LINKABLE USER REQUESTS",
+            "type": 1,
+            "description": "User requests can be linked because they contain attributes that can be combined into quasi-identifiers.",
+            "questions": [
+                "Is there a set of attributes that can serve as an identifier?",
+                "Is there other data sent together with that quasi-identifier?",
+                "Is there existing data to link it to?"
+            ],
+            "competent_agents": [1, 3]
+        },
+        {
+            "title": "LINKING THROUGH DISTINGUISHABLE PATTERNS",
+            "type": 1,
+            "description": "Patterns in the (meta)data contained in user requests can be used to link them to each other.",
+            "questions": [
+                "Is the data from different individuals distinguishable?",
+                "Is it possible to query data using distinguishable attributes?"
+            ],
+            "competent_agents": [1, 3]
+        },
+        {
+            "title": "LINKABLE DATASET",
+            "type": 1,
+            "description": "Stored personal data can be linked to individuals.",
+            "questions": [
+                "Is there a set of attributes that can serve as an identifier?",
+                "Is there other data sent together with that quasi-identifier?",
+                "Is there existing data to link it to?"
+            ],
+            "competent_agents": [1, 3]
+        },
+        {
+            "title": "PROFILING USERS",
+            "type": 1,
+            "description": "Users can be profiled by analyzing their data for patterns.",
+            "questions": [
+                "Are there patterns derivable from the data?",
+                "Can (new) personal data be inferred from the linked data points?"
+            ],
+            "competent_agents": [0, 3]
+        },
+        {
+            "title": "IDENTIFIED USER REQUESTS",
+            "type": 2,
+            "description": "The incoming user requests contain data that directly reveals the user identity.",
+            "questions": [
+                "Does data sent to the system (potentially) contain identity data?"
+            ],
+            "competent_agents": [0, 3]
+        },
+        {
+            "title": "IDENTIFIABLE USER REQUESTS",
+            "type": 2,
+            "description": "The user can be identified because the data in their requests can be used to infer who they are.",
+            "questions": [
+                "Are requests or records sufficiently unique to differentiate them from those of a speci\ufb01c individual?"
+            ],
+            "competent_agents": [1, 3]
+        },
+        {
+            "title": "IDENTIFIABLE DATA FLOWS",
+            "type": 2,
+            "description": "Data sent to the system is sufficiently revealing to identify the user.",
+            "questions": [
+                "Is there free-form user provided data that is received of processed by the system?",
+                "Is data collected that may reveal the identifying information?"
+            ],
+            "competent_agents": [1, 3]
+        },
+        {
+            "title": "IDENTIFIERS IN DATA REQUESTS",
+            "type": 2,
+            "description": "Communication contains (quasi-)identifiers.",
+            "questions": [
+                "Is there a distinctive identifier used during interactions or when referring to an individual\u2019s data?",
+                "Can multiple attributes be combined to create a unique reference to an individual or their data?"
+            ],
+            "competent_agents": [1, 3]
+        },
+        {
+            "title": "IDENTIFIABLE DATASET",
+            "type": 2,
+            "description": "Stored data can be used to identify individuals.",
+            "questions": [
+                "Is there a distinctive identifier used during interactions or when referring to an individual\u2019s data?",
+                "Can multiple attributes be combined to create a unique reference to an individual or their data?"
+            ],
+            "competent_agents": [1, 3]
+        },
+        {
+            "title": "NON-REPUDIATION OF SERVICE USAGE",
+            "type": 3,
+            "description": "Users cannot deny having used a service because of authentication or logged access.",
+            "questions": [
+                "Does the system record data affecting deniability?",
+                "Does the data itself impact deniability claims?"
+            ],
+            "competent_agents": [0, 4]
+        },
+        {
+            "title": "NON-REPUDIATION OF SENDING",
+            "type": 3,
+            "description": "Users cannot deny having sent a message.",
+            "questions": [
+                "Is the data digitally signed?",
+                "Which keys are used for signing? Who has access to these keys to verify signatures?"
+            ],
+            "competent_agents": [0, 5]
+        },
+        {
+            "title": "NON-REPUDIATION OF RECEIPT",
+            "type": 3,
+            "description": "Users cannot deny having received a message.",
+            "questions": [
+                "Do (passive) interactions with the system (e.g., receiving a message) have side-effects (e.g., trigger transmissions, logging)?",
+                "Is deniability of receipt a desired feature for the system?"
+            ],
+            "competent_agents": [0, 1]
+        },
+        {
+            "title": "NON-REPUDIATION OF STORAGE",
+            "type": 3,
+            "description": "Users cannot deny claims about data stored in non-repudiable storage.",
+            "questions": [
+                "Is the data digitally signed?",
+                "Which keys are used for signing? Who has access to these keys to verify signatures?"
+            ],
+            "competent_agents": [0, 5]
+        },
+        {
+            "title": "NON-REPUDIATION OF HIDDEN DATA OR METADATA",
+            "type": 3,
+            "description": "Hidden or metadata in a document prevent users from denying claims associated with it.",
+            "questions": [
+                "Does stored or transmitted data have associated metadata?",
+                "Are there embedded data or hidden patterns in the data or transmissions?",
+                "Does this data lead to undesirable deniability issues?"
+            ],
+            "competent_agents": [0, 3]
+        },
+        {
+            "title": "DETECTABLE USERS",
+            "type": 4,
+            "description": "Inferring the existence of a user from the system\u2019s response.",
+            "questions": [
+                "Does the system show status messages (informational, warnings, errors) when retrieving data?",
+                "Are the status messages distinct when an item (a file, user, . . .) does not exist compared to not having access rights?"
+            ],
+            "competent_agents": [0, 1]
+        },
+        {
+            "title": "DETECTABLE SERVICE USAGE",
+            "type": 4,
+            "description": "Detecting communication between a service and its users.",
+            "questions": [
+                "Can the communication be observed?",
+                "Can information be inferred from the observed communications?"
+            ],
+            "competent_agents": [0, 5]
+        },
+        {
+            "title": "DETECTABLE EVENTS",
+            "type": 4,
+            "description": "Detecting side effects or communications triggered by application events.",
+            "questions": [
+                "Do actions in the system have side effects (e.g., saving a file, writing to a log, triggering other transmissions)?",
+                "Are these side effects observable?"
+            ],
+            "competent_agents": [0, 1]
+        },
+        {
+            "title": "DETECTABLE RECORDS",
+            "type": 4,
+            "description": "Detecting the existence of records in a system.",
+            "questions": [
+                "Does the system show status messages (informational, warnings, errors) when retrieving data?",
+                "Are the status messages distinct when an item (a file, user, . . .) does not exist compared to not having access rights?"
+            ],
+            "competent_agents": [0, 1]
+        },
+        {
+            "title": "EXCESSIVELY SENSITIVE DATA COLLECTED",
+            "type": 5,
+            "description": "The system acquires more sensitive or finegrained data than strictly necessary for its functionality.",
+            "questions": [
+                "Is the data more sensitive than strictly necessary?",
+                "Is the data more fine-grained than strictly necessary?",
+                "Does the data encoding include additional (meta)data?"
+            ],
+            "competent_agents": [1, 3]
+        },
+        {
+            "title": "EXCESSIVE AMOUNT OF DATA COLLECTED",
+            "type": 5,
+            "description": "The system acquires more data than strictly needed for its functionality.",
+            "questions": [
+                "Is the amount of collected data necessary for the correct functioning of the system?",
+                "Is the processing frequency necessary?",
+                "Are there more data subjects involved than necessary?"
+            ],
+            "competent_agents": [1, 3]
+        },
+        {
+            "title": "UNNECESSARY DATA ANALYSIS",
+            "type": 5,
+            "description": "Data is further processed, analyzed, or enriched in a way that is not strictly necessary for the functionality.",
+            "questions": [
+                "Is the data enrichment/analysis necessary for the system\u2019s functionality?"
+            ],
+            "competent_agents": [1, 3]
+        },
+        {
+            "title": "UNNECESSARY DATA RETENTION",
+            "type": 5,
+            "description": "Data is stored for longer than needed.",
+            "questions": [
+                "Is the data stored for longer time than necessary?"
+            ],
+            "competent_agents": [3, 4]
+        },
+        {
+            "title": "OVEREXPOSURE OF PERSONAL DATA",
+            "type": 5,
+            "description": "Personal data is shared with more services or external parties than necessary.",
+            "questions": [
+                "Is the data necessary for the recipient?",
+                "Are there more parties involved than necessary?",
+                "How accessible is the data (public/limited/private)?"
+            ],
+            "competent_agents": [3, 4]
+        },
+        {
+            "title": "INSUFFICIENT TRANSPARENCY",
+            "type": 6,
+            "description": "Data subjects are insufficiently informed about the collection and processing of their personal data.",
+            "questions": [
+                "Are data subjects insufficiently informed about the processing of personal data, including the purposes and methods of the processing involved?"
+            ],
+            "competent_agents": [3, 4]
+        },
+        {
+            "title": "INSUFFICIENT INFORMATION WHEN SHARING DATA OF OTHERS",
+            "type": 6,
+            "description": "When sharing personal data of others, users are insufficiently informed about the further data processing.",
+            "questions": [
+                "If a user shares personal data of others, is it clear what, why, and how that data is further processed?"
+            ],
+            "competent_agents": [3, 4]
+        },
+        {
+            "title": "INSUFFICIENT PRIVACY CONTROLS",
+            "type": 6,
+            "description": "Data subjects have insufficient controls to manage their preferences.",
+            "questions": [
+                "Does the system enable the data subject to configure which personal data is processed and for what purposes?",
+                "Can the data subject alter their preferences afterwards?"
+            ],
+            "competent_agents": [1, 3]
+        },
+        {
+            "title": "INSUFFICIENT ACCESS",
+            "type": 6,
+            "description": "Data subjects do not have access to their personal data.",
+            "questions": [
+                "Do data subjects lack the ability to access the personal data being collected, processed, stored, or disclosed about them?"
+            ],
+            "competent_agents": [3, 4]
+        },
+        {
+            "title": "INSUFFICIENT RECTIFICATION OR ERASURE",
+            "type": 6,
+            "description": "Data subjects cannot rectify or erase their personal data.",
+            "questions": [
+                "Do data subjects have the ability to correct or delete their personal data?"
+            ],
+            "competent_agents": [3, 4]
+        },
+        {
+            "title": "NON-COMPLIANCE OF PROCESSING WITH APPLICABLE REGULATIONS",
+            "type": 7,
+            "description": "The processing of personal data by the system is not compliant with applicable privacy regulations.",
+            "questions": [
+                "Will the system be used in jurisdictions with specific rules for personal data processing (e.g., the EU)?",
+                "Does the system, or its processing activities, violate one or more rules in these applicable regulation(s)?"
+            ],
+            "competent_agents": [3, 4]
+        },
+        {
+            "title": "NON-ADHERENCE TO PRIVACY STANDARDS",
+            "type": 7,
+            "description": "The system is not compliant with privacy standards and best practices.",
+            "questions": [
+                "Are there any (industry) specific privacy standards that are applicable to the system?",
+                "Does the system adequately implement the principles and controls outlined in these standards?"
+            ],
+            "competent_agents": [3, 4]
+        },
+        {
+            "title": "IMPROPER DATA LIFECYCLE MANAGEMENT",
+            "type": 7,
+            "description": "Data is not properly managed throughout its entire lifecycle within the system.",
+            "questions": [
+                "Is there a data lifecycle management policy defined for the data processed within the system?",
+                "Does the policy outline clear principles for each phase of the data lifecycle (creation, storage, sharing and usage, archival, and destruction)?"
+            ],
+            "competent_agents": [3, 5]
+        },
+        {
+            "title": "INSUFFICIENT SECURITY OF PROCESSING",
+            "type": 7,
+            "description": "Data security measures and processes do not adhere to risk and security management best practices and standards.",
+            "questions": [
+                "Is there an established process to manage security risks and identify the required countermeasures?",
+                "Does the system incorporate the required countermeasures?",
+                "Are the countermeasures aligned with industry standards and best practices?"
+            ],
+            "competent_agents": [0, 5]
+        }
+    ]
+}
