@@ -67,7 +67,7 @@
             "type": 2,
             "description": "The user can be identified because the data in their requests can be used to infer who they are.",
             "questions": [
-                "Are requests or records sufficiently unique to differentiate them from those of a speci\ufb01c individual?"
+                "Are requests or records sufficiently unique to differentiate them from those of a specific individual?"
             ],
             "competent_agents": [1, 3]
         },
@@ -86,7 +86,7 @@
             "type": 2,
             "description": "Communication contains (quasi-)identifiers.",
             "questions": [
-                "Is there a distinctive identifier used during interactions or when referring to an individual\u2019s data?",
+                "Is there a distinctive identifier used during interactions or when referring to an individual's data?",
                 "Can multiple attributes be combined to create a unique reference to an individual or their data?"
             ],
             "competent_agents": [1, 3]
@@ -96,7 +96,7 @@
             "type": 2,
             "description": "Stored data can be used to identify individuals.",
             "questions": [
-                "Is there a distinctive identifier used during interactions or when referring to an individual\u2019s data?",
+                "Is there a distinctive identifier used during interactions or when referring to an individual's data?",
                 "Can multiple attributes be combined to create a unique reference to an individual or their data?"
             ],
             "competent_agents": [1, 3]
@@ -155,7 +155,7 @@
         {
             "title": "DETECTABLE USERS",
             "type": 4,
-            "description": "Inferring the existence of a user from the system\u2019s response.",
+            "description": "Inferring the existence of a user from the system's response.",
             "questions": [
                 "Does the system show status messages (informational, warnings, errors) when retrieving data?",
                 "Are the status messages distinct when an item (a file, user, . . .) does not exist compared to not having access rights?"
@@ -219,7 +219,7 @@
             "type": 5,
             "description": "Data is further processed, analyzed, or enriched in a way that is not strictly necessary for the functionality.",
             "questions": [
-                "Is the data enrichment/analysis necessary for the system\u2019s functionality?"
+                "Is the data enrichment/analysis necessary for the system's functionality?"
             ],
             "competent_agents": [1, 3]
         },
