@@ -69,8 +69,23 @@ This is the previous analysis from your team:
 {f"The Chief Information Security Officer thinks the threat is {"" if previous_analysis[5]["reply"] else "not "} present because {previous_analysis[5]["reason"]}." if previous_analysis[5] else ""}
 '''
 	"""
+
+def LINDDUN_GO_USER_PROMPT(inputs, question, title, description):
+	return f"""
+'''
+APPLICATION TYPE: {inputs["app_type"]}
+AUTHENTICATION METHODS: {inputs["authentication"]}
+APPLICATION DESCRIPTION: {inputs["app_description"]}
+DATABASE_SCHEMA: {inputs["database"]}
+DATA POLICY: {inputs["data_policy"]}
+QUESTIONS: {question}
+THREAT_TITLE: {title}
+THREAT_DESCRIPTION: {description}
+'''
+	"""
+
 LINDDUN_GO_SYSTEM_PROMPT = """
-When providing the answer, you must use a JSON response with the following structure:
+When providing the answer, you MUST reply with a JSON object with the following structure:
 {
     "reply": <boolean>,
     "reason": <string>
@@ -109,6 +124,7 @@ THREAT_DESCRIPTION: threat_description
 '''
 
 Example of expected JSON response format:
+
 {
     "reply": true,
     "reason": "The threat is present because the application description mentions that the application is internet facing and uses a weak authentication method."

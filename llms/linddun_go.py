@@ -2,12 +2,15 @@ import json
 import google.generativeai as genai
 import random
 from openai import OpenAI
+from mistralai.client import MistralClient
+from mistralai.models.chat_completion import ChatMessage
 from misc.utils import (
     match_number_color,
     match_letter,
 )
 from llms.prompts import (
     LINDDUN_GO_SYSTEM_PROMPT,
+    LINDDUN_GO_USER_PROMPT,
     LINDDUN_GO_SPECIFIC_PROMPTS,
     LINDDUN_GO_PREVIOUS_ANALYSIS_PROMPT,
     LINDDUN_GO_JUDGE_PROMPT,
@@ -43,11 +46,11 @@ def get_linddun_go(api_key, model_name, inputs):
 
     present_threats = []
 
-    for elem in deck:
-        question = "\n".join(elem["questions"])
-        title = elem["title"]
-        description = elem["description"]
-        type = elem["type"]
+    for card in deck:
+        question = "\n".join(card["questions"])
+        title = card["title"]
+        description = card["description"]
+        type = card["type"]
         response = client.chat.completions.create(
             model=model_name,
             response_format={"type": "json_object"},
@@ -56,19 +59,10 @@ def get_linddun_go(api_key, model_name, inputs):
                 {
                     "role": "system",
                     "content": LINDDUN_GO_SPECIFIC_PROMPTS[0]+LINDDUN_GO_SYSTEM_PROMPT,
-                }, {"role": "user", "content": 
-                 f"""
-'''
-APPLICATION TYPE: {inputs["app_type"]}
-AUTHENTICATION METHODS: {inputs["authentication"]}
-APPLICATION DESCRIPTION: {inputs["app_description"]}
-DATABASE_SCHEMA: {inputs["database"]}
-DATA POLICY: {inputs["data_policy"]}
-QUESTIONS: {question}
-THREAT_TITLE: {title}
-THREAT_DESCRIPTION: {description}
-'''
-                """
+                }, 
+                {
+                    "role": "user", 
+                    "content": LINDDUN_GO_USER_PROMPT(inputs, question, title, description)
                 },
             ],
             max_tokens=4096,
@@ -86,68 +80,134 @@ THREAT_DESCRIPTION: {description}
     return present_threats
 
 
-def get_multiagent_linddun_go(api_key, model_name, inputs, rounds, threats_to_analyze):
 
-    client = OpenAI(api_key=api_key)
-    present_threats = []
+def get_multiagent_linddun_go(keys, models, inputs, rounds, threats_to_analyze, llms_to_use):
+    openai_client = OpenAI(api_key=keys["openai_api_key"]) if "OpenAI API" in llms_to_use else None
+    mistral_client = MistralClient(api_key=keys["mistral_api_key"]) if "Mistral API" in llms_to_use else None
+    if "Google AI API" in llms_to_use:
+        genai.configure(api_key=keys["google_api_key"])
+        google_client = genai.GenerativeModel(
+                models["google_model"], generation_config={"response_mime_type": "application/json"}
+        )
+    else:
+        google_client = None
+    threats = []
     deck = get_deck()
     random.shuffle(deck)
 
 
-    for elem in deck[0:threats_to_analyze]:
-        question = "\n".join(elem["questions"])
-        title = elem["title"]
-        description = elem["description"]
-        type = elem["type"]
+    for card in deck[0:threats_to_analyze]:
+        question = "\n".join(card["questions"])
+        title = card["title"]
+        description = card["description"]
+        type = card["type"]
         previous_analysis = [{} for _ in range(6)]
         for round in range(rounds):
-            for i in elem["competent_agents"]:
-                response = client.chat.completions.create(
-                    model=model_name,
-                    response_format={"type": "json_object"},
-                    messages=[
-                        {
-                            "role": "system",
-                            "content": LINDDUN_GO_SPECIFIC_PROMPTS[i]+LINDDUN_GO_SYSTEM_PROMPT+(LINDDUN_GO_PREVIOUS_ANALYSIS_PROMPT(previous_analysis) if previous_analysis[i] else ""),
-                        },
-                        {"role": "user", "content": 
-                        f"""
-        '''
-        APPLICATION TYPE: {inputs["app_type"]}
-        AUTHENTICATION METHODS: {inputs["authentication"]}
-        APPLICATION DESCRIPTION: {inputs["app_description"]}
-        DATABASE_SCHEMA: {inputs["database"]}
-        DATA POLICY: {inputs["data_policy"]}
-        QUESTIONS: {question}
-        THREAT_TITLE: {title}
-        THREAT_DESCRIPTION: {description}
-        '''
-                        """
-                        },
-                    ],
-                    max_tokens=4096,
-                )
-                response_content = json.loads(response.choices[0].message.content)
+            for i in card["competent_agents"]:
+                llm = random.randrange(0, len(llms_to_use))
+                system_prompt = LINDDUN_GO_SPECIFIC_PROMPTS[i]+LINDDUN_GO_SYSTEM_PROMPT+(LINDDUN_GO_PREVIOUS_ANALYSIS_PROMPT(previous_analysis) if previous_analysis[i] else "")  
+                user_prompt = LINDDUN_GO_USER_PROMPT(inputs, question, title, description)
+                if llms_to_use[llm] == "OpenAI API":
+                    response_content = get_response_openai(
+                        openai_client, 
+                        models["openai_model"], 
+                        system_prompt,
+                        user_prompt
+                    )
+                elif llms_to_use[llm] == "Mistral API":
+                    response_content = get_response_mistral(
+                        mistral_client,
+                        models["mistral_model"],
+                        system_prompt,
+                        user_prompt
+                    )
+                elif llms_to_use[llm] == "Google AI API":
+                    response_content = get_response_google(
+                        google_client,
+                        system_prompt,
+                        user_prompt
+                    )
+                else:
+                    raise Exception("Invalid LLM provider")
+
+                #print(llm)
+                #print(response_content)
                 
                 previous_analysis[i] = response_content
                 #print(response_content)
         #print(previous_analysis)
-        final_verdict = judge(api_key, model_name, previous_analysis)
+        final_verdict = judge(keys, models, previous_analysis)
         final_verdict["question"] = question
         final_verdict["threat_title"] = title
         final_verdict["threat_description"] = description
         final_verdict["threat_type"] = type
         #print(final_verdict)
-        present_threats.append(final_verdict)
+        threats.append(final_verdict)
     #print(f"Present threats:\n{present_threats}")
 
-    return present_threats
+    return threats
 
-
-def judge(api_key, model_name, previous_analysis):
-    client = OpenAI(api_key=api_key)
+def get_response_openai(client, model, system_prompt, user_prompt):
     response = client.chat.completions.create(
-        model=model_name,
+        model=model,
+        response_format={"type": "json_object"},
+        messages=[
+            {
+                "role": "system",
+                "content": system_prompt,
+            },
+            {
+                "role": "user", 
+                "content": user_prompt,
+            },
+        ],
+        max_tokens=4096,
+    )
+    return json.loads(response.choices[0].message.content)
+
+def get_response_mistral(client, model, system_prompt, user_prompt):
+
+	response = client.chat(
+			model=model,
+			response_format={"type": "json_object"},
+			messages=[
+				ChatMessage(role="system", content=system_prompt),
+				ChatMessage(role="user", content=user_prompt),
+			],
+			max_tokens=4096,
+	)
+
+	return json.loads(response.choices[0].message.content)
+
+def get_response_google(client, system_prompt, user_prompt):
+    messages = [
+        {
+            'role':'user',
+            'parts': system_prompt,
+        },
+        {
+            'role':'user',
+            'parts': user_prompt,
+        }
+    ]
+    response = client.generate_content(
+        messages,
+        generation_config=genai.types.GenerationConfig(
+            response_mime_type="application/json",
+            max_output_tokens=4096,
+            temperature=0.01,
+        ),
+    )
+
+    return json.loads(response.candidates[0].content.parts[0].text)
+
+    
+	
+
+def judge(keys, models, previous_analysis):
+    client = OpenAI(api_key=keys["openai_api_key"])
+    response = client.chat.completions.create(
+        model=models["openai_model"],
         response_format={"type": "json_object"},
         temperature=0.01,
         messages=[

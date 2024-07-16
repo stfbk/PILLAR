@@ -1,3 +1,4 @@
+import json
 import streamlit as st
 from llms.linddun_go import (
     get_linddun_go,
@@ -21,21 +22,45 @@ threats just by providing the description.
     with c1:
         multiagent_linddun_go = st.checkbox("Use multiple LLM agents to simulate LINDDUN Go with a team of experts")
         rounds = st.slider("Number of rounds", 1, 5, 3, disabled=not multiagent_linddun_go)
-        threats_to_analyze = st.slider("Number of threats to analyze", 1, 10, 3, disabled=not multiagent_linddun_go)
+        if "max_threats" not in st.session_state:
+            with open("misc/deck.json", "r") as deck_file:
+                deck = json.load(deck_file)
+            st.session_state["max_threats"] = len(deck["cards"])
+        threats_to_analyze = st.slider("Number of threats to analyze", 1, st.session_state["max_threats"], 3, disabled=not multiagent_linddun_go)
+        llms_to_use = st.multiselect(
+            "Select the LLMs to use",
+            ["OpenAI API", "Azure OpenAI Service", "Google AI API", "Mistral API"],
+            default=["OpenAI API"],
+            help="Select the LLM providers to use for the multi-agent simulation, if you want to have multiple ones.",
+            disabled=not multiagent_linddun_go,
+        )
     with c2:
         linddun_go_submit_button = st.button(label="Simulate LINDDUN Go")
     
     if linddun_go_submit_button and st.session_state["input"]["app_description"]:
         inputs = st.session_state["input"]
+        present_threats = []
         # Show a spinner while generating the attack tree
         with st.spinner("Answering questions..."):
             try:
-                if st.session_state["model_provider"] == "OpenAI API":
-                    if multiagent_linddun_go:
-                        present_threats = get_multiagent_linddun_go(st.session_state["openai_api_key"], st.session_state["selected_model"], inputs, rounds, threats_to_analyze)
-                    else:
-                        present_threats = get_linddun_go(st.session_state["openai_api_key"], st.session_state["selected_model"], inputs)
-
+                if multiagent_linddun_go:
+                    present_threats = get_multiagent_linddun_go(
+                        st.session_state["keys"], 
+                        {
+                            "openai_model": st.session_state["openai_model"],
+                            "mistral_model": st.session_state["mistral_model"],
+                            "google_model": None,
+                            "azure_deployment_name": None,
+                        },
+                        inputs, 
+                        rounds, 
+                        threats_to_analyze,
+                        llms_to_use,
+                    )
+                elif st.session_state["model_provider"] == "OpenAI API":
+                    present_threats = get_linddun_go(st.session_state["keys"]["openai_api_key"], st.session_state["openai_model"], inputs)
+                elif st.session_state["model_provider"] == "Mistral API":
+                    pass
             except Exception as e:
                 st.error(f"Error generating simulation: {e}")
 

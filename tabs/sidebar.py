@@ -5,15 +5,17 @@ def sidebar():
 
 # Add instructions on how to use the app to the sidebar
     st.sidebar.header("How to use LINDDUN GPT")
+    if "keys" not in st.session_state:
+        st.session_state["keys"] = {}
 
     with st.sidebar:
         try:
             openai_api_key = st.secrets["openai_api_key"]
-            st.session_state["openai_api_key"] = openai_api_key
+            st.session_state["keys"]["openai_api_key"] = openai_api_key
             google_api_key = st.secrets["google_api_key"]
-            st.session_state["google_api_key"] = google_api_key
+            st.session_state["keys"]["google_api_key"] = google_api_key
             mistral_api_key = st.secrets["mistral_api_key"]
-            st.session_state["mistral_api_key"] = mistral_api_key
+            st.session_state["keys"]["mistral_api_key"] = mistral_api_key
         except Exception as e:
             openai_api_key = None
             google_api_key = None
@@ -46,15 +48,15 @@ def sidebar():
             )
             if openai_api_key_input:
                 openai_api_key = openai_api_key_input
-            st.session_state["openai_api_key"] = openai_api_key
+            st.session_state["keys"]["openai_api_key"] = openai_api_key
 
-            # Add model selection input field to the sidebar
-            selected_model = st.selectbox(
-                "Select the model you would like to use:",
-                ["gpt-3.5-turbo", "gpt-4-turbo", "gpt-4", "gpt-4o"],
-                key="selected_model",
-                help="OpenAI have moved to continuous model upgrades so `gpt-3.5-turbo`, `gpt-4` and `gpt-4-turbo` point to the latest available version of each model.",
-            )
+        # Add model selection input field to the sidebar
+        openai_model = st.selectbox(
+            "Select the model you would like to use:",
+            ["gpt-3.5-turbo", "gpt-4-turbo", "gpt-4", "gpt-4o"],
+            key="openai_model",
+            help="OpenAI have moved to continuous model upgrades so `gpt-3.5-turbo`, `gpt-4` and `gpt-4-turbo` point to the latest available version of each model.",
+        )
 
         if model_provider == "Azure OpenAI Service":
             st.markdown(
@@ -71,7 +73,7 @@ def sidebar():
                 type="password",
                 help="You can find your Azure OpenAI API key on the [Azure portal](https://portal.azure.com/).",
             )
-            st.session_state["azure_api_key"] = azure_api_key
+            st.session_state["keys"]["azure_api_key"] = azure_api_key
 
             # Add Azure OpenAI endpoint input field to the sidebar
             azure_api_endpoint = st.text_input(
@@ -109,13 +111,13 @@ def sidebar():
             )
             if google_api_key_input:
                 google_api_key = google_api_key_input
-            st.session_state["google_api_key"] = google_api_key
-            # Add model selection input field to the sidebar
-            google_model = st.selectbox(
-                "Select the model you would like to use:",
-                ["gemini-1.5-pro-latest"],
-                key="google_model",
-            )
+            st.session_state["keys"]["google_api_key"] = google_api_key
+        # Add model selection input field to the sidebar
+        google_model = st.selectbox(
+            "Select the model you would like to use:",
+            ["gemini-1.5-pro-latest"],
+            key="google_model",
+        )
 
         if model_provider == "Mistral API":
             st.markdown(
@@ -133,14 +135,14 @@ def sidebar():
             )
             if mistral_api_key_input:
                 mistral_api_key = mistral_api_key_input
-            st.session_state["mistral_api_key"] = mistral_api_key
+            st.session_state["keys"]["mistral_api_key"] = mistral_api_key
 
-            # Add model selection input field to the sidebar
-            mistral_model = st.selectbox(
-                "Select the model you would like to use:",
-                ["mistral-large-latest", "mistral-small-latest"],
-                key="mistral_model",
-            )
+        # Add model selection input field to the sidebar
+        mistral_model = st.selectbox(
+            "Select the model you would like to use:",
+            ["mistral-large-latest", "mistral-small-latest", "open-mixtral-8x22b"],
+            key="mistral_model",
+        )
 
         st.markdown("""---""")
 

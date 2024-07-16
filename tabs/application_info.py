@@ -2,12 +2,6 @@ import streamlit as st
 import base64
 
 from llms.threat_model import (
-    create_threat_model_prompt,
-    get_threat_model,
-    get_threat_model_azure,
-    get_threat_model_google,
-    get_threat_model_mistral,
-    threat_model_gen_markdown,
     get_image_analysis,
     create_image_analysis_prompt,
 )
@@ -54,8 +48,8 @@ description, the more accurate the threat model will be.
     # If model provider is OpenAI API and the model is gpt-4-turbo or gpt-4o
     with col1:
         if st.session_state["model_provider"] == "OpenAI API":
-            selected_model = st.session_state["selected_model"]
-            openai_api_key = st.session_state["openai_api_key"]
+            selected_model = st.session_state["openai_model"]
+            openai_api_key = st.session_state["keys"]["openai_api_key"]
         if st.session_state["model_provider"] == "OpenAI API" and selected_model in [
             "gpt-4-turbo",
             "gpt-4o",

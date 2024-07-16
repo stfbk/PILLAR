@@ -38,22 +38,22 @@ understanding possible privacy threats and provides suggestions on how to mitiga
                     if model_provider == "Azure OpenAI Service":
                         model_output = get_threat_model_azure(
                             st.session_state["azure_api_endpoint"],
-                            st.session_state["azure_api_key"],
+                            st.session_state["keys"]["azure_api_key"],
                             st.session_state["azure_api_version"],
                             st.session_state["azure_deployment_name"],
                             st.session_state["threat_model_prompt"],
                         )
                     elif model_provider == "OpenAI API":
                         model_output = get_threat_model(
-                            st.session_state["openai_api_key"], st.session_state["selected_model"], threat_model_prompt
+                            st.session_state["keys"]["openai_api_key"], st.session_state["openai_model"], threat_model_prompt
                         )
                     elif model_provider == "Google AI API":
                         model_output = get_threat_model_google(
-                            st.session_state["google_api_key"], st.session_state["google_model"], threat_model_prompt
+                            st.session_state["keys"]["google_api_key"], st.session_state["google_model"], threat_model_prompt
                         )
                     elif model_provider == "Mistral API":
                         model_output = get_threat_model_mistral(
-                            st.session_state["mistral_api_key"], st.session_state["mistral_model"], threat_model_prompt
+                            st.session_state["keys"]["mistral_api_key"], st.session_state["mistral_model"], threat_model_prompt
                         )
 
                     # Access the threat model from the parsed content
