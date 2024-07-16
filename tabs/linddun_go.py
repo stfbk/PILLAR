@@ -56,12 +56,18 @@ threats just by providing the description.
                             "azure_deployment_name": None,
                         },
                         inputs, 
+                        st.session_state["temperature"],
                         rounds, 
                         threats_to_analyze,
                         llms_to_use,
                     )
                 elif st.session_state["model_provider"] == "OpenAI API":
-                    present_threats = get_linddun_go(st.session_state["keys"]["openai_api_key"], st.session_state["openai_model"], inputs)
+                    present_threats = get_linddun_go(
+                        st.session_state["keys"]["openai_api_key"], 
+                        st.session_state["openai_model"], 
+                        inputs,
+                        st.session_state["temperature"],
+                    )
                 elif st.session_state["model_provider"] == "Mistral API":
                     pass
             except Exception as e:

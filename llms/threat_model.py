@@ -109,13 +109,13 @@ def get_image_analysis(api_key, model_name, prompt, base64_image):
 
 
 # Function to get threat model from the GPT response.
-def get_threat_model(api_key, model_name, prompt):
+def get_threat_model_openai(api_key, model_name, prompt, temperature):
 		client = OpenAI(api_key=api_key)
 
 		response = client.chat.completions.create(
 				model=model_name,
 				response_format={"type": "json_object"},
-				temperature=0.01,
+				temperature=temperature,
 				messages=[
 						{
 								"role": "system",
@@ -161,12 +161,19 @@ def get_threat_model_azure(
 
 
 # Function to get threat model from the Google response.
-def get_threat_model_google(google_api_key, google_model, prompt):
+def get_threat_model_google(google_api_key, google_model, prompt, temperature):
 		genai.configure(api_key=google_api_key)
 		model = genai.GenerativeModel(
 				google_model, generation_config={"response_mime_type": "application/json"}
 		)
-		response = model.generate_content(prompt)
+		response = model.generate_content(
+			prompt, 
+			generation_config=genai.types.GenerationConfig(
+				temperature=temperature,
+				response_mime_type="application/json",
+				max_output_tokens=4096,
+			)
+		)
 		try:
 				# Access the JSON content from the 'parts' attribute of the 'content' object
 				response_content = json.loads(response.candidates[0].content.parts[0].text)
@@ -180,17 +187,18 @@ def get_threat_model_google(google_api_key, google_model, prompt):
 
 
 # Function to get threat model from the Mistral response.
-def get_threat_model_mistral(mistral_api_key, mistral_model, prompt):
+def get_threat_model_mistral(mistral_api_key, mistral_model, prompt, temperature):
 	client = MistralClient(api_key=mistral_api_key)
 
 	response = client.chat(
-			model=mistral_model,
-			response_format={"type": "json_object"},
-			messages=[
-				ChatMessage(role="system", content=THREAT_MODEL_SYSTEM_PROMPT),
-				ChatMessage(role="user", content=prompt),
-			],
-			max_tokens=4096,
+		model=mistral_model,
+		response_format={"type": "json_object"},
+		messages=[
+			ChatMessage(role="system", content=THREAT_MODEL_SYSTEM_PROMPT),
+			ChatMessage(role="user", content=prompt),
+		],
+		max_tokens=4096,
+		temperature=temperature,
 	)
 
 	# Convert the JSON string in the 'content' field to a Python dictionary

@@ -39,7 +39,7 @@ def get_deck(file="misc/deck.json"):
     return deck["cards"]
 
 
-def get_linddun_go(api_key, model_name, inputs):
+def get_linddun_go(api_key, model_name, inputs, temperature):
     client = OpenAI(api_key=api_key)
     deck = get_deck()
     
@@ -54,7 +54,7 @@ def get_linddun_go(api_key, model_name, inputs):
         response = client.chat.completions.create(
             model=model_name,
             response_format={"type": "json_object"},
-            temperature=0.01,
+            temperature=temperature,
             messages=[
                 {
                     "role": "system",
@@ -81,7 +81,7 @@ def get_linddun_go(api_key, model_name, inputs):
 
 
 
-def get_multiagent_linddun_go(keys, models, inputs, rounds, threats_to_analyze, llms_to_use):
+def get_multiagent_linddun_go(keys, models, inputs, temperature, rounds, threats_to_analyze, llms_to_use):
     openai_client = OpenAI(api_key=keys["openai_api_key"]) if "OpenAI API" in llms_to_use else None
     mistral_client = MistralClient(api_key=keys["mistral_api_key"]) if "Mistral API" in llms_to_use else None
     if "Google AI API" in llms_to_use:
@@ -111,6 +111,7 @@ def get_multiagent_linddun_go(keys, models, inputs, rounds, threats_to_analyze, 
                     response_content = get_response_openai(
                         openai_client, 
                         models["openai_model"], 
+                        temperature,
                         system_prompt,
                         user_prompt
                     )
@@ -118,12 +119,14 @@ def get_multiagent_linddun_go(keys, models, inputs, rounds, threats_to_analyze, 
                     response_content = get_response_mistral(
                         mistral_client,
                         models["mistral_model"],
+                        temperature,
                         system_prompt,
                         user_prompt
                     )
                 elif llms_to_use[llm] == "Google AI API":
                     response_content = get_response_google(
                         google_client,
+                        temperature,
                         system_prompt,
                         user_prompt
                     )
@@ -136,7 +139,7 @@ def get_multiagent_linddun_go(keys, models, inputs, rounds, threats_to_analyze, 
                 previous_analysis[i] = response_content
                 #print(response_content)
         #print(previous_analysis)
-        final_verdict = judge(keys, models, previous_analysis)
+        final_verdict = judge(keys, models, previous_analysis, temperature)
         final_verdict["question"] = question
         final_verdict["threat_title"] = title
         final_verdict["threat_description"] = description
@@ -147,7 +150,7 @@ def get_multiagent_linddun_go(keys, models, inputs, rounds, threats_to_analyze, 
 
     return threats
 
-def get_response_openai(client, model, system_prompt, user_prompt):
+def get_response_openai(client, model, temperature, system_prompt, user_prompt):
     response = client.chat.completions.create(
         model=model,
         response_format={"type": "json_object"},
@@ -162,10 +165,11 @@ def get_response_openai(client, model, system_prompt, user_prompt):
             },
         ],
         max_tokens=4096,
+        temperature=temperature,
     )
     return json.loads(response.choices[0].message.content)
 
-def get_response_mistral(client, model, system_prompt, user_prompt):
+def get_response_mistral(client, model, temperature, system_prompt, user_prompt):
 
 	response = client.chat(
 			model=model,
@@ -175,11 +179,12 @@ def get_response_mistral(client, model, system_prompt, user_prompt):
 				ChatMessage(role="user", content=user_prompt),
 			],
 			max_tokens=4096,
+            temperature=temperature,
 	)
 
 	return json.loads(response.choices[0].message.content)
 
-def get_response_google(client, system_prompt, user_prompt):
+def get_response_google(client, temperature, system_prompt, user_prompt):
     messages = [
         {
             'role':'user',
@@ -195,7 +200,7 @@ def get_response_google(client, system_prompt, user_prompt):
         generation_config=genai.types.GenerationConfig(
             response_mime_type="application/json",
             max_output_tokens=4096,
-            temperature=0.01,
+            temperature=temperature,
         ),
     )
 
@@ -204,12 +209,12 @@ def get_response_google(client, system_prompt, user_prompt):
     
 	
 
-def judge(keys, models, previous_analysis):
+def judge(keys, models, previous_analysis, temperature):
     client = OpenAI(api_key=keys["openai_api_key"])
     response = client.chat.completions.create(
         model=models["openai_model"],
         response_format={"type": "json_object"},
-        temperature=0.01,
+        temperature=temperature,
         messages=[
             {
                 "role": "system",

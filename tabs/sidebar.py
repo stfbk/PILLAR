@@ -132,6 +132,7 @@ def sidebar():
             )
 
         st.markdown("""---""")
+        st.slider("Temperature setting", 0.01, 1.0, 0.7, key="temperature", help="The randomness of the model's responses. Lower values are more deterministic, higher values are more random.")
 
 # Add "About" section to the sidebar
     st.sidebar.header("About")

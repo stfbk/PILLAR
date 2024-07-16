@@ -1,7 +1,7 @@
 import streamlit as st
 from llms.threat_model import (
     create_threat_model_prompt,
-    get_threat_model,
+    get_threat_model_openai,
     get_threat_model_azure,
     get_threat_model_google,
     get_threat_model_mistral,
@@ -48,16 +48,25 @@ understanding possible privacy threats and provides suggestions on how to mitiga
                             st.session_state["threat_model_prompt"],
                         )
                     elif model_provider == "OpenAI API":
-                        model_output = get_threat_model(
-                            st.session_state["keys"]["openai_api_key"], st.session_state["openai_model"], threat_model_prompt
+                        model_output = get_threat_model_openai(
+                            st.session_state["keys"]["openai_api_key"],
+                            st.session_state["openai_model"], 
+                            threat_model_prompt,
+                            st.session_state["temperature"],
                         )
                     elif model_provider == "Google AI API":
                         model_output = get_threat_model_google(
-                            st.session_state["keys"]["google_api_key"], st.session_state["google_model"], threat_model_prompt
+                            st.session_state["keys"]["google_api_key"], 
+                            st.session_state["google_model"], 
+                            threat_model_prompt,
+                            st.session_state["temperature"],
                         )
                     elif model_provider == "Mistral API":
                         model_output = get_threat_model_mistral(
-                            st.session_state["keys"]["mistral_api_key"], st.session_state["mistral_model"], threat_model_prompt
+                            st.session_state["keys"]["mistral_api_key"], 
+                            st.session_state["mistral_model"], 
+                            threat_model_prompt,
+                            st.session_state["temperature"],
                         )
 
                     # Access the threat model from the parsed content
