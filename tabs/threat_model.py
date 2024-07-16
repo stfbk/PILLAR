@@ -21,6 +21,10 @@ understanding possible privacy threats and provides suggestions on how to mitiga
     threat_model_submit_button = st.button(label="Generate Threat Model")
 
     model_provider = st.session_state["model_provider"]
+    
+    if "threat_model_output" not in st.session_state:
+        st.session_state["threat_model_output"] = ""
+
     # If the Generate Threat Model button is clicked and the user has provided an application description
     if threat_model_submit_button and st.session_state["input"]["app_description"]:
         inputs = st.session_state["input"]
@@ -76,18 +80,20 @@ understanding possible privacy threats and provides suggestions on how to mitiga
 
         # Convert the threat model JSON to Markdown
         markdown_output = threat_model_gen_markdown(threat_model)
+        st.session_state["threat_model_output"] = markdown_output
 
-        # Display the threat model in Markdown
-        st.markdown(markdown_output, unsafe_allow_html=True)
+    # If the submit button is clicked and the user has not provided an application description
+    elif threat_model_submit_button and not st.session_state["input"]["app_description"]:
+        st.error("Please enter your application details before submitting.")
+        
+    # Display the threat model in Markdown
+    st.markdown(st.session_state["threat_model_output"], unsafe_allow_html=True)
 
+    if st.session_state["threat_model_output"] != "":
         # Add a button to allow the user to download the output as a Markdown file
         st.download_button(
             label="Download Threat Model",
-            data=markdown_output,  # Use the Markdown output
+            data=st.session_state["threat_model_output"],  # Use the Markdown output
             file_name="privacy_threat_model.md",
             mime="text/markdown",
         )
-
-    # If the submit button is clicked and the user has not provided an application description
-    if threat_model_submit_button and not st.session_state["input"]["app_description"]:
-        st.error("Please enter your application details before submitting.")

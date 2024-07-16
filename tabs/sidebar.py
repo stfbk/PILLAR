@@ -31,16 +31,17 @@ def sidebar():
             key="model_provider",
             help="Select the model provider you would like to use. This will determine the models available for selection.",
         )
-
-        if model_provider == "OpenAI API":
-            st.markdown(
+        st.markdown(
                 """
-        1. Enter your [OpenAI API key](https://platform.openai.com/account/api-keys) and chosen model below 🔑
-        2. Provide details of the application that you would like to threat model  📝
-        3. Generate a threat list, attack tree and/or mitigating controls for your application 🚀
+        1. Enter your [OpenAI API key](https://platform.openai.com/account/api-keys), [Google AI API key](https://makersuite.google.com/app/apikey) and/or [Mistral API key](https://console.mistral.ai/api-keys/) below
+        2. Choose the models you would like to use for each provider
+        3. Provide details of the application that you would like to privacy threat model
+        4. Generate a privacy threat model, or simulate the LINDDUN Go methodology for your application (even with multiple LLMs having a discussion)
         """
             )
-            # Add OpenAI API key input field to the sidebar
+        c1, c2 = st.columns([1, 1])
+
+        with c1:
             openai_api_key_input = st.text_input(
                 "Enter your OpenAI API key:",
                 type="password",
@@ -50,13 +51,25 @@ def sidebar():
                 openai_api_key = openai_api_key_input
             st.session_state["keys"]["openai_api_key"] = openai_api_key
 
-        # Add model selection input field to the sidebar
-        openai_model = st.selectbox(
-            "Select the model you would like to use:",
-            ["gpt-3.5-turbo", "gpt-4-turbo", "gpt-4", "gpt-4o"],
-            key="openai_model",
-            help="OpenAI have moved to continuous model upgrades so `gpt-3.5-turbo`, `gpt-4` and `gpt-4-turbo` point to the latest available version of each model.",
-        )
+            google_api_key_input = st.text_input(
+                "Enter your Google AI API key:",
+                type="password",
+                help="You can generate a Google AI API key in the [Google AI Studio](https://makersuite.google.com/app/apikey).",
+            )
+            if google_api_key_input:
+                google_api_key = google_api_key_input
+            st.session_state["keys"]["google_api_key"] = google_api_key
+
+        with c2:
+            mistral_api_key_input = st.text_input(
+                "Enter your Mistral API key:",
+                type="password",
+                help="You can generate a Mistral API key in the [Mistral console](https://console.mistral.ai/api-keys/).",
+            )
+            if mistral_api_key_input:
+                mistral_api_key = mistral_api_key_input
+            st.session_state["keys"]["mistral_api_key"] = mistral_api_key
+            st.empty()
 
         if model_provider == "Azure OpenAI Service":
             st.markdown(
@@ -95,54 +108,28 @@ def sidebar():
 
             st.write(f"Azure API Version: {azure_api_version}")
 
-        if model_provider == "Google AI API":
-            st.markdown(
-                """
-        1. Enter your [Google AI API key](https://makersuite.google.com/app/apikey) and chosen model below 🔑
-        2. Provide details of the application that you would like to threat model  📝
-        3. Generate a threat list, attack tree and/or mitigating controls for your application 🚀
-        """
+        c1, c2 = st.columns([1, 1])
+        with c1:
+            # Add model selection input field to the sidebar
+            openai_model = st.selectbox(
+                "OpenAI model:",
+                ["gpt-3.5-turbo", "gpt-4-turbo", "gpt-4", "gpt-4o"],
+                key="openai_model",
+                help="OpenAI have moved to continuous model upgrades so `gpt-3.5-turbo`, `gpt-4` and `gpt-4-turbo` point to the latest available version of each model.",
             )
-            # Add OpenAI API key input field to the sidebar
-            google_api_key_input = st.text_input(
-                "Enter your Google AI API key:",
-                type="password",
-                help="You can generate a Google AI API key in the [Google AI Studio](https://makersuite.google.com/app/apikey).",
+            # Add model selection input field to the sidebar
+            google_model = st.selectbox(
+                "Google AI model:",
+                ["gemini-1.5-pro-latest"],
+                key="google_model",
             )
-            if google_api_key_input:
-                google_api_key = google_api_key_input
-            st.session_state["keys"]["google_api_key"] = google_api_key
-        # Add model selection input field to the sidebar
-        google_model = st.selectbox(
-            "Select the model you would like to use:",
-            ["gemini-1.5-pro-latest"],
-            key="google_model",
-        )
-
-        if model_provider == "Mistral API":
-            st.markdown(
-                """
-        1. Enter your [Mistral API key](https://console.mistral.ai/api-keys/) and chosen model below 🔑
-        2. Provide details of the application that you would like to threat model  📝
-        3. Generate a threat list, attack tree and/or mitigating controls for your application 🚀
-        """
+        with c2:
+            # Add model selection input field to the sidebar
+            mistral_model = st.selectbox(
+                "Mistral model:",
+                ["mistral-large-latest", "mistral-small-latest", "open-mixtral-8x22b"],
+                key="mistral_model",
             )
-            # Add OpenAI API key input field to the sidebar
-            mistral_api_key_input = st.text_input(
-                "Enter your Mistral API key:",
-                type="password",
-                help="You can generate a Mistral API key in the [Mistral console](https://console.mistral.ai/api-keys/).",
-            )
-            if mistral_api_key_input:
-                mistral_api_key = mistral_api_key_input
-            st.session_state["keys"]["mistral_api_key"] = mistral_api_key
-
-        # Add model selection input field to the sidebar
-        mistral_model = st.selectbox(
-            "Select the model you would like to use:",
-            ["mistral-large-latest", "mistral-small-latest", "open-mixtral-8x22b"],
-            key="mistral_model",
-        )
 
         st.markdown("""---""")
 
