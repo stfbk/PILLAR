@@ -33,9 +33,9 @@ MUST have the following structure:
     "dfd": [
         {
             "from": "source_node",
-            "typefrom": "Entity/Process/Data Store",
+            "typefrom": "Entity/Process/Data store",
             "to": "destination_node",
-            "typeto": "Entity/Process/Data Store",
+            "typeto": "Entity/Process/Data store",
             "bidirectional": true/false
         },
         //// other edges description....
