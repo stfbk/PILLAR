@@ -35,7 +35,7 @@ st.set_page_config(
     page_title="LINDDUN GPT",
     page_icon=":shield:",
     layout="wide",
-    initial_sidebar_state="collapsed",
+    initial_sidebar_state="expanded",
 )
 
 # ------------------ Sidebar ------------------ #

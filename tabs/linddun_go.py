@@ -27,10 +27,17 @@ threats just by providing the description.
                 deck = json.load(deck_file)
             st.session_state["max_threats"] = len(deck["cards"])
         threats_to_analyze = st.slider("Number of threats to analyze", 1, st.session_state["max_threats"], 3, disabled=not multiagent_linddun_go)
+        available_llms = []
+        if st.session_state["keys"]["openai_api_key"] and st.session_state["openai_model"]:
+            available_llms.append("OpenAI API")
+        if st.session_state["keys"]["mistral_api_key"] and st.session_state["mistral_model"]:
+            available_llms.append("Mistral API")
+        if st.session_state["keys"]["google_api_key"] and st.session_state["google_model"]:
+            available_llms.append("Google AI API")
         llms_to_use = st.multiselect(
             "Select the LLMs to use",
-            ["OpenAI API", "Azure OpenAI Service", "Google AI API", "Mistral API"],
-            default=["OpenAI API"],
+            available_llms,
+            default=[available_llms[0]] if available_llms else [],
             help="Select the LLM providers to use for the multi-agent simulation, if you want to have multiple ones.",
             disabled=not multiagent_linddun_go,
         )
@@ -47,6 +54,8 @@ threats just by providing the description.
         with st.spinner("Answering questions..."):
             try:
                 if multiagent_linddun_go:
+                    if not llms_to_use:
+                        raise ValueError("Please select at least one LLM to use.")
                     present_threats = get_multiagent_linddun_go(
                         st.session_state["keys"], 
                         {
