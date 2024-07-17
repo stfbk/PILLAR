@@ -322,3 +322,16 @@ Example of expected JSON response format:
 			]
 		}}
 """
+def THREAT_MODEL_USER_PROMPT(
+		inputs
+):
+		prompt = f"""
+'''
+APPLICATION TYPE: {inputs["app_type"]}
+AUTHENTICATION METHODS: {inputs["authentication"]}
+APPLICATION DESCRIPTION: {inputs["app_description"]}
+DATABASE SCHEMA: {inputs["database"]}
+DATA POLICY: {inputs["data_policy"]}
+'''
+"""
+		return prompt

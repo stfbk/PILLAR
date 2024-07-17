@@ -1,12 +1,12 @@
 import streamlit as st
 from llms.threat_model import (
-    create_threat_model_prompt,
     get_threat_model_openai,
     get_threat_model_azure,
     get_threat_model_google,
     get_threat_model_mistral,
     threat_model_gen_markdown,
 )
+from llms.prompts import THREAT_MODEL_USER_PROMPT
 
 
 def threat_model():
@@ -28,7 +28,7 @@ understanding possible privacy threats and provides suggestions on how to mitiga
     # If the Generate Threat Model button is clicked and the user has provided an application description
     if threat_model_submit_button and st.session_state["input"]["app_description"]:
         inputs = st.session_state["input"]
-        threat_model_prompt = create_threat_model_prompt(
+        threat_model_prompt = THREAT_MODEL_USER_PROMPT(
             inputs
         )
 

@@ -29,20 +29,6 @@ def threat_model_gen_markdown(threat_model):
 		return markdown_output
 
 
-# Function to create a prompt for generating a threat model
-def create_threat_model_prompt(
-		inputs
-):
-		prompt = f"""
-'''
-APPLICATION TYPE: {inputs["app_type"]}
-AUTHENTICATION METHODS: {inputs["authentication"]}
-APPLICATION DESCRIPTION: {inputs["app_description"]}
-DATABASE SCHEMA: {inputs["database"]}
-DATA POLICY: {inputs["data_policy"]}
-'''
-"""
-		return prompt
 
 
 def create_image_analysis_prompt():
