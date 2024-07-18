@@ -21,6 +21,10 @@ a list of dictionaries with keys 'from', 'typefrom', 'to', 'typeto' and
         st.session_state["input"]["dfd"] = [ 
             {"from": "User", "typefrom": "Entity", "to": "Application", "typeto": "Process", "bidirectional": True},
         ]
+    if not st.session_state["input"]["dfd"]:
+        st.session_state["input"]["dfd"] = [
+            { "from": "User", "typefrom": "Entity", "to": "Application", "typeto": "Process", "bidirectional": True },
+        ]
     if "graph" not in st.session_state["input"]:
         st.session_state["input"]["graph"] = graphviz.Digraph()
         st.session_state["input"]["graph"].attr(
