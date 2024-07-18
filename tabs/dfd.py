@@ -41,7 +41,7 @@ a list of dictionaries with keys 'from', 'typefrom', 'to', 'typeto' and
         st.session_state["input"]["dfd"] = state
 
     with col1:
-        col11, col12 = st.columns([1,1])
+        col11, col12, col13 = st.columns([1,0.5,0.5])
         with col12:
             if st.button("AI generation", help="Generate a DFD graph from the provided application information, using the AI model."):
                 st.session_state["input"]["dfd"] = get_dfd(
@@ -50,6 +50,7 @@ a list of dictionaries with keys 'from', 'typefrom', 'to', 'typeto' and
                     st.session_state["temperature"],
                     st.session_state["input"],
                 )["dfd"]
+        with col13:
             if st.button("Update graph", help="Update the graph with the data currently in the table."):
                 graph = graphviz.Digraph()
                 graph.attr(
@@ -81,6 +82,8 @@ a list of dictionaries with keys 'from', 'typefrom', 'to', 'typeto' and
                     st.session_state["input"]["dfd"] = dfd
                 except Exception as e:
                     st.error(f"Error reading the uploaded file: {e}")
+        st.checkbox("Use DFD in subsequent threat modeling", key="use_dfd", help="Choose whether or not to include the DFD in the subsequent threat modeling process. Including it adds context to the LLM, but also increases token count.")
+        st.session_state["input"]["use_dfd"] = st.session_state["use_dfd"]
     with col2:
         st.graphviz_chart(st.session_state["input"]["graph"])
     def format_correct(state):

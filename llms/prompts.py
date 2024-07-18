@@ -71,11 +71,19 @@ This is the previous analysis from your team:
 	"""
 
 def LINDDUN_GO_USER_PROMPT(inputs, question, title, description):
-	return f"""
+	a = f"""
 '''
 APPLICATION TYPE: {inputs["app_type"]}
 AUTHENTICATION METHODS: {inputs["authentication"]}
 APPLICATION DESCRIPTION: {inputs["app_description"]}
+{f"""
+The user has also provided a Data Flow Diagram to describe the application.
+The DFD is described as a list of edges, connecting the "from" node to the
+"to" node. "typefrom" and "typeto" describe the type of the node, which can be
+an Entity, Process, or Data store. The "bidirectional" field indicates if the
+flow is bidirectional or not. This is the DFD provided:
+{inputs["dfd"]}
+""" if inputs["use_dfd"] else ""}
 DATABASE_SCHEMA: {inputs["database"]}
 DATA POLICY: {inputs["data_policy"]}
 QUESTIONS: {question}
@@ -83,6 +91,8 @@ THREAT_TITLE: {title}
 THREAT_DESCRIPTION: {description}
 '''
 	"""
+	print(a)
+	return a
 
 LINDDUN_GO_SYSTEM_PROMPT = """
 When providing the answer, you MUST reply with a JSON object with the following structure:
@@ -254,6 +264,14 @@ def THREAT_MODEL_USER_PROMPT(
 APPLICATION TYPE: {inputs["app_type"]}
 AUTHENTICATION METHODS: {inputs["authentication"]}
 APPLICATION DESCRIPTION: {inputs["app_description"]}
+{f"""
+The user has also provided a Data Flow Diagram to describe the application.
+The DFD is described as a list of edges, connecting the "from" node to the
+"to" node. "typefrom" and "typeto" describe the type of the node, which can be
+an Entity, Process, or Data store. The "bidirectional" field indicates if the
+flow is bidirectional or not. This is the DFD provided:
+{inputs["dfd"]}
+""" if inputs["use_dfd"] else ""}
 DATABASE SCHEMA: {inputs["database"]}
 DATA POLICY: {inputs["data_policy"]}
 '''
