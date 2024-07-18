@@ -23,6 +23,9 @@ a list of dictionaries with keys 'from', 'typefrom', 'to', 'typeto' and
         ]
     if "graph" not in st.session_state["input"]:
         st.session_state["input"]["graph"] = graphviz.Digraph()
+        st.session_state["input"]["graph"].attr(
+            bgcolor=f"{st.get_option("theme.backgroundColor")}",
+        )
 
     def update_edges():
         changes = st.session_state["edges"]
