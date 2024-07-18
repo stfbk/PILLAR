@@ -112,7 +112,7 @@ Example input format:
 '''
 APPLICATION TYPE: Web | Mobile | Desktop | Cloud | IoT | Other application
 AUTHENTICATION METHODS: SSO | MFA | OAUTH2 | Basic | None
-APPLICATION DESCRIPTION: the general application description 
+APPLICATION DESCRIPTION: the general application description, sometimes with a Data Flow Diagram
 DATABASE SCHEMA: the database schema used by the application to contain the data, or none if no database is used, in this JSON format:
 {[
 {
@@ -200,11 +200,12 @@ LINDDUN threat types you should consider:
 
 When providing the threat model, use a JSON formatted response with the key
 "threat_model". Under "threat_model", include an array of objects with the keys
-"threat_type", "Scenario", and "Potential Impact". 
+"threat_type", "Scenario", and "Reason". 
 
 For each threat type, list multiple credible threats. Each threat scenario
 should provide a credible scenario in which the threat could occur in the
-context of the application. It is very important that your responses are
+context of the application. Each "Reason" should explain why the threat is
+present in the application. It is very important that your responses are
 tailored to reflect the details you are given. You MUST include all threat
 categories at least three times, and as many times you can.
 
@@ -216,7 +217,7 @@ Example input format:
 '''
 APPLICATION TYPE: Web | Mobile | Desktop | Cloud | IoT | Other application
 AUTHENTICATION METHODS: SSO | MFA | OAUTH2 | Basic | None
-APPLICATION DESCRIPTION: the general application description 
+APPLICATION DESCRIPTION: the general application description, sometimes with a Data Flow Diagram
 DATABASE SCHEMA: the database schema used by the application to contain the
 data, or none if no database is used, in this JSON format:
 {[
@@ -298,7 +299,7 @@ The input is going to be structured as follows, enclosed in triple quotes:
 '''
 APPLICATION TYPE: Web | Mobile | Desktop | Cloud | IoT | Other application
 AUTHENTICATION METHODS: SSO | MFA | OAUTH2 | Basic | None
-APPLICATION DESCRIPTION: the general application description 
+APPLICATION DESCRIPTION: the general application description, sometimes with a Data Flow Diagram
 DATABASE SCHEMA: the database schema used by the application to contain the
 data, or none if no database is used, in this JSON format:
 {[

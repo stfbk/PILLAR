@@ -17,14 +17,14 @@ def threat_model_gen_markdown(threat_model):
 		markdown_output = "## Privacy Threat Model\n\n"
 
 		# Start the markdown table with headers
-		markdown_output += "| Threat Type | Scenario | Potential Impact |\n"
-		markdown_output += "|-------------|----------|------------------|\n"
+		markdown_output += "| Threat Type | Scenario | Reason |\n"
+		markdown_output += "|-------------|----------|--------|\n"
 
 		# Fill the table rows with the threat model data
 		for threat in threat_model:
 				color = match_color(threat["threat_type"])
 				color_html = f"<p style='background-color:{color};color:#ffffff;'>"
-				markdown_output += f"| {color_html}{threat['threat_type']}</p> | {threat['Scenario']} | {threat['Potential Impact']} |\n"
+				markdown_output += f"| {color_html}{threat['threat_type']}</p> | {threat['Scenario']} | {threat['Reason']} |\n"
 
 		return markdown_output
 
