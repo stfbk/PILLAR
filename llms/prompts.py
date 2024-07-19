@@ -71,7 +71,7 @@ This is the previous analysis from your team:
 	"""
 
 def LINDDUN_GO_USER_PROMPT(inputs, question, title, description):
-	a = f"""
+	return f"""
 '''
 APPLICATION TYPE: {inputs["app_type"]}
 AUTHENTICATION METHODS: {inputs["authentication"]}
@@ -91,8 +91,6 @@ THREAT_TITLE: {title}
 THREAT_DESCRIPTION: {description}
 '''
 	"""
-	print(a)
-	return a
 
 LINDDUN_GO_SYSTEM_PROMPT = """
 When providing the answer, you MUST reply with a JSON object with the following structure:

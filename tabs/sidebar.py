@@ -40,7 +40,7 @@ def sidebar():
                 "OpenAI API",
                 "Google AI API",
                 "Mistral API",
-            ],  # ["OpenAI API", "Azure OpenAI Service", "Google AI API", "Mistral API"],
+            ],
             key="model_provider",
             help="Select the model provider you would like to use. This will determine the models available for selection.",
         )
@@ -59,7 +59,7 @@ def sidebar():
                 "OpenAI API",
                 "Google AI API",
                 "Mistral API",
-            ],  # ["OpenAI API", "Azure OpenAI Service", "Google AI API", "Mistral API"],
+            ],
             help="Select the model provider you would like to insert the keys for. This will determine the models available for selection.",
         )
 
@@ -68,7 +68,7 @@ def sidebar():
         with c1:
             if llm_to_configure == "OpenAI API":
                 openai_api_key_input = st.text_input(
-                    "Enter your OpenAI API key:",
+                    "OpenAI API key:",
                     type="password",
                     help="You can find your OpenAI API key on the [OpenAI dashboard](https://platform.openai.com/account/api-keys).",
                 )
@@ -78,7 +78,7 @@ def sidebar():
 
             if llm_to_configure == "Google AI API":
                 google_api_key_input = st.text_input(
-                    "Enter your Google AI API key:",
+                    "Google AI API key:",
                     type="password",
                     help="You can generate a Google AI API key in the [Google AI Studio](https://makersuite.google.com/app/apikey).",
                 )
@@ -88,7 +88,7 @@ def sidebar():
 
             if llm_to_configure == "Mistral API":
                 mistral_api_key_input = st.text_input(
-                    "Enter your Mistral API key:",
+                    "Mistral API key:",
                     type="password",
                     help="You can generate a Mistral API key in the [Mistral console](https://console.mistral.ai/api-keys/).",
                 )
@@ -100,7 +100,7 @@ def sidebar():
             if llm_to_configure == "OpenAI API":
                 openai_model = st.selectbox(
                     "OpenAI model:",
-                    ["gpt-3.5-turbo", "gpt-4-turbo", "gpt-4", "gpt-4o"],
+                    ["gpt-4o-mini", "gpt-3.5-turbo", "gpt-4-turbo", "gpt-4", "gpt-4o"],
                     help="OpenAI have moved to continuous model upgrades so `gpt-3.5-turbo`, `gpt-4` and `gpt-4-turbo` point to the latest available version of each model.",
                 )
                 if openai_model != st.session_state["openai_model"]:
