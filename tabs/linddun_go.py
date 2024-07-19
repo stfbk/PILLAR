@@ -46,6 +46,8 @@ threats just by providing the description.
     
     if "linddun_go_output" not in st.session_state:
         st.session_state["linddun_go_output"] = ""
+    if "linddun_go_threats" not in st.session_state:
+        st.session_state["linddun_go_threats"] = []
 
     if linddun_go_submit_button and st.session_state["input"]["app_description"]:
         inputs = st.session_state["input"]
@@ -85,14 +87,16 @@ threats just by providing the description.
         # Convert the threat model JSON to Markdown
         markdown_output = linddun_go_gen_markdown(present_threats)
         st.session_state["linddun_go_output"] = markdown_output
+        st.session_state["linddun_go_threats"] = present_threats
 
     elif linddun_go_submit_button and not st.session_state["input"]["app_description"]:
         st.error("Please enter your application details before submitting.")
 
-    # Display the threat model in Markdown
-    st.markdown(st.session_state["linddun_go_output"], unsafe_allow_html=True)
 
     if st.session_state["linddun_go_output"] != "":
+        st.markdown("# LINDDUN Go simulation result")
+        # Display the threat model in Markdown
+        st.markdown(st.session_state["linddun_go_output"], unsafe_allow_html=True)
         # Add a button to allow the user to download the output as a Markdown file
         st.download_button(
             label="Download Output",

@@ -18,10 +18,8 @@ from llms.prompts import (
 
 # Function to convert JSON to Markdown for display.
 def linddun_go_gen_markdown(present_threats):
-    markdown_output = "## Threats identified with LINDDUN Go\n\n"
-
     # Start the markdown table with headers
-    markdown_output += "| Threat Name | Threat description | Detection reason |\n"
+    markdown_output = "| Threat Name | Threat description | Detection reason |\n"
     markdown_output += "|-------------|--------------------|------------------|\n"
 
     # Fill the table rows with the threat model data
