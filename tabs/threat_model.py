@@ -28,7 +28,7 @@ understanding possible privacy threats and provides suggestions on how to mitiga
         st.session_state["threat_model_threats"] = []
 
     # If the Generate Threat Model button is clicked and the user has provided an application description
-    if threat_model_submit_button and st.session_state["input"]["app_description"]:
+    if threat_model_submit_button and (st.session_state["input"]["app_description"] or st.session_state["dfd_only"]):
         inputs = st.session_state["input"]
         threat_model_prompt = THREAT_MODEL_USER_PROMPT(
             inputs
@@ -95,7 +95,7 @@ understanding possible privacy threats and provides suggestions on how to mitiga
         st.session_state["threat_model_threats"] = threat_model
 
     # If the submit button is clicked and the user has not provided an application description
-    elif threat_model_submit_button and not st.session_state["input"]["app_description"]:
+    elif threat_model_submit_button and not st.session_state["input"]["app_description"] and not st.session_state["dfd_only"]:
         st.error("Please enter your application details before submitting.")
         
 

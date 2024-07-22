@@ -49,7 +49,7 @@ threats just by providing the description.
     if "linddun_go_threats" not in st.session_state:
         st.session_state["linddun_go_threats"] = []
 
-    if linddun_go_submit_button and st.session_state["input"]["app_description"]:
+    if linddun_go_submit_button and (st.session_state["input"]["app_description"] or st.session_state["dfd_only"]):
         inputs = st.session_state["input"]
         present_threats = []
         # Show a spinner while generating the attack tree
@@ -89,7 +89,7 @@ threats just by providing the description.
         st.session_state["linddun_go_output"] = markdown_output
         st.session_state["linddun_go_threats"] = present_threats
 
-    elif linddun_go_submit_button and not st.session_state["input"]["app_description"]:
+    elif linddun_go_submit_button and not st.session_state["input"]["app_description"] and not st.session_state["dfd_only"]:
         st.error("Please enter your application details before submitting.")
 
 

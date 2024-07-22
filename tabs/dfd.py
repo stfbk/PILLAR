@@ -44,10 +44,14 @@ a list of dictionaries with keys 'from', 'typefrom', 'to', 'typeto' and
 
         st.session_state["input"]["dfd"] = state
 
+    st.checkbox("DFD only", value=False, key="dfd_only", help="Check this box if you only want to use a Data Flow Diagram for the threat modeling, without including the application description.")
+    st.session_state["input"]["dfd_only"] = st.session_state["dfd_only"]
+    st.checkbox("Include DFD in application info for threat modeling", key="use_dfd", help="Choose whether or not to include the DFD in the subsequent threat modeling process, together with the application description. Including it adds context to the LLM, but also increases token count.", disabled=st.session_state["dfd_only"])
+    st.session_state["input"]["use_dfd"] = st.session_state["use_dfd"]
     with col1:
         col11, col12, col13 = st.columns([1,0.5,0.5])
         with col12:
-            if st.button("AI generation", help="Generate a DFD graph from the provided application information, using the AI model."):
+            if st.button("AI generation", help="Generate a DFD graph from the application information provided in the previous tab, using the AI model.", disabled=st.session_state["dfd_only"]):
                 st.session_state["input"]["dfd"] = get_dfd(
                     st.session_state["keys"]["openai_api_key"],
                     st.session_state["openai_model"],
@@ -83,11 +87,11 @@ a list of dictionaries with keys 'from', 'typefrom', 'to', 'typeto' and
                 try:
                     reader = csv.DictReader(StringIO(uploaded_file.getvalue().decode("utf-8-sig")), delimiter=",")
                     dfd = list(reader)
+                    for edge in dfd:
+                        edge["bidirectional"] = True if edge["bidirectional"] == "true" else False
                     st.session_state["input"]["dfd"] = dfd
                 except Exception as e:
                     st.error(f"Error reading the uploaded file: {e}")
-        st.checkbox("Use DFD in subsequent threat modeling", key="use_dfd", help="Choose whether or not to include the DFD in the subsequent threat modeling process. Including it adds context to the LLM, but also increases token count.")
-        st.session_state["input"]["use_dfd"] = st.session_state["use_dfd"]
     with col2:
         st.graphviz_chart(st.session_state["input"]["graph"])
     def format_correct(state):
@@ -103,7 +107,7 @@ a list of dictionaries with keys 'from', 'typefrom', 'to', 'typeto' and
             new_dict["typefrom"].append(object.get("typefrom"))
             new_dict["to"].append(object.get("to"))
             new_dict["typeto"].append(object.get("typeto"))
-            new_dict["bidirectional"].append(object.get("bidirectional"))
+            bool(new_dict["bidirectional"].append(object.get("bidirectional")))
         return new_dict
         
     edges = st.data_editor(
