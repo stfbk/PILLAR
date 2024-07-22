@@ -1,10 +1,5 @@
 import streamlit as st
-import base64
 
-from llms.threat_model import (
-    get_image_analysis,
-    create_image_analysis_prompt,
-)
 
 # Function to get user input for the application description and key details
 def get_description():
@@ -50,91 +45,10 @@ description, the more accurate the threat model will be.
 
     # If model provider is OpenAI API and the model is gpt-4-turbo or gpt-4o
     with col1:
-        if st.session_state["model_provider"] == "OpenAI API":
-            selected_model = st.session_state["openai_model"]
-            openai_api_key = st.session_state["keys"]["openai_api_key"]
-        if st.session_state["model_provider"] == "OpenAI API" and selected_model in [
-            "gpt-4-turbo",
-            "gpt-4o",
-        ]:
-            uploaded_file = st.file_uploader(
-                "Upload architecture diagram", type=["jpg", "jpeg", "png"]
-            )
-            if uploaded_file is not None:
-                if not openai_api_key:
-                    st.error("Please enter your OpenAI API key to analyse the image.")
-                else:
-                    if (
-                        "uploaded_file" not in st.session_state
-                        or st.session_state.uploaded_file != uploaded_file
-                    ):
-                        st.session_state.uploaded_file = uploaded_file
-                        with st.spinner("Analysing the uploaded image..."):
-
-                            def encode_image(uploaded_file):
-                                return base64.b64encode(uploaded_file.read()).decode(
-                                    "utf-8"
-                                )
-
-                            base64_image = encode_image(uploaded_file)
-
-                            image_analysis_prompt = create_image_analysis_prompt()
-
-                            try:
-                                image_analysis_output = get_image_analysis(
-                                    openai_api_key,
-                                    selected_model,
-                                    image_analysis_prompt,
-                                    base64_image,
-                                )
-                                if (
-                                    image_analysis_output
-                                    and "choices" in image_analysis_output
-                                    and image_analysis_output["choices"][0]["message"][
-                                        "content"
-                                    ]
-                                ):
-                                    image_analysis_content = image_analysis_output[
-                                        "choices"
-                                    ][0]["message"]["content"]
-                                    st.session_state.image_analysis_content = (
-                                        image_analysis_content
-                                    )
-                                    # Update app_description session state
-                                    st.session_state["app_description"] = (
-                                        image_analysis_content
-                                    )
-                                else:
-                                    st.error(
-                                        "Failed to analyze the image. Please check the API key and try again."
-                                    )
-                            except KeyError as e:
-                                st.error(
-                                    "Failed to analyze the image. Please check the API key and try again."
-                                )
-                                print(f"Error: {e}")
-                            except Exception as e:
-                                st.error(
-                                    "An unexpected error occurred while analyzing the image."
-                                )
-                                print(f"Error: {e}")
-
-            # Use text_area with the session state value and update the session state on change
-            app_description = st.text_area(
-                label="Describe the application to be modelled",
-                value=st.session_state["input"]["app_description"],
-                help="Please provide a detailed description of the application, including the purpose of the application, the technologies used, and any other relevant information.",
-                height=250,
-            )
-            # Update session state only if the text area content has changed
-            if app_description != st.session_state["input"]["app_description"]:
-                st.session_state["input"]["app_description"] = app_description
-
-        else:
-            # For other model providers or models, use the get_input() function
-            app_description = get_description()
-            # Update session state
-            st.session_state["input"]["app_description"] = app_description
+        # For other model providers or models, use the get_input() function
+        app_description = get_description()
+        # Update session state
+        st.session_state["input"]["app_description"] = app_description
 
     # Ensure app_description is always up to date in the session state
     app_description = st.session_state["input"]["app_description"]

@@ -2,9 +2,14 @@ import streamlit as st
 import graphviz
 import csv
 import pandas as pd
+import base64
+import json
 from io import StringIO
 from llms.dfd import get_dfd
 
+from llms.threat_model import (
+    get_image_analysis,
+)
 
 def dfd():
     st.markdown("""
@@ -16,7 +21,6 @@ a list of dictionaries with keys 'from', 'typefrom', 'to', 'typeto' and
 'bidirectional', representing each edge. 
 """)
     st.markdown("""---""")
-    col1, col2 = st.columns([0.6,0.4])
     if "dfd" not in st.session_state["input"]:
         st.session_state["input"]["dfd"] = [ 
             {"from": "User", "typefrom": "Entity", "to": "Application", "typeto": "Process", "bidirectional": True},
@@ -48,9 +52,73 @@ a list of dictionaries with keys 'from', 'typefrom', 'to', 'typeto' and
     st.session_state["input"]["dfd_only"] = st.session_state["dfd_only"]
     st.checkbox("Include DFD in application info for threat modeling", key="use_dfd", help="Choose whether or not to include the DFD in the subsequent threat modeling process, together with the application description. Including it adds context to the LLM, but also increases token count.", disabled=st.session_state["dfd_only"])
     st.session_state["input"]["use_dfd"] = st.session_state["use_dfd"]
+    col1, col2 = st.columns([0.6,0.4])
     with col1:
-        col11, col12, col13 = st.columns([1,0.5,0.5])
+        col11, col12, col13 = st.columns([0.4,0.4,0.2])
         with col12:
+            if st.session_state["model_provider"] == "OpenAI API":
+                selected_model = "gpt-4o"
+                openai_api_key = st.session_state["keys"]["openai_api_key"]
+                uploaded_file = st.file_uploader(
+                    "Upload DFD image", type=["jpg", "jpeg", "png"],
+                    help="Upload an image of the DFD to be analyzed by the AI model and converted for later usage.",
+                )
+                if uploaded_file is not None:
+                    if not openai_api_key:
+                        st.error("Please enter your OpenAI API key to analyse the image.")
+                    else:
+                        if (
+                            "uploaded_file" not in st.session_state
+                            or st.session_state["uploaded_file"] != uploaded_file
+                        ):
+                            st.session_state["uploaded_file"] = uploaded_file
+                            with st.spinner("Analysing the uploaded image..."):
+
+                                def encode_image(uploaded_file):
+                                    return base64.b64encode(uploaded_file.read()).decode(
+                                        "utf-8"
+                                    )
+
+                                base64_image = encode_image(uploaded_file)
+
+                                try:
+                                    image_analysis_output = get_image_analysis(
+                                        openai_api_key,
+                                        selected_model,
+                                        base64_image,
+                                    )
+                                    if (
+                                        image_analysis_output
+                                        and "choices" in image_analysis_output
+                                        and image_analysis_output["choices"][0]["message"][
+                                            "content"
+                                        ]
+                                    ):
+                                        image_analysis_content = image_analysis_output[
+                                            "choices"
+                                        ][0]["message"]["content"]
+                                        st.session_state["image_analysis_content"] = (
+                                            image_analysis_content
+                                        )
+                                        # Update app_description session state
+                                        st.session_state["input"]["dfd"] = (
+                                            json.loads(image_analysis_content)["dfd"]
+                                        )
+                                    else:
+                                        st.error(
+                                            "Failed to analyze the image. Please check the API key and try again."
+                                        )
+                                except KeyError as e:
+                                    st.error(
+                                        "Failed to analyze the image. Please check the API key and try again."
+                                    )
+                                    print(f"Error: {e}")
+                                except Exception as e:
+                                    st.error(
+                                        "An unexpected error occurred while analyzing the image."
+                                    )
+                                    print(f"Error: {e}")
+        with col13:
             if st.button("AI generation", help="Generate a DFD graph from the application information provided in the previous tab, using the AI model.", disabled=st.session_state["dfd_only"]):
                 st.session_state["input"]["dfd"] = get_dfd(
                     st.session_state["keys"]["openai_api_key"],
@@ -58,7 +126,6 @@ a list of dictionaries with keys 'from', 'typefrom', 'to', 'typeto' and
                     st.session_state["temperature"],
                     st.session_state["input"],
                 )["dfd"]
-        with col13:
             if st.button("Update graph", help="Update the graph with the data currently in the table."):
                 graph = graphviz.Digraph()
                 graph.attr(
@@ -123,3 +190,5 @@ a list of dictionaries with keys 'from', 'typefrom', 'to', 'typeto' and
         num_rows="dynamic",
         on_change=update_edges,
     )
+    
+

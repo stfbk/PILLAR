@@ -10,6 +10,7 @@ from misc.utils import (
 )
 from llms.prompts import (
 	THREAT_MODEL_SYSTEM_PROMPT,
+	DFD_IMAGE_SYSTEM_PROMPT,
 )
 
 # Function to convert JSON to Markdown for display.
@@ -27,69 +28,43 @@ def threat_model_gen_markdown(threat_model):
 	return markdown_output
 
 
-
-
-def create_image_analysis_prompt():
-		prompt = """
-		You are a Senior Solution Architect tasked with explaining the following architecture diagram to 
-		a Security Architect to support the threat modelling of the system.
-
-		In order to complete this task you must:
-
-			1. Analyse the diagram
-			2. Explain the system architecture to the Security Architect. Your explanation should cover the key 
-				 components, their interactions, and any technologies used.
-		
-		Provide a direct explanation of the diagram in a clear, structured format, suitable for a professional 
-		discussion.
-		
-		IMPORTANT INSTRUCTIONS:
-		 - Do not include any words before or after the explanation itself. For example, do not start your
-		explanation with "The image shows..." or "The diagram shows..." just start explaining the key components
-		and other relevant details.
-		 - Do not infer or speculate about information that is not visible in the diagram. Only provide information that can be
-		directly determined from the diagram itself.
-		"""
-		return prompt
-
-
 # Function to get analyse uploaded architecture diagrams.
-def get_image_analysis(api_key, model_name, prompt, base64_image):
-		headers = {"Content-Type": "application/json", "Authorization": f"Bearer {api_key}"}
+def get_image_analysis(api_key, model_name, base64_image):
+	headers = {"Content-Type": "application/json", "Authorization": f"Bearer {api_key}"}
 
-		messages = [
+	messages = [
+		{
+			"role": "user",
+			"content": [
+				{"type": "text", "text": DFD_IMAGE_SYSTEM_PROMPT},
 				{
-						"role": "user",
-						"content": [
-								{"type": "text", "text": prompt},
-								{
-										"type": "image_url",
-										"image_url": {"url": f"data:image/jpeg;base64,{base64_image}"},
-								},
-						],
-				}
-		]
+					"type": "image_url",
+					"image_url": {"url": f"data:image/jpeg;base64,{base64_image}"},
+				},
+			],
+		}
+	]
 
-		payload = {"model": model_name, "messages": messages, "max_tokens": 4000}
+	payload = {"model": model_name, "messages": messages, "response_format": {"type": "json_object" }, "max_tokens": 4096}
 
-		response = requests.post(
-				"https://api.openai.com/v1/chat/completions", headers=headers, json=payload
-		)
+	response = requests.post(
+		"https://api.openai.com/v1/chat/completions", headers=headers, json=payload
+	)
 
-		# Log the response for debugging
-		try:
-				response.raise_for_status()  # Raise an HTTPError for bad responses
-				response_content = response.json()
-				return response_content
-		except requests.exceptions.HTTPError as http_err:
-				print(f"HTTP error occurred: {http_err}")  # HTTP error
-		except Exception as err:
-				print(f"Other error occurred: {err}")  # Other errors
+	# Log the response for debugging
+	try:
+		response.raise_for_status()  # Raise an HTTPError for bad responses
+		response_content = response.json()
+		return response_content
+	except requests.exceptions.HTTPError as http_err:
+		print(f"HTTP error occurred: {http_err}")  # HTTP error
+	except Exception as err:
+		print(f"Other error occurred: {err}")  # Other errors
 
-		print(
-				f"Response content: {response.content}"
-		)  # Log the response content for further inspection
-		return None
+	print(
+			f"Response content: {response.content}"
+	)  # Log the response content for further inspection
+	return None
 
 
 # Function to get threat model from the GPT response.
