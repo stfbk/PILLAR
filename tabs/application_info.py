@@ -13,6 +13,7 @@ def get_description():
         placeholder="Enter your application details...",
         height=250,
         help="Please provide a detailed description of the application, including the purpose of the application, the technologies used, and any other relevant information.",
+        disabled=st.session_state["dfd_only"],
     )
 
     st.session_state["input"]["app_description"] = input_text
@@ -44,6 +45,8 @@ description, the more accurate the threat model will be.
     if "input" not in st.session_state:
         st.session_state["input"] = {}
         init_state()
+    if "dfd_only" not in st.session_state:
+        st.session_state["dfd_only"] = False
 
     # If model provider is OpenAI API and the model is gpt-4-turbo or gpt-4o
     with col1:
@@ -151,6 +154,7 @@ description, the more accurate the threat model will be.
                 "IoT application",
                 "Other",
             ],
+            disabled=st.session_state["dfd_only"],
         )
         if app_type != st.session_state["input"]["app_type"]:
             st.session_state["input"]["app_type"] = app_type
@@ -158,6 +162,7 @@ description, the more accurate the threat model will be.
         authentication = st.multiselect(
             "What authentication methods are supported by the application?",
             ["SSO", "MFA", "OAUTH2", "Basic", "None"],
+            disabled=st.session_state["dfd_only"],
         )
         if authentication != st.session_state["input"]["authentication"]:
             st.session_state["input"]["authentication"] = authentication
@@ -168,12 +173,13 @@ description, the more accurate the threat model will be.
             help="Please describe the data policy of the application, including how users can access, modify, or delete their data. If possible, specify the data retention policy and how data is handled after account deletion.",
             placeholder="Enter the data policy details...",
             height=250,
+            disabled=st.session_state["dfd_only"],
         )
         if data_policy != st.session_state["input"]["data_policy"]:
             st.session_state["input"]["data_policy"] = data_policy
 
 
-    has_database = st.checkbox("The app uses a database", value=True)
+    has_database = st.checkbox("The app uses a database", value=True, disabled=st.session_state["dfd_only"])
     if has_database != st.session_state["input"]["has_database"]:
         st.session_state["input"]["has_database"] = has_database
     st.markdown("""
@@ -199,7 +205,7 @@ description, the more accurate the threat model will be.
             "notes": st.column_config.TextColumn("Notes", help="Enter any additional information which might be important in the privacy realm, such as the data's collection frequency.", width="medium", required=False, default=None),
         },
         num_rows="dynamic",
-        disabled=not has_database,
+        disabled=not has_database or st.session_state["dfd_only"],
     )
 
     database = None if not has_database else database
