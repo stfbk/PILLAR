@@ -90,8 +90,8 @@ The JSON output MUST be structured as follows:
                 "role": "user", 
                 "content": THREAT_MODEL_USER_PROMPT(inputs) + f"""
                 
-THREAT: {threat['Scenario']}
-REASON: {threat['Reason']}
+THREAT: {threat['Scenario'] if 'Scenario' in threat else threat['threat_title'] + ' - ' + threat['threat_description']}
+REASON: {threat['Reason'] if 'Reason' in threat else threat['reason']}
 PERCEIVED_IMPACT: {threat['perceived_impact'] if 'perceived_impact' in threat else ''}
 PERCEIVED_LIKELIHOOD: {threat['perceived_likelihood'] if 'perceived_likelihood' in threat else ''}
 IMPLEMENTED_MEASURES: {threat['measures'] if 'measures' in threat else ''}
@@ -100,13 +100,5 @@ IMPLEMENTED_MEASURES: {threat['measures'] if 'measures' in threat else ''}
         ],
         max_tokens=4096,
     )
-    print(THREAT_MODEL_USER_PROMPT(inputs) + f"""
-                
-THREAT: {threat['Scenario']}
-REASON: {threat['Reason']}
-PERCEIVED_IMPACT: {threat['perceived_impact'] if 'perceived_impact' in threat else ''}
-PERCEIVED_LIKELIHOOD: {threat['perceived_likelihood'] if 'perceived_likelihood' in threat else ''}
-IMPLEMENTED_MEASURES: {threat['measures'] if 'measures' in threat else ''}
-""")
     return json.loads(response.choices[0].message.content)
 
