@@ -101,7 +101,11 @@ def get_multiagent_linddun_go(keys, models, inputs, temperature, rounds, threats
         type = card["type"]
         previous_analysis = [{} for _ in range(6)]
         for round in range(rounds):
-            for i in card["competent_agents"]:
+            for i in range(6):
+                if round == 2 and i not in card["competent_agents"]:
+                    previous_analysis[i] = {} # At the third round, we only have to consider the analysis of the competent agents in the second round, not the others, so we reset the previous analysis for the non-competent agents
+                if i not in card["competent_agents"] and round != 0:
+                    continue
                 llm = random.randrange(0, len(llms_to_use))
                 system_prompt = LINDDUN_GO_SPECIFIC_PROMPTS[i]+LINDDUN_GO_SYSTEM_PROMPT+(LINDDUN_GO_PREVIOUS_ANALYSIS_PROMPT(previous_analysis) if previous_analysis[i] else "")  
                 user_prompt = LINDDUN_GO_USER_PROMPT(inputs, question, title, description)
@@ -136,7 +140,7 @@ def get_multiagent_linddun_go(keys, models, inputs, temperature, rounds, threats
                 
                 previous_analysis[i] = response_content
                 #print(response_content)
-        #print(previous_analysis)
+            #print(previous_analysis)
         final_verdict = judge(keys, models, previous_analysis, temperature)
         final_verdict["question"] = question
         final_verdict["threat_title"] = title
