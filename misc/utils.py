@@ -35,3 +35,19 @@ def match_letter(threat_type_number):
 def match_number_color(threat_type_number):
     letter = match_letter(threat_type_number)
     return match_color(letter)
+
+def match_category_number(category):
+    if category == "Linking":
+        return 1
+    elif category == "Identifying":
+        return 2
+    elif category == "Non-repudiation":
+        return 3
+    elif category == "Detecting":
+        return 4
+    elif category == "Data disclosure":
+        return 5
+    elif category == "Unawareness and unintervenability":
+        return 6
+    elif category == "Non-compliance":
+        return 7

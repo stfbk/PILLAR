@@ -1,5 +1,8 @@
 import streamlit as st
-from llms.linddun_pro import get_linddun_pro
+from llms.linddun_pro import (
+    get_linddun_pro,
+    linddun_pro_gen_markdown,
+)
 
 
 def linddun_pro():
@@ -43,7 +46,20 @@ and which LINDDUN threat category to look for. Finally, click the button below t
                         st.session_state["data_flow_description"],
                     )
                 )
-                print(st.session_state["linddun_pro_threats"])
+    st.markdown("## Threats for the specified edge")
+    if st.session_state["linddun_pro_threats"][st.session_state["edge_num"]]:
+        markdown = linddun_pro_gen_markdown(st.session_state["linddun_pro_threats"][st.session_state["edge_num"]])
+        st.markdown(markdown, unsafe_allow_html=True)
+        st.download_button(
+            label="Download Threat Model",
+            data=markdown,
+            file_name="linddun_pro_threat_model.md",
+            mime="text/markdown",
+        )
+        st.session_state["linddun_pro_output"] = markdown
+
+    else:
+        st.markdown("No threats found for the specified edge yet, provide the necessary information and press the analyze button to find some.")
     
     
     

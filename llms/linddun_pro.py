@@ -1,6 +1,21 @@
 import json
 from openai import OpenAI
+from misc.utils import (
+    match_category_number,
+    match_number_color,
+)
 
+def linddun_pro_gen_markdown(threats):
+    # Start the markdown table with headers
+    markdown_output = "| Category| Threat at source | Threat at data flow | Threat at destination |\n"
+    markdown_output += "|------|-------------|--------------------|------------------|\n"
+
+    # Fill the table rows with the threat model data
+    for threat in threats:
+        color = match_number_color(match_category_number(threat["category"]))
+        color_html = f"<p style='background-color:{color};color:#ffffff;'>"
+        markdown_output += f"| {color_html}{threat['category']}</p> | {threat['source']} | {threat['data_flow']} | {threat['destination']} |\n"
+    return markdown_output
 
 def mapping_table(edge, category):
     table = [
@@ -42,12 +57,15 @@ DATA FLOW: A boolean, indicating whether you should analyze the data flow for th
 DESTINATION: A boolean, indicating whether you should analyze the destination node for the edge.
 '''
 
-The output should be a detailed analysis of the possible threats of the specified category for the edge. You should consider the source, data flow, and destination nodes based on the provided information.
+The output should be a detailed analysis of the possible threats of the specified category for the edge. You should consider the source, data flow, and destination nodes based on the provided information,
+finding potential privacy threats and explaining why they are relevant to the source, destination or data flow. If no threats are relevant to one of these, you should explain why. If 
+it is specified that you don't need to analyze the source, data flow or destination, just say "Not applicable" for that part.
 The output MUST be a JSON response with the following structure:
 
 {
-    "threat": "A brief description of the identified threat.",
-    "reason": "A detailed explanation of why the threat is relevant to the specified edge.",
+    "source": "A detailed explanation of which threat of the specified category is possible at the source node.",
+    "data_flow": "A detailed explanation of which threat of the specified category is possible in the data flow.",
+    "destination": "A detailed explanation of which threat of the specified category is possible at the destination node.",
 }
                 """,
             },
@@ -67,4 +85,6 @@ DESTINATION: {destination}
         ],
         max_tokens=4096,
     )
-    return json.loads(response.choices[0].message.content)
+    threat = json.loads(response.choices[0].message.content)
+    threat["category"] = category
+    return threat
