@@ -8,6 +8,7 @@ from tabs.dfd import dfd
 from tabs.threat_model import threat_model
 from tabs.linddun_go import linddun_go
 from tabs.risk_assessment import risk_assessment
+from tabs.linddun_pro import linddun_pro
 
 
 # ------------------ Helper Functions ------------------ #
@@ -45,8 +46,8 @@ sidebar()
 
 # ------------------ Main App UI ------------------ #
 
-tab1, tab2, tab3, tab4, tab5 = st.tabs(
-    ["Application info", "DFD", "Threat Model", "LINDDUN Go", "Risk Assessment"],
+tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs(
+    ["Application info", "DFD", "Threat Model", "LINDDUN Go", "LINDDUN Pro", "Risk Assessment"],
 )
 
 with tab1:
@@ -61,5 +62,9 @@ with tab3:
 
 with tab4:
     linddun_go()
+
 with tab5:
+    linddun_pro()
+
+with tab6:
     risk_assessment()

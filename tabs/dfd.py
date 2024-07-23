@@ -10,7 +10,7 @@ from llms.dfd import get_dfd
 from llms.threat_model import (
     get_image_analysis,
 )
-
+    
 def dfd():
     st.markdown("""
 In this section, you can create a Data Flow Diagram (DFD) to visualize the flow
@@ -127,22 +127,7 @@ a list of dictionaries with keys 'from', 'typefrom', 'to', 'typeto' and
                     st.session_state["input"],
                 )["dfd"]
             if st.button("Update graph", help="Update the graph with the data currently in the table."):
-                graph = graphviz.Digraph()
-                graph.attr(
-                    bgcolor=f"{st.get_option("theme.backgroundColor")}",
-                )
-                graph.node_attr.update(
-                    color=f"{st.get_option("theme.primaryColor")}",
-                    fontcolor="white",
-                )
-                for object in st.session_state["input"]["dfd"]:
-                    graph.node(object["from"], shape=f"{"box" if object["typefrom"] == "Entity" else "ellipse" if object["typefrom"] == "Process" else "cylinder"}")
-                    graph.node(object["to"], shape=f"{"box" if object["typeto"] == "Entity" else "ellipse" if object["typeto"] == "Process" else "cylinder"}")
-                    graph.edge(object["from"], object["to"], _attributes={"color": "white"})
-                    if object["bidirectional"]:
-                        graph.edge(object["to"], object["from"], _attributes={"color": "white"})
-                #print(graph.source)
-                st.session_state["input"]["graph"] = graph
+                update_graph()
         with col11:
             uploaded_file = st.file_uploader(
                 "Upload DFD", 
@@ -192,3 +177,25 @@ a list of dictionaries with keys 'from', 'typefrom', 'to', 'typeto' and
     )
     
 
+
+def update_graph():
+    graph = graphviz.Digraph()
+    graph.attr(
+        bgcolor=f"{st.get_option("theme.backgroundColor")}",
+    )
+    graph.node_attr.update(
+        color=f"{st.get_option("theme.primaryColor")}",
+        fontcolor="white",
+    )
+    graph.edge_attr.update(
+        color="white",
+        fontcolor="white",
+    )
+    for (i, object) in enumerate(st.session_state["input"]["dfd"]):
+        graph.node(object["from"], shape=f"{"box" if object["typefrom"] == "Entity" else "ellipse" if object["typefrom"] == "Process" else "cylinder"}")
+        graph.node(object["to"], shape=f"{"box" if object["typeto"] == "Entity" else "ellipse" if object["typeto"] == "Process" else "cylinder"}")
+        graph.edge(object["from"], object["to"], label=f"DF{i}")
+        if object["bidirectional"]:
+            graph.edge(object["to"], object["from"], label=f"DF{i}_inv")
+    #print(graph.source)
+    st.session_state["input"]["graph"] = graph
