@@ -4,6 +4,10 @@ from misc.utils import (
     match_category_number,
     match_number_color,
 )
+from llms.prompts import (
+    LINDDUN_PRO_SYSTEM_PROMPT,
+    LINDDUN_PRO_USER_PROMPT,
+)
 
 def linddun_pro_gen_markdown(threats):
     # Start the markdown table with headers
@@ -32,7 +36,7 @@ def mapping_table(edge, category):
     return (True, True, True)
 
 
-def get_linddun_pro(api_key, model, edge, category, description):
+def get_linddun_pro(api_key, model, dfd, edge, category, description):
     client = OpenAI(api_key=api_key)
     
     source, data_flow, destination = mapping_table(edge, category)
@@ -43,44 +47,11 @@ def get_linddun_pro(api_key, model, edge, category, description):
         messages=[
             {
                 "role": "system",
-                "content": """
-You are a privacy analyst with more than 20 years of experience working with the LINDDUN Pro privacy threat modeling technique.
-You are analyzing one edge of the Data Flow Diagram for a software application to identify potential privacy threats concerning that specific edge.
-
-The input is structured as follows, enclosed in triple quotes:
-'''
-EDGE: {"from": "source_node", "typefrom": "source_type", "to": "destination_node", "typeto": "destination_type"}
-CATEGORY: The specific LINDDUN threat category you should analyze for the edge.
-DESCRIPTION: A detailed description of the data flow for the edge.
-SOURCE: A boolean, indicating whether you should analyze the source node for the edge.
-DATA FLOW: A boolean, indicating whether you should analyze the data flow for the edge.
-DESTINATION: A boolean, indicating whether you should analyze the destination node for the edge.
-'''
-
-The output should be a detailed analysis of the possible threats of the specified category for the edge. You should consider the source, data flow, and destination nodes based on the provided information,
-finding potential privacy threats and explaining why they are relevant to the source, destination or data flow. If no threats are relevant to one of these, you should explain why. If 
-it is specified that you don't need to analyze the source, data flow or destination, just say "Not applicable" for that part.
-The output MUST be a JSON response with the following structure:
-
-{
-    "source": "A detailed explanation of which threat of the specified category is possible at the source node.",
-    "data_flow": "A detailed explanation of which threat of the specified category is possible in the data flow.",
-    "destination": "A detailed explanation of which threat of the specified category is possible at the destination node.",
-}
-                """,
+                "content": LINDDUN_PRO_SYSTEM_PROMPT,
             },
             {
                 "role": "user", 
-                "content": f"""
-'''
-EDGE: {{ "from": {edge["from"]}, "typefrom": {edge["typefrom"]}, "to": {edge["to"]}, "typeto": {edge["typeto"]} }}
-CATEGORY: {category}
-DESCRIPTION: {description}
-SOURCE: {source}
-DATA FLOW: {data_flow}
-DESTINATION: {destination}
-'''
-"""
+                "content": LINDDUN_PRO_USER_PROMPT(dfd, edge, category, description, source, data_flow, destination),
             },
         ],
         max_tokens=4096,

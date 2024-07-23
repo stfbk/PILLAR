@@ -1,4 +1,0 @@
-﻿from,typefrom,to,typeto,bidirectional
-User,Entity,Portal,Process,true
-Portal,Process,Services,Process,true
-Services,Process,Social network database,Data store,true

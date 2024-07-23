@@ -82,8 +82,7 @@ APPLICATION DESCRIPTION: {inputs["app_description"]}
 The user has also provided a Data Flow Diagram to describe the application.
 The DFD is described as a list of edges, connecting the "from" node to the
 "to" node. "typefrom" and "typeto" describe the type of the node, which can be
-an Entity, Process, or Data store. The "bidirectional" field indicates if the
-flow is bidirectional or not. This is the DFD provided:
+an Entity, Process, or Data store. This is the DFD provided:
 {inputs["dfd"]}
 """ if inputs["use_dfd"] else ""}
 DATABASE_SCHEMA: {inputs["database"]}
@@ -99,8 +98,7 @@ THREAT_DESCRIPTION: {description}
 The user has provided only a Data Flow Diagram to describe the application.
 The DFD is described as a list of edges, connecting the "from" node to the
 "to" node. "typefrom" and "typeto" describe the type of the node, which can be
-an Entity, Process, or Data store. The "bidirectional" field indicates if the
-flow is bidirectional or not. This is the DFD provided:
+an Entity, Process, or Data store. This is the DFD provided:
 {inputs["dfd"]}
 QUESTIONS: {question}
 THREAT_TITLE: {title}
@@ -286,8 +284,7 @@ APPLICATION DESCRIPTION: {inputs["app_description"]}
 The user has also provided a Data Flow Diagram to describe the application.
 The DFD is described as a list of edges, connecting the "from" node to the
 "to" node. "typefrom" and "typeto" describe the type of the node, which can be
-an Entity, Process, or Data store. The "bidirectional" field indicates if the
-flow is bidirectional or not. This is the DFD provided:
+an Entity, Process, or Data store. This is the DFD provided:
 {inputs["dfd"]}
 """ if inputs["use_dfd"] else ""}
 DATABASE SCHEMA: {inputs["database"]}
@@ -300,8 +297,7 @@ DATA POLICY: {inputs["data_policy"]}
 The user has provided only a Data Flow Diagram to describe the application.
 The DFD is described as a list of edges, connecting the "from" node to the
 "to" node. "typefrom" and "typeto" describe the type of the node, which can be
-an Entity, Process, or Data store. The "bidirectional" field indicates if the
-flow is bidirectional or not. This is the DFD provided:
+an Entity, Process, or Data store. This is the DFD provided:
 {inputs["dfd"]}
 '''
 """
@@ -357,7 +353,6 @@ MUST have the following structure:
             "typefrom": "Entity/Process/Data store",
             "to": "destination_node",
             "typeto": "Entity/Process/Data store",
-            "bidirectional": true/false
         },
         //// other edges description....
     ]
@@ -385,7 +380,6 @@ MUST have the following structure:
             "typefrom": "Entity/Process/Data store",
             "to": "destination_node",
             "typeto": "Entity/Process/Data store",
-            "bidirectional": true/false
         },
         //// other edges description....
     ]
@@ -393,6 +387,46 @@ MUST have the following structure:
 Be very precise and detailed in your response, providing the DFD as accurately
 as possible, following exactly what is shown in the image.
 Avoid adding multiple edges between the same nodes, and ensure that the
-directionality of the edges is correct. If there are any bidirectional edges,
-please specify it in the "bidirectional" attribute, without repeating the same edge twice.
+directionality of the edges is correct. 
+"""
+
+
+LINDDUN_PRO_SYSTEM_PROMPT = """
+You are a privacy analyst with more than 20 years of experience working with the LINDDUN Pro privacy threat modeling technique.
+Your task is to analyze one single edge of the Data Flow Diagram for a software application to identify potential privacy threats concerning that specific edge.
+
+The input is structured as follows, enclosed in triple quotes:
+'''
+DFD: The Data Flow Diagram for the whole application, represented as a list of dictionaries with the keys 'from', 'typefrom', 'to', and 'typeto', representing each edge.
+EDGE: {"from": "source_node", "typefrom": "source_type", "to": "destination_node", "typeto": "destination_type"}
+CATEGORY: The specific LINDDUN threat category you should analyze for the edge.
+DESCRIPTION: A detailed description of the data flow for the edge.
+SOURCE: A boolean, indicating whether you should analyze the source node for the edge.
+DATA FLOW: A boolean, indicating whether you should analyze the data flow for the edge.
+DESTINATION: A boolean, indicating whether you should analyze the destination node for the edge.
+'''
+
+The output should be a detailed analysis of the possible threats of the specified category for the edge. You should consider the source, data flow, and destination nodes based on the provided information,
+finding potential privacy threats and explaining why they are relevant to the source, destination or data flow. If no threats are relevant to one of these, you should explain why. If 
+it is specified that you don't need to analyze the source, data flow or destination, just say "Not applicable" for that part.
+The output MUST be a JSON response with the following structure:
+
+{
+    "source": "A detailed explanation of which threat of the specified category is possible at the source node.",
+    "data_flow": "A detailed explanation of which threat of the specified category is possible in the data flow.",
+    "destination": "A detailed explanation of which threat of the specified category is possible at the destination node.",
+}
                 """
+
+def LINDDUN_PRO_USER_PROMPT(dfd, edge, category, description, source, data_flow, destination):
+	return f"""
+	'''
+	DFD: {dfd}
+	EDGE: {{ "from": {edge["from"]}, "typefrom": {edge["typefrom"]}, "to": {edge["to"]}, "typeto": {edge["typeto"]} }}
+	CATEGORY: {category}
+	DESCRIPTION: {description}
+	SOURCE: {source}
+	DATA FLOW: {data_flow}
+	DESTINATION: {destination}
+	'''
+	"""

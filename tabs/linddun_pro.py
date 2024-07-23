@@ -26,7 +26,7 @@ and which LINDDUN threat category to look for. Finally, click the button below t
     with col2:
         st.selectbox("Select the edge to consider", 
             [i for i in range(len(st.session_state["input"]["dfd"]))],
-            help="Select the edge of the DFD to find threats for. Choosing a bidirectional edge will assess both flows.",
+            help="Select the edge of the DFD to find threats for.",
             key="edge_num"
         )
         st.multiselect("Select the LINDDUN threat categories to look for",
@@ -41,6 +41,7 @@ and which LINDDUN threat category to look for. Finally, click the button below t
                     get_linddun_pro(
                         st.session_state["keys"]["openai_api_key"],
                         st.session_state["openai_model"],
+                        st.session_state["input"]["dfd"],
                         st.session_state["input"]["dfd"][st.session_state["edge_num"]],
                         category,
                         st.session_state["data_flow_description"],

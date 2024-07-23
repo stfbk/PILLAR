@@ -17,17 +17,16 @@ In this section, you can create a Data Flow Diagram (DFD) to visualize the flow
 of data within your application, helped by AI. You can let the LLM generate a
 DFD for you, and then you can modify it with the table editor. You can also
 download and upload a CSV file representing the DFD. The DFD is represented as
-a list of dictionaries with keys 'from', 'typefrom', 'to', 'typeto' and
-'bidirectional', representing each edge. 
+a list of dictionaries with keys 'from', 'typefrom', 'to' and 'typeto', representing each edge. 
 """)
     st.markdown("""---""")
     if "dfd" not in st.session_state["input"]:
         st.session_state["input"]["dfd"] = [ 
-            {"from": "User", "typefrom": "Entity", "to": "Application", "typeto": "Process", "bidirectional": True},
+            {"from": "User", "typefrom": "Entity", "to": "Application", "typeto": "Process"},
         ]
-    if not st.session_state["input"]["dfd"]:
+    if not st.session_state["input"]["dfd"]: # Never have an empty DFD, it breaks
         st.session_state["input"]["dfd"] = [
-            { "from": "User", "typefrom": "Entity", "to": "Application", "typeto": "Process", "bidirectional": True },
+            { "from": "User", "typefrom": "Entity", "to": "Application", "typeto": "Process"},
         ]
     if "graph" not in st.session_state["input"]:
         st.session_state["input"]["graph"] = graphviz.Digraph()
@@ -132,15 +131,13 @@ a list of dictionaries with keys 'from', 'typefrom', 'to', 'typeto' and
             uploaded_file = st.file_uploader(
                 "Upload DFD", 
                 type=["csv"], 
-                help="Upload a CSV file containing the DFD, in the format of a list of dictionaries with keys 'from', 'typefrom', 'to', 'typeto' and 'bidirectional', representing each edge.",
+                help="Upload a CSV file containing the DFD, in the format of a list of dictionaries with keys 'from', 'typefrom', 'to' and 'typeto', representing each edge.",
                 key="dfd_file"
             )
             if uploaded_file is not None:
                 try:
                     reader = csv.DictReader(StringIO(uploaded_file.getvalue().decode("utf-8-sig")), delimiter=",")
                     dfd = list(reader)
-                    for edge in dfd:
-                        edge["bidirectional"] = True if edge["bidirectional"] == "true" else False
                     st.session_state["input"]["dfd"] = dfd
                 except Exception as e:
                     st.error(f"Error reading the uploaded file: {e}")
@@ -152,14 +149,12 @@ a list of dictionaries with keys 'from', 'typefrom', 'to', 'typeto' and
             "typefrom": [],
             "to": [],
             "typeto": [],
-            "bidirectional": [],
         }
         for object in state:
             new_dict["from"].append(object.get("from"))
             new_dict["typefrom"].append(object.get("typefrom"))
             new_dict["to"].append(object.get("to"))
             new_dict["typeto"].append(object.get("typeto"))
-            bool(new_dict["bidirectional"].append(object.get("bidirectional")))
         return new_dict
         
     edges = st.data_editor(
@@ -169,7 +164,6 @@ a list of dictionaries with keys 'from', 'typefrom', 'to', 'typeto' and
             "typefrom": st.column_config.SelectboxColumn("Type", help="The type of the starting element", width="medium", required=True, options=["Entity", "Data store", "Process"]),
             "to": st.column_config.TextColumn("To", help="The destination of the edge.", width="medium", required=True),
             "typeto": st.column_config.SelectboxColumn("Type", help="The type of the destination element", width="medium", required=True, options=["Entity", "Data store", "Process"]),
-            "bidirectional": st.column_config.CheckboxColumn("Bidirectional", help="Whether the edge is bidirectional.", width="medium", required=True, default=True),
         },
         key="edges",
         num_rows="dynamic",
@@ -195,7 +189,5 @@ def update_graph():
         graph.node(object["from"], shape=f"{"box" if object["typefrom"] == "Entity" else "ellipse" if object["typefrom"] == "Process" else "cylinder"}")
         graph.node(object["to"], shape=f"{"box" if object["typeto"] == "Entity" else "ellipse" if object["typeto"] == "Process" else "cylinder"}")
         graph.edge(object["from"], object["to"], label=f"DF{i}")
-        if object["bidirectional"]:
-            graph.edge(object["to"], object["from"], label=f"DF{i}_inv")
     #print(graph.source)
     st.session_state["input"]["graph"] = graph
