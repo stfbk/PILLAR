@@ -2,6 +2,7 @@ import streamlit as st
 from llms.linddun_pro import (
     get_linddun_pro,
     linddun_pro_gen_markdown,
+    threat_tree,
 )
 
 
@@ -37,8 +38,7 @@ and which LINDDUN threat category to look for. Finally, click the button below t
         st.text_area("Data flow description", help="Describe in detail the data flow for the selected edge.", key="data_flow_description")
         if st.button("Analyze"):
             for category in st.session_state["threat_categories"]:
-                st.session_state["linddun_pro_threats"][st.session_state["edge_num"]].append(
-                    get_linddun_pro(
+                new_threat = get_linddun_pro(
                         st.session_state["keys"]["openai_api_key"],
                         st.session_state["openai_model"],
                         st.session_state["input"]["dfd"],
@@ -46,7 +46,7 @@ and which LINDDUN threat category to look for. Finally, click the button below t
                         category,
                         st.session_state["data_flow_description"],
                     )
-                )
+                st.session_state["linddun_pro_threats"][st.session_state["edge_num"]].append(new_threat)
     st.markdown("## Threats for the specified edge")
     if st.session_state["linddun_pro_threats"][st.session_state["edge_num"]]:
         markdown = linddun_pro_gen_markdown(st.session_state["linddun_pro_threats"][st.session_state["edge_num"]])

@@ -173,9 +173,11 @@ a list of dictionaries with keys 'from', 'typefrom', 'to' and 'typeto', represen
 
 
 def update_graph():
-    graph = graphviz.Digraph()
+    graph = graphviz.Digraph(engine='neato')
     graph.attr(
         bgcolor=f"{st.get_option("theme.backgroundColor")}",
+        overlap="scale",
+        mode="KK",
     )
     graph.node_attr.update(
         color=f"{st.get_option("theme.primaryColor")}",

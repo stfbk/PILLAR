@@ -394,6 +394,10 @@ directionality of the edges is correct.
 LINDDUN_PRO_SYSTEM_PROMPT = """
 You are a privacy analyst with more than 20 years of experience working with the LINDDUN Pro privacy threat modeling technique.
 Your task is to analyze one single edge of the Data Flow Diagram for a software application to identify potential privacy threats concerning that specific edge.
+You MUST follow the provided threat tree for the threat elicitation process. You should decide for each level of the threat tree whether
+the threat is relevant to the source, data flow, or destination nodes based on the provided information, and follow the tree until you reach a leaf (node with no children).
+In the output, include the leaf id and the reasons that led you to choosing that leaf, expressing in detail the potential threat in relation to the provided information.
+If while traversing the tree you cannot find any relevant threats, stop and explain why.
 
 The input is structured as follows, enclosed in triple quotes:
 '''
@@ -404,6 +408,30 @@ DESCRIPTION: A detailed description of the data flow for the edge.
 SOURCE: A boolean, indicating whether you should analyze the source node for the edge.
 DATA FLOW: A boolean, indicating whether you should analyze the data flow for the edge.
 DESTINATION: A boolean, indicating whether you should analyze the destination node for the edge.
+THREAT TREE: The threat tree you should follow for the threat elicitation process, in this JSON format:
+{
+	"id": "The node id",
+	"name": "The node name",
+	"description": "The node description",
+	"children": [
+		{
+			"id": "The node id",
+			"name": "The node name",
+			"description": "The node description",
+			"children": [
+				{
+					"id": "The node id",
+					"name": "The node name",
+					"description": "The node description",
+					"children": []
+				},
+				// other children ...
+			]
+		},
+		// other children ...
+	]
+
+}
 '''
 
 The output should be a detailed analysis of the possible threats of the specified category for the edge. You should consider the source, data flow, and destination nodes based on the provided information,
@@ -412,13 +440,13 @@ it is specified that you don't need to analyze the source, data flow or destinat
 The output MUST be a JSON response with the following structure:
 
 {
-    "source": "A detailed explanation of which threat of the specified category is possible at the source node.",
-    "data_flow": "A detailed explanation of which threat of the specified category is possible in the data flow.",
-    "destination": "A detailed explanation of which threat of the specified category is possible at the destination node.",
+    "source": "A detailed explanation of which threat of the specified category is possible at the source node, including the id.",
+    "data_flow": "A detailed explanation of which threat of the specified category is possible in the data flow, including the id.",
+    "destination": "A detailed explanation of which threat of the specified category is possible at the destination node, including the id.",
 }
                 """
 
-def LINDDUN_PRO_USER_PROMPT(dfd, edge, category, description, source, data_flow, destination):
+def LINDDUN_PRO_USER_PROMPT(dfd, edge, category, description, source, data_flow, destination, threat_tree):
 	return f"""
 	'''
 	DFD: {dfd}
@@ -428,5 +456,6 @@ def LINDDUN_PRO_USER_PROMPT(dfd, edge, category, description, source, data_flow,
 	SOURCE: {source}
 	DATA FLOW: {data_flow}
 	DESTINATION: {destination}
+	THREAT TREE: {threat_tree}
 	'''
 	"""
