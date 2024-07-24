@@ -78,7 +78,6 @@ def threat_tree(category):
     tree = {}
     tree = build_tree(tree, full_tree)
 
-    print(tree)
     return tree
 
 def build_tree(tree, full_tree):

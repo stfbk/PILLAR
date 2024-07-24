@@ -2,7 +2,6 @@ import streamlit as st
 from llms.linddun_pro import (
     get_linddun_pro,
     linddun_pro_gen_markdown,
-    threat_tree,
 )
 
 
@@ -46,7 +45,13 @@ and which LINDDUN threat category to look for. Finally, click the button below t
                         category,
                         st.session_state["data_flow_description"],
                     )
-                st.session_state["linddun_pro_threats"][st.session_state["edge_num"]].append(new_threat)
+                flag = False
+                for (i, threat) in enumerate(st.session_state["linddun_pro_threats"][st.session_state["edge_num"]]):
+                    if new_threat["category"] == threat["category"]:
+                        flag = True
+                        st.session_state["linddun_pro_threats"][st.session_state["edge_num"]][i] = new_threat
+                if not flag:
+                    st.session_state["linddun_pro_threats"][st.session_state["edge_num"]].append(new_threat)
     st.markdown("## Threats for the specified edge")
     if st.session_state["linddun_pro_threats"][st.session_state["edge_num"]]:
         markdown = linddun_pro_gen_markdown(st.session_state["linddun_pro_threats"][st.session_state["edge_num"]])
