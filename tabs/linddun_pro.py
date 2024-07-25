@@ -44,6 +44,7 @@ and which LINDDUN threat category to look for. Finally, click the button below t
                         st.session_state["input"]["dfd"][st.session_state["edge_num"]],
                         category,
                         st.session_state["data_flow_description"],
+                        st.session_state["temperature"],
                     )
                 flag = False
                 for (i, threat) in enumerate(st.session_state["linddun_pro_threats"][st.session_state["edge_num"]]):

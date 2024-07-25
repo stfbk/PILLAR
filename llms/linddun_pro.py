@@ -19,7 +19,7 @@ def linddun_pro_gen_markdown(threats):
     for threat in threats:
         color = match_number_color(match_category_number(threat["category"]))
         color_html = f"<p style='background-color:{color};color:#ffffff;'>"
-        markdown_output += f"| {color_html}{threat['category']}</p> | {threat['source']} | {threat['data_flow']} | {threat['destination']} |\n"
+        markdown_output += f"| {color_html}{threat['category']}</p> | {threat["source_id"]} <br> {threat['source']} | {threat["data_flow_id"]} <br> {threat['data_flow']} | {threat["destination_id"]} <br> {threat['destination']} |\n"
     return markdown_output
 
 def mapping_table(edge, category):
@@ -37,7 +37,7 @@ def mapping_table(edge, category):
     return (True, True, True)
 
 
-def get_linddun_pro(api_key, model, dfd, edge, category, description):
+def get_linddun_pro(api_key, model, dfd, edge, category, description, temperature):
     client = OpenAI(api_key=api_key)
     
     source, data_flow, destination = mapping_table(edge, category)
@@ -58,6 +58,7 @@ def get_linddun_pro(api_key, model, dfd, edge, category, description):
             },
         ],
         max_tokens=4096,
+        temperature=temperature,
     )
     threat = json.loads(response.choices[0].message.content)
     threat["category"] = category
@@ -87,8 +88,8 @@ def build_tree(tree, full_tree):
         tree["description"] = full_tree["fullDescription"]
     else:
         tree["description"] = full_tree["description"]
-    if "children" in full_tree:
-        tree["children"] = []
-        for child in full_tree["children"]:
-            tree["children"].append(build_tree({}, child))
+    tree["children"] = []
+    for child in full_tree["children"]:
+        tree["children"].append(build_tree({}, child))
+    
     return tree
