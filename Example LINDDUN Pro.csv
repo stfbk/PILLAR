@@ -1,19 +1,19 @@
-﻿from,typefrom,to,typeto
-P2 Delivery,Process,E1 Print Service,Entity
-E2 Banking,Entity,P2 Delivery,Process
-E2 Banking,Entity,P1 Scheduler,Process
-E3 Email Provider,Entity,P2 Delivery,Process
-P2 Delivery,Process,E3 Email Provider,Entity
-P2 Delivery,Process,P3 PDS,Process
-E4 PDS User,Entity,P3 PDS,Process
-P3 PDS,Process,E4 PDS User,Entity
-DS1 Archive,Data store,P1 Scheduler,Process
-P1 Scheduler,Process,P2 Delivery,Process
-DS2 PDS Docs,Data store,P3 PDS,Process
-P3 PDS,Process,DS2 PDS Docs,Data store
-P3 PDS,Process,P2 Delivery,Process
-P3 PDS,Process,DS3 User data,Data store
-DS3 User data,Data store,P3 PDS,Process
-P2 Delivery,Process,E2 Banking,Entity
-P2 Delivery,Process,DS1 Archive,Data store
-P1 Scheduler,Process,DS1 Archive,Data store
+﻿from,typefrom,to,typeto,trusted
+P2 Delivery,Process,E1 Print Service,Entity,false
+E2 Banking,Entity,P2 Delivery,Process,false
+E2 Banking,Entity,P1 Scheduler,Process,false
+E3 Email Provider,Entity,P2 Delivery,Process,false
+P2 Delivery,Process,E3 Email Provider,Entity,false
+P2 Delivery,Process,P3 PDS,Process,true
+E4 PDS User,Entity,P3 PDS,Process,false
+P3 PDS,Process,E4 PDS User,Entity,false
+DS1 Archive,Data store,P1 Scheduler,Process,true
+P1 Scheduler,Process,P2 Delivery,Process,true
+DS2 PDS Docs,Data store,P3 PDS,Process,true
+P3 PDS,Process,DS2 PDS Docs,Data store,true
+P3 PDS,Process,P2 Delivery,Process,true
+P3 PDS,Process,DS3 User data,Data store,true
+DS3 User data,Data store,P3 PDS,Process,true
+P2 Delivery,Process,E2 Banking,Entity,false
+P2 Delivery,Process,DS1 Archive,Data store,true
+P1 Scheduler,Process,DS1 Archive,Data store,true

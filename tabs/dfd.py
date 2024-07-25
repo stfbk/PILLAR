@@ -4,6 +4,7 @@ import csv
 import pandas as pd
 import base64
 import json
+import random
 from io import StringIO
 from llms.dfd import get_dfd
 
@@ -17,16 +18,17 @@ In this section, you can create a Data Flow Diagram (DFD) to visualize the flow
 of data within your application, helped by AI. You can let the LLM generate a
 DFD for you, and then you can modify it with the table editor. You can also
 download and upload a CSV file representing the DFD. The DFD is represented as
-a list of dictionaries with keys 'from', 'typefrom', 'to' and 'typeto', representing each edge. 
+a list of dictionaries with keys 'from', 'typefrom', 'to', 'typeto' and
+'trusted', representing each edge. 
 """)
     st.markdown("""---""")
     if "dfd" not in st.session_state["input"]:
         st.session_state["input"]["dfd"] = [ 
-            {"from": "User", "typefrom": "Entity", "to": "Application", "typeto": "Process"},
+            {"from": "User", "typefrom": "Entity", "to": "Application", "typeto": "Process", "trusted": True },
         ]
     if not st.session_state["input"]["dfd"]: # Never have an empty DFD, it breaks
         st.session_state["input"]["dfd"] = [
-            { "from": "User", "typefrom": "Entity", "to": "Application", "typeto": "Process"},
+            { "from": "User", "typefrom": "Entity", "to": "Application", "typeto": "Process", "trusted": True },
         ]
     if "graph" not in st.session_state["input"]:
         st.session_state["input"]["graph"] = graphviz.Digraph()
@@ -139,6 +141,11 @@ a list of dictionaries with keys 'from', 'typefrom', 'to' and 'typeto', represen
                     reader = csv.DictReader(StringIO(uploaded_file.getvalue().decode("utf-8-sig")), delimiter=",")
                     dfd = list(reader)
                     st.session_state["input"]["dfd"] = dfd
+                    for edge in st.session_state["input"]["dfd"]:
+                        if edge["trusted"] == "true":
+                            edge["trusted"] = True
+                        else:
+                            edge["trusted"] = False
                 except Exception as e:
                     st.error(f"Error reading the uploaded file: {e}")
     with col2:
@@ -149,12 +156,14 @@ a list of dictionaries with keys 'from', 'typefrom', 'to' and 'typeto', represen
             "typefrom": [],
             "to": [],
             "typeto": [],
+            "trusted": [],
         }
         for object in state:
             new_dict["from"].append(object.get("from"))
             new_dict["typefrom"].append(object.get("typefrom"))
             new_dict["to"].append(object.get("to"))
             new_dict["typeto"].append(object.get("typeto"))
+            new_dict["trusted"].append(object.get("trusted"))
         return new_dict
         
     edges = st.data_editor(
@@ -164,6 +173,7 @@ a list of dictionaries with keys 'from', 'typefrom', 'to' and 'typeto', represen
             "typefrom": st.column_config.SelectboxColumn("Type", help="The type of the starting element", width="medium", required=True, options=["Entity", "Data store", "Process"]),
             "to": st.column_config.TextColumn("To", help="The destination of the edge.", width="medium", required=True),
             "typeto": st.column_config.SelectboxColumn("Type", help="The type of the destination element", width="medium", required=True, options=["Entity", "Data store", "Process"]),
+            "trusted": st.column_config.CheckboxColumn("Trusted", help="Check this if the edge is inside the trusted boundary.", width="small"),
         },
         key="edges",
         num_rows="dynamic",
@@ -173,11 +183,12 @@ a list of dictionaries with keys 'from', 'typefrom', 'to' and 'typeto', represen
 
 
 def update_graph():
-    graph = graphviz.Digraph(engine='neato')
+    graph = graphviz.Digraph(engine='fdp')
     graph.attr(
         bgcolor=f"{st.get_option("theme.backgroundColor")}",
-        overlap="scale",
-        mode="KK",
+        overlap="false",
+        K="1.5",
+        start=str(random.randint(0, 100)),
     )
     graph.node_attr.update(
         color=f"{st.get_option("theme.primaryColor")}",
@@ -187,9 +198,22 @@ def update_graph():
         color="white",
         fontcolor="white",
     )
+    with graph.subgraph(name='cluster_0') as c:
+        c.attr(
+            color="#00a6fb",
+            label="Trusted",
+            fontcolor="#00a6fb",
+            style="dashed"
+        )
+        for object in st.session_state["input"]["dfd"]:
+            if object["trusted"]:
+                c.node(object["from"])
+            if object["trusted"]:
+                c.node(object["to"])
     for (i, object) in enumerate(st.session_state["input"]["dfd"]):
         graph.node(object["from"], shape=f"{"box" if object["typefrom"] == "Entity" else "ellipse" if object["typefrom"] == "Process" else "cylinder"}")
         graph.node(object["to"], shape=f"{"box" if object["typeto"] == "Entity" else "ellipse" if object["typeto"] == "Process" else "cylinder"}")
-        graph.edge(object["from"], object["to"], label=f"DF{i}")
-    #print(graph.source)
+        graph.edge(object["from"], object["to"], label=f"DF{i}", constraint="false")
+        
+        
     st.session_state["input"]["graph"] = graph

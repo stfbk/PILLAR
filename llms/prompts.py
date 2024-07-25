@@ -82,7 +82,8 @@ APPLICATION DESCRIPTION: {inputs["app_description"]}
 The user has also provided a Data Flow Diagram to describe the application.
 The DFD is described as a list of edges, connecting the "from" node to the
 "to" node. "typefrom" and "typeto" describe the type of the node, which can be
-an Entity, Process, or Data store. This is the DFD provided:
+an Entity, Process, or Data store. "trusted" indicates whether the edge stays
+inside or outside the trusted boundary. This is the DFD provided:
 {inputs["dfd"]}
 """ if inputs["use_dfd"] else ""}
 DATABASE_SCHEMA: {inputs["database"]}
@@ -98,7 +99,8 @@ THREAT_DESCRIPTION: {description}
 The user has provided only a Data Flow Diagram to describe the application.
 The DFD is described as a list of edges, connecting the "from" node to the
 "to" node. "typefrom" and "typeto" describe the type of the node, which can be
-an Entity, Process, or Data store. This is the DFD provided:
+an Entity, Process, or Data store. "trusted" indicates whether the edge stays
+inside or outside the trusted boundary. This is the DFD provided:
 {inputs["dfd"]}
 QUESTIONS: {question}
 THREAT_TITLE: {title}
@@ -284,7 +286,8 @@ APPLICATION DESCRIPTION: {inputs["app_description"]}
 The user has also provided a Data Flow Diagram to describe the application.
 The DFD is described as a list of edges, connecting the "from" node to the
 "to" node. "typefrom" and "typeto" describe the type of the node, which can be
-an Entity, Process, or Data store. This is the DFD provided:
+an Entity, Process, or Data store. "trusted" indicates whether the edge stays
+inside or outside the trusted boundary. This is the DFD provided:
 {inputs["dfd"]}
 """ if inputs["use_dfd"] else ""}
 DATABASE SCHEMA: {inputs["database"]}
@@ -297,7 +300,8 @@ DATA POLICY: {inputs["data_policy"]}
 The user has provided only a Data Flow Diagram to describe the application.
 The DFD is described as a list of edges, connecting the "from" node to the
 "to" node. "typefrom" and "typeto" describe the type of the node, which can be
-an Entity, Process, or Data store. This is the DFD provided:
+an Entity, Process, or Data store. "trusted" indicates whether the edge stays
+inside or outside the trusted boundary. This is the DFD provided:
 {inputs["dfd"]}
 '''
 """
@@ -317,6 +321,12 @@ Keep in mind these guidelines for DFDs:
 5. Each data store should have at least one entering data flow and one exiting data flow
 6. Data memorized in a system has to go through a process
 7. All processes flow either to a data store or to another process
+
+You can also include a trusted boundary in the DFD to represent the system's
+security perimeter. The trusted boundary should encompass all the entities,
+processes, and data stores that are considered secure and trusted.
+To specify it, add a "trusted" attribute to the edges in the DFD, set to True
+if the edge is inside the trusted boundary, and False if it traverses it.
 
 The input is going to be structured as follows, enclosed in triple quotes:
 
@@ -353,6 +363,7 @@ MUST have the following structure:
             "typefrom": "Entity/Process/Data store",
             "to": "destination_node",
             "typeto": "Entity/Process/Data store",
+			"trusted": True/False
         },
         //// other edges description....
     ]
@@ -370,6 +381,11 @@ threat modelling can be executed upon it.
 The input is an image which already contains the architecture of the application as a DFD.
 You have to analyze the image and provide the Data Flow Diagram (DFD) for the application, as a JSON structure.
 
+You should also include a trusted boundary in the DFD to represent the system's
+security perimeter, which should be indicated in the image. To specify it, add
+a "trusted" attribute to the edges in the DFD, set to True if the edge is
+inside the trusted boundary, and False if it traverses it.
+
 You MUST reply with a json-formatted list of dictionaries under the "dfd"
 attribute, where each dictionary represents an edge in the DFD. The response
 MUST have the following structure:
@@ -380,10 +396,12 @@ MUST have the following structure:
             "typefrom": "Entity/Process/Data store",
             "to": "destination_node",
             "typeto": "Entity/Process/Data store",
+			"trusted": True/False
         },
         //// other edges description....
     ]
 }
+
 Be very precise and detailed in your response, providing the DFD as accurately
 as possible, following exactly what is shown in the image.
 Avoid adding multiple edges between the same nodes, and ensure that the
@@ -433,8 +451,8 @@ recipient does with that data triggers the threat
 
 The input is structured as follows, enclosed in triple quotes:
 '''
-DFD: The Data Flow Diagram for the whole application, represented as a list of dictionaries with the keys 'from', 'typefrom', 'to', and 'typeto', representing each edge.
-EDGE: {"from": "source_node", "typefrom": "source_type", "to": "destination_node", "typeto": "destination_type"}
+DFD: The Data Flow Diagram for the whole application, represented as a list of dictionaries with the keys "from", "typefrom", "to", "typeto" and "trusted", representing each edge.
+EDGE: {"from": "source_node", "typefrom": "source_type", "to": "destination_node", "typeto": "destination_type", "trusted": True/False}
 CATEGORY: The specific LINDDUN threat category you should analyze for the edge.
 DESCRIPTION: A detailed description of the data flow for the edge.
 SOURCE: A boolean, indicating whether you should analyze the source node for the edge.
