@@ -146,6 +146,7 @@ a list of dictionaries with keys 'from', 'typefrom', 'to', 'typeto' and
                             edge["trusted"] = True
                         else:
                             edge["trusted"] = False
+                    st.info("Please remove the uploaded file to modify the DFD from the table.")
                 except Exception as e:
                     st.error(f"Error reading the uploaded file: {e}")
     with col2:

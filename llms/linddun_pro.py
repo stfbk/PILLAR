@@ -19,7 +19,7 @@ def linddun_pro_gen_markdown(threats):
     for threat in threats:
         color = match_number_color(match_category_number(threat["category"]))
         color_html = f"<p style='background-color:{color};color:#ffffff;'>"
-        markdown_output += f"| {color_html}{threat['category']}</p> | {threat["source_id"]} <br> {threat['source']} | {threat["data_flow_id"]} <br> {threat['data_flow']} | {threat["destination_id"]} <br> {threat['destination']} |\n"
+        markdown_output += f"| {color_html}{threat['category']}</p> | {threat["source_id"].strip()} <br> {threat['source']} | {threat["data_flow_id"].strip()} <br> {threat['data_flow']} | {threat["destination_id"].strip()} <br> {threat['destination']} |\n"
     return markdown_output
 
 def mapping_table(edge, category):
