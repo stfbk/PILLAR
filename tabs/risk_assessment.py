@@ -4,6 +4,8 @@ from llms.threat_model import threat_model_gen_markdown
 from llms.risk_assessment import (
     assessment_gen_markdown,
     get_assessment,
+    get_control_measures,
+    measures_gen_markdown,
 )
 
 
@@ -23,17 +25,33 @@ def risk_assessment():
         st.session_state["threat_source"] = ""
     if "assessments" not in st.session_state:
         st.session_state["assessments"] = []
+    if "control_measures" not in st.session_state:
+        st.session_state["control_measures"] = []
 
-    if st.button("Import LINDDUN Go", help="Import the output of the LINDDUN Go simulation to assess the risks.", disabled=not st.session_state["linddun_go_threats"]):
-        st.session_state["to_assess"] = st.session_state["linddun_go_threats"]
-        st.session_state["threat_source"] = "linddun_go"
-        st.session_state["assessments"] = [{"impact": "", "likelihood": "", "control": ""} for _ in st.session_state["to_assess"]]
-        st.session_state["current_threat"] = 0
-    if st.button("Import Threat Model", help="Import the output of the Threat Model to assess the risks.", disabled=not st.session_state["threat_model_threats"]):
-        st.session_state["to_assess"] = st.session_state["threat_model_threats"]
-        st.session_state["threat_source"] = "threat_model"
-        st.session_state["assessments"] = [{"impact": "", "likelihood": "", "control": ""} for _ in st.session_state["to_assess"]]
-        st.session_state["current_threat"] = 0
+    col1, col2, col3 = st.columns([1, 1, 1])
+    with col1:
+        if st.button("Import Threat Model", help="Import the output of the Threat Model to assess the risks.", disabled=not st.session_state["threat_model_threats"]):
+            st.session_state["to_assess"] = st.session_state["threat_model_threats"]
+            st.session_state["threat_source"] = "threat_model"
+            st.session_state["assessments"] = [{"impact": "", "likelihood": "", "control": ""} for _ in st.session_state["to_assess"]]
+            st.session_state["control_measures"] = [[] for _ in st.session_state["to_assess"]]
+            st.session_state["current_threat"] = 0
+    with col2:
+        if st.button("Import LINDDUN Go", help="Import the output of the LINDDUN Go simulation to assess the risks.", disabled=not st.session_state["linddun_go_threats"]):
+            st.session_state["to_assess"] = st.session_state["linddun_go_threats"]
+            st.session_state["threat_source"] = "linddun_go"
+            st.session_state["assessments"] = [{"impact": "", "likelihood": "", "control": ""} for _ in st.session_state["to_assess"]]
+            st.session_state["control_measures"] = [[] for _ in st.session_state["to_assess"]]
+            st.session_state["current_threat"] = 0
+    with col3:
+        if st.button("Import LINDDUN Pro", help="Import the output of the LINDDUN Pro threat modeling to assess the risks.", disabled=not st.session_state["linddun_pro_threats"]):
+            st.session_state["to_assess"] = st.session_state["linddun_go_threats"]
+            st.session_state["threat_source"] = "linddun_pro"
+            st.session_state["assessments"] = [{"impact": "", "likelihood": "", "control": ""} for _ in st.session_state["to_assess"]]
+            st.session_state["control_measures"] = [[] for _ in st.session_state["to_assess"]]
+            st.session_state["current_threat"] = 0
+            
+        
     
     col1, col2, col3 = st.columns([0.1,0.8,0.1])
     with col1:
@@ -52,17 +70,20 @@ def risk_assessment():
     
     col1, col2 = st.columns([0.1, 0.9])
     with col1:
-        if st.button("Assess Threat", help="Assess the current threat."):
-            assessment = get_assessment(
+        if st.button("Get control measures", help="Get control measures for the current threat, based on [privacy patterns](https://privacypatterns.org/)."):
+            control_measures = get_control_measures(
                 st.session_state["keys"]["openai_api_key"],
                 st.session_state["openai_model"],
                 st.session_state["to_assess"][st.session_state["current_threat"]],
                 st.session_state["input"],
             )
-            st.session_state["assessments"][st.session_state["current_threat"]] = assessment
+            st.session_state["control_measures"][st.session_state["current_threat"]] = control_measures
     with col2:
-        if st.session_state["assessments"] and st.session_state["assessments"][st.session_state["current_threat"]] != {"impact": "", "likelihood": "", "control": ""}:
-            st.markdown(assessment_gen_markdown(st.session_state["assessments"][st.session_state["current_threat"]]), unsafe_allow_html=True)
+        if st.session_state["control_measures"] and st.session_state["control_measures"][st.session_state["current_threat"]] != []:
+            st.markdown(measures_gen_markdown(st.session_state["control_measures"][st.session_state["current_threat"]]), unsafe_allow_html=True)
+
+    if st.session_state["assessments"] and st.session_state["assessments"][st.session_state["current_threat"]] != {"impact": "", "likelihood": "", "control": ""}:
+        st.markdown(assessment_gen_markdown(st.session_state["assessments"][st.session_state["current_threat"]]), unsafe_allow_html=True)
 
     if st.session_state["assessments"] and st.session_state["assessments"][st.session_state["current_threat"]] != {"impact": "", "likelihood": "", "control": ""}:
         col1, col2, col3 = st.columns([0.1, 0.1, 0.1])
@@ -81,6 +102,14 @@ def risk_assessment():
 
 
         
+    if st.button("Assess Threat", help="Assess the current threat."):
+        assessment = get_assessment(
+            st.session_state["keys"]["openai_api_key"],
+            st.session_state["openai_model"],
+            st.session_state["to_assess"][st.session_state["current_threat"]],
+            st.session_state["input"],
+        )
+        st.session_state["assessments"][st.session_state["current_threat"]] = assessment
     
     
 

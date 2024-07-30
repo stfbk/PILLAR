@@ -120,7 +120,7 @@ a list of dictionaries with keys 'from', 'typefrom', 'to', 'typeto' and
                                     )
                                     print(f"Error: {e}")
         with col13:
-            if st.button("AI generation", help="Generate a DFD graph from the application information provided in the previous tab, using the AI model.", disabled=st.session_state["dfd_only"]):
+            if st.button("Generate from app description", help="Generate a DFD graph from the application information provided in the previous tab, using the AI model.", disabled=st.session_state["dfd_only"]):
                 st.session_state["input"]["dfd"] = get_dfd(
                     st.session_state["keys"]["openai_api_key"],
                     st.session_state["openai_model"],
@@ -131,9 +131,9 @@ a list of dictionaries with keys 'from', 'typefrom', 'to', 'typeto' and
                 update_graph()
         with col11:
             uploaded_file = st.file_uploader(
-                "Upload DFD", 
+                "Upload DFD csv file", 
                 type=["csv"], 
-                help="Upload a CSV file containing the DFD, in the format of a list of dictionaries with keys 'from', 'typefrom', 'to' and 'typeto', representing each edge.",
+                help="Upload a CSV file containing the DFD, in the format of a list of dictionaries with keys 'from', 'typefrom', 'to', 'typeto' and 'trusted', representing each edge.",
                 key="dfd_file"
             )
             if uploaded_file is not None:
@@ -167,20 +167,28 @@ a list of dictionaries with keys 'from', 'typefrom', 'to', 'typeto' and
             new_dict["trusted"].append(object.get("trusted"))
         return new_dict
         
-    edges = st.data_editor(
-        data=pd.DataFrame().from_dict(format_correct(st.session_state["input"]["dfd"])),
-        column_config={
-            "from": st.column_config.TextColumn("From", help="The starting point of the edge.", width="medium", required=True),
-            "typefrom": st.column_config.SelectboxColumn("Type", help="The type of the starting element", width="medium", required=True, options=["Entity", "Data store", "Process"]),
-            "to": st.column_config.TextColumn("To", help="The destination of the edge.", width="medium", required=True),
-            "typeto": st.column_config.SelectboxColumn("Type", help="The type of the destination element", width="medium", required=True, options=["Entity", "Data store", "Process"]),
-            "trusted": st.column_config.CheckboxColumn("Trusted", help="Check this if the edge is inside the trusted boundary.", width="small"),
-        },
-        key="edges",
-        num_rows="dynamic",
-        on_change=update_edges,
-    )
-    
+    col1, col2 = st.columns([0.9, 0.1])
+    with col1: 
+        edges = st.data_editor(
+            data=pd.DataFrame().from_dict(format_correct(st.session_state["input"]["dfd"])),
+            column_config={
+                "from": st.column_config.TextColumn("From", help="The starting point of the edge.", width="medium", required=True),
+                "typefrom": st.column_config.SelectboxColumn("Type", help="The type of the starting element", width="medium", required=True, options=["Entity", "Data store", "Process"]),
+                "to": st.column_config.TextColumn("To", help="The destination of the edge.", width="medium", required=True),
+                "typeto": st.column_config.SelectboxColumn("Type", help="The type of the destination element", width="medium", required=True, options=["Entity", "Data store", "Process"]),
+                "trusted": st.column_config.CheckboxColumn("Trusted", help="Check this if the edge is inside the trusted boundary.", width="small"),
+            },
+            key="edges",
+            num_rows="dynamic",
+            on_change=update_edges,
+        )
+    with col2:
+        st.download_button(
+            "Download graphviz source", 
+            help="Download the graphviz source code for the current DFD, to be used in PDF or PNG generation.",
+            data=st.session_state["input"]["graph"].source,
+            file_name="dfd.dot",
+        )
 
 
 def update_graph():
