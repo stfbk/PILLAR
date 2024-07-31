@@ -51,3 +51,19 @@ def match_category_number(category):
         return 6
     elif category == "Non-compliance":
         return 7
+
+def match_number_category(threat_type_number):
+    if threat_type_number == 1:
+        return "Linking"
+    elif threat_type_number == 2:
+        return "Identifying"
+    elif threat_type_number == 3:
+        return "Non-repudiation"
+    elif threat_type_number == 4:
+        return "Detecting"
+    elif threat_type_number == 5:
+        return "Data disclosure"
+    elif threat_type_number == 6:
+        return "Unawareness and unintervenability"
+    elif threat_type_number == 7:
+        return "Non-compliance"
