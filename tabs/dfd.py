@@ -35,6 +35,8 @@ a list of dictionaries with keys 'from', 'typefrom', 'to', 'typeto' and
         st.session_state["input"]["graph"].attr(
             bgcolor=f"{st.get_option("theme.backgroundColor")}",
         )
+    if "is_graph_generated" not in st.session_state:
+        st.session_state["is_graph_generated"] = False
 
     def update_edges():
         changes = st.session_state["edges"]
@@ -192,12 +194,14 @@ a list of dictionaries with keys 'from', 'typefrom', 'to', 'typeto' and
 
 
 def update_graph():
-    graph = graphviz.Digraph(engine='fdp')
+    st.session_state["is_graph_generated"] = True
+    graph = graphviz.Digraph(engine='fdp', format='svg')
+    st.session_state["graph_seed"] = str(random.randint(0, 100))
     graph.attr(
         bgcolor=f"{st.get_option("theme.backgroundColor")}",
         overlap="false",
         K="1.5",
-        start=str(random.randint(0, 100)),
+        start=st.session_state["graph_seed"],
     )
     graph.node_attr.update(
         color=f"{st.get_option("theme.primaryColor")}",

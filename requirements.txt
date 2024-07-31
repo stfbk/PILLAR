@@ -4,3 +4,5 @@ openai
 streamlit
 graphviz
 csv
+markdown
+pdfkit
