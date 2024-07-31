@@ -51,14 +51,14 @@ threats just by providing the description.
 
     if linddun_go_submit_button and (st.session_state["input"]["app_description"] or st.session_state["dfd_only"]):
         inputs = st.session_state["input"]
-        present_threats = []
+        threats = []
         # Show a spinner while generating the attack tree
         with st.spinner("Answering questions..."):
             try:
                 if multiagent_linddun_go:
                     if not llms_to_use:
                         raise ValueError("Please select at least one LLM to use.")
-                    present_threats = get_multiagent_linddun_go(
+                    threats = get_multiagent_linddun_go(
                         st.session_state["keys"], 
                         {
                             "openai_model": st.session_state["openai_model"],
@@ -73,7 +73,7 @@ threats just by providing the description.
                         llms_to_use,
                     )
                 elif st.session_state["model_provider"] == "OpenAI API":
-                    present_threats = get_linddun_go(
+                    threats = get_linddun_go(
                         st.session_state["keys"]["openai_api_key"], 
                         st.session_state["openai_model"], 
                         inputs,
@@ -85,9 +85,9 @@ threats just by providing the description.
                 st.error(f"Error generating simulation: {e}")
 
         # Convert the threat model JSON to Markdown
-        markdown_output = linddun_go_gen_markdown(present_threats)
+        markdown_output = linddun_go_gen_markdown(threats)
         st.session_state["linddun_go_output"] = markdown_output
-        st.session_state["linddun_go_threats"] = present_threats
+        st.session_state["linddun_go_threats"] = threats
 
     elif linddun_go_submit_button and not st.session_state["input"]["app_description"] and not st.session_state["dfd_only"]:
         st.error("Please enter your application details before submitting.")

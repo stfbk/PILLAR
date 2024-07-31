@@ -42,7 +42,7 @@ def get_linddun_go(api_key, model_name, inputs, temperature):
     deck = get_deck()
     
 
-    present_threats = []
+    threats = []
 
     for card in deck:
         question = "\n".join(card["questions"])
@@ -72,10 +72,9 @@ def get_linddun_go(api_key, model_name, inputs, temperature):
         response_content["threat_description"] = description
         response_content["threat_type"] = type
         #print(response_content)
-        if response_content["reply"]:
-            present_threats.append(response_content)
+        threats.append(response_content)
 
-    return present_threats
+    return threats
 
 
 
