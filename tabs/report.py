@@ -1,9 +1,10 @@
 import streamlit as st
 import markdown 
 import pdfkit
-import base64
 import urllib.parse
 import graphviz
+from misc.utils import match_color
+from tabs.risk_assessment import measures_gen_markdown
 
 def report():
     st.markdown("""
@@ -34,42 +35,62 @@ Just fill in the required information and you will be able to download the PDF r
     
 def generate_report():
     text="""# Privacy Threat Modeling and Risk Assessment Report\n"""
-    graph = graphviz.Digraph(engine='fdp', format='svg')
-    graph.attr(
-        bgcolor="white",
-        overlap="false",
-        K="1.5",
-        start=st.session_state["graph_seed"]
-    )
-    graph.node_attr.update(
-        color="black",
-        fontcolor="black",
-    )
-    graph.edge_attr.update(
-        color="black",
-        fontcolor="black",
-    )
-    with graph.subgraph(name='cluster_0') as c:
-        c.attr(
-            color="#00a6fb",
-            label="Trusted",
-            fontcolor="#00a6fb",
-            style="dashed"
-        )
-        for object in st.session_state["input"]["dfd"]:
-            if object["trusted"]:
-                c.node(object["from"])
-            if object["trusted"]:
-                c.node(object["to"])
-    for (i, object) in enumerate(st.session_state["input"]["dfd"]):
-        graph.node(object["from"], shape=f"{"box" if object["typefrom"] == "Entity" else "ellipse" if object["typefrom"] == "Process" else "cylinder"}")
-        graph.node(object["to"], shape=f"{"box" if object["typeto"] == "Entity" else "ellipse" if object["typeto"] == "Process" else "cylinder"}")
-        graph.edge(object["from"], object["to"], label=f"DF{i}", constraint="false")
+    
+    text += "## Report Details \n\n"
+    
+    text += f"| | | | |\n"
+    text += f"|------|-------|-----|-----|\n"
+    text += f"| **Application Name** | {st.session_state['app_name']} | **Application Version** | {st.session_state['app_version']} |\n"
+    text += f"| **Report author** | {st.session_state['author']} | **Date** | {st.session_state['date']} |\n"
+    text += f"| **High-level Description** | {st.session_state['high_level_description']} | | |\n\n"
+
         
         
     if st.session_state["include_graph"] and st.session_state["is_graph_generated"]:
-        text += f"![Data Flow Diagram](data:image/svg+xml,{urllib.parse.quote(graph.pipe(encoding="utf-8"))})"
-    html = markdown.markdown(text)
+        graph = graphviz.Digraph(engine='fdp', format='svg')
+        graph.attr(
+            bgcolor="white",
+            overlap="false",
+            K="1.5",
+            start=st.session_state["graph_seed"]
+        )
+        graph.node_attr.update(
+            color="black",
+            fontcolor="black",
+        )
+        graph.edge_attr.update(
+            color="black",
+            fontcolor="black",
+        )
+        with graph.subgraph(name='cluster_0') as c:
+            c.attr(
+                color="#00a6fb",
+                label="Trusted",
+                fontcolor="#00a6fb",
+                style="dashed"
+            )
+            for object in st.session_state["input"]["dfd"]:
+                if object["trusted"]:
+                    c.node(object["from"])
+                if object["trusted"]:
+                    c.node(object["to"])
+        for (i, object) in enumerate(st.session_state["input"]["dfd"]):
+            graph.node(object["from"], shape=f"{"box" if object["typefrom"] == "Entity" else "ellipse" if object["typefrom"] == "Process" else "cylinder"}")
+            graph.node(object["to"], shape=f"{"box" if object["typeto"] == "Entity" else "ellipse" if object["typeto"] == "Process" else "cylinder"}")
+            graph.edge(object["from"], object["to"], label=f"DF{i}", constraint="false")
+        text += f"![Data Flow Diagram](data:image/svg+xml,{urllib.parse.quote(graph.pipe(encoding="utf-8"))})\n"
+    
+    if st.session_state["threat_source"] == "threat_model":
+        text = from_threat_model(text)
+    elif st.session_state["threat_source"] == "linddun_go":
+        text = from_linddun_go(text)
+    elif st.session_state["threat_source"] == "linddun_pro":
+        text = from_linddun_pro(text)
+    
+
+
+    
+    html = markdown.markdown(text, extensions=["markdown.extensions.tables"])
     options = {
         'page-size': 'Letter',
         'margin-top': '0.75in',
@@ -82,3 +103,24 @@ def generate_report():
 
     pdf = pdfkit.from_string(html, False, options=options)
     return pdf
+
+
+def from_threat_model(text):
+    text += "## Threats found with the simple threat model\n"
+    for (i, threat) in enumerate(st.session_state["to_assess"]):
+        if st.session_state["to_report"][i]:
+            text += f"## Threat {i+1}: {threat["title"]}\n\n"
+            color = match_color(threat["threat_type"])
+            color_html = f"<span style='background-color:{color};color:#ffffff;'>"
+
+            text += f"**Category**: {color_html}{threat['threat_type']}</span>\n\n"
+            text += f"**Reason for detection**: {threat['Reason']}\n\n"
+            text += f"**Scenario**: {threat['Scenario']}\n\n"
+            text += f"**Suggested control measures**: \n\n{measures_gen_markdown(st.session_state["control_measures"][i])}\n\n"
+            text += f"**Impact assessment**: {st.session_state["assessments"][i]["impact"]}\n\n"
+
+    return text
+def from_linddun_go():
+    pass
+def from_linddun_pro():
+    pass

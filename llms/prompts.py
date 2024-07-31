@@ -215,7 +215,7 @@ LINDDUN threat types you should consider:
 
 When providing the threat model, use a JSON formatted response with the key
 "threat_model". Under "threat_model", include an array of objects with the keys
-"threat_type", "Scenario", and "Reason". 
+"title", "threat_type", "Scenario", and "Reason". 
 
 For each threat type, list multiple credible threats. Each threat scenario
 should provide a credible scenario in which the threat could occur in the
@@ -257,15 +257,17 @@ Example of expected JSON response format:
 {
 	"threat_model": [
 		{
+			"title": "Example Threat 1",
 			"threat_type": "L - Linking",
 			"Scenario": "Example Scenario 1",
-			"Potential Impact": "Example Potential Impact 1"
+			"Reason": "Example Reason 1"
 		},
 		/// more linking threats....
 		{
+			"title": "Example Threat 2",
 			"threat_type": "I - Identifying",
-			"Scenario": "Example Scenario 1",
-			"Potential Impact": "Example Potential Impact 1"
+			"Scenario": "Example Scenario 2",
+			"Reason": "Example Reason 2"
 		},
 		/// more identifying threats....
 		/// continue for all categories....

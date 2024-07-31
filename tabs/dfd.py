@@ -37,6 +37,8 @@ a list of dictionaries with keys 'from', 'typefrom', 'to', 'typeto' and
         )
     if "is_graph_generated" not in st.session_state:
         st.session_state["is_graph_generated"] = False
+    if "graph_seed" not in st.session_state:
+        st.session_state["graph_seed"] = str(random.randint(0, 100))
 
     def update_edges():
         changes = st.session_state["edges"]

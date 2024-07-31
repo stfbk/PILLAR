@@ -21,9 +21,9 @@ def threat_model_gen_markdown(threat_model):
 
 	# Fill the table rows with the threat model data
 	for threat in threat_model:
-			color = match_color(threat["threat_type"])
-			color_html = f"<p style='background-color:{color};color:#ffffff;'>"
-			markdown_output += f"| {color_html}{threat['threat_type']}</p> | {threat['Scenario']} | {threat['Reason']} |\n"
+		color = match_color(threat["threat_type"])
+		color_html = f"<p style='background-color:{color};color:#ffffff;'>"
+		markdown_output += f"| {color_html}{threat['threat_type']}</p> | {threat['Scenario']} | {threat['Reason']} |\n"
 
 	return markdown_output
 

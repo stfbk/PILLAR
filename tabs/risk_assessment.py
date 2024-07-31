@@ -28,8 +28,8 @@ def risk_assessment():
         st.session_state["assessments"] = []
     if "control_measures" not in st.session_state:
         st.session_state["control_measures"] = []
-    if "threats_to_report" not in st.session_state:
-        st.session_state["threats_to_report"] = []
+    if "to_report" not in st.session_state:
+        st.session_state["to_report"] = []
 
     col1, col2, col3 = st.columns([1, 1, 1])
     with col1:
@@ -38,7 +38,7 @@ def risk_assessment():
             st.session_state["threat_source"] = "threat_model"
             st.session_state["assessments"] = [{"impact": ""} for _ in st.session_state["to_assess"]]
             st.session_state["control_measures"] = [[] for _ in st.session_state["to_assess"]]
-            st.session_state["threats_to_report"] = [False for _ in st.session_state["to_assess"]]
+            st.session_state["to_report"] = [False for _ in st.session_state["to_assess"]]
             st.session_state["current_threat"] = 0
     with col2:
         if st.button("Import LINDDUN Go", help="Import the output of the LINDDUN Go simulation to assess the risks.", disabled=not st.session_state["linddun_go_threats"]):
@@ -46,7 +46,7 @@ def risk_assessment():
             st.session_state["threat_source"] = "linddun_go"
             st.session_state["assessments"] = [{"impact": ""} for _ in st.session_state["to_assess"]]
             st.session_state["control_measures"] = [[] for _ in st.session_state["to_assess"]]
-            st.session_state["threats_to_report"] = [False for _ in st.session_state["to_assess"]]
+            st.session_state["to_report"] = [False for _ in st.session_state["to_assess"]]
             st.session_state["current_threat"] = 0
     with col3:
         empty = True
@@ -68,7 +68,7 @@ def risk_assessment():
             st.session_state["threat_source"] = "linddun_pro"
             st.session_state["assessments"] = [{"impact": ""} for _ in st.session_state["to_assess"]]
             st.session_state["control_measures"] = [[] for _ in st.session_state["to_assess"]]
-            st.session_state["threats_to_report"] = [False for _ in st.session_state["to_assess"]]
+            st.session_state["to_report"] = [False for _ in st.session_state["to_assess"]]
             st.session_state["current_threat"] = 0
             
         
@@ -91,11 +91,11 @@ def risk_assessment():
             st.markdown(markdown, unsafe_allow_html=True)
     
     def update_checkbox():
-        st.session_state["threats_to_report"][st.session_state["current_threat"]] = st.session_state["report"]
+        st.session_state["to_report"][st.session_state["current_threat"]] = st.session_state["report"]
     if st.session_state["to_assess"]:
         st.checkbox(
             "Include this threat in the report",
-            value=st.session_state["threats_to_report"][st.session_state["current_threat"]],
+            value=st.session_state["to_report"][st.session_state["current_threat"]],
             key="report",
             on_change=update_checkbox,
         )
