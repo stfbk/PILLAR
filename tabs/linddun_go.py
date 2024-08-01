@@ -9,14 +9,18 @@ from llms.linddun_go import (
 
 def linddun_go():
     st.markdown("""
-The [LINDDUN Go](https://linddun.org/go/) process enables teams to dynamically apply the
-LINDDUN methodology to identify and assess privacy threats in real-time. This
-interactive simulation guides the LLM through the steps of the LINDDUN Go
-framework, asking questions about the application to elicit potential threats.
-By simulating [this process](https://linddun.org/go-getting-started/), developers can quickly identify and address privacy
-threats just by providing the description.
+The [LINDDUN Go](https://linddun.org/go/) process enables teams to dynamically
+apply the LINDDUN methodology to identify and assess privacy threats in a
+game-like fashion. This interactive simulation guides the LLM through the steps
+of the LINDDUN Go framework, asking questions about the application for each
+one of the LINDDUN Go deck to elicit potential threats. The simulation can also
+be carried out by a team of experts (whose role is played by the LLMs), with
+each expert contributing their expertise to the threat modeling process,
+carrying out a discussion between the LLMs. The final decision on the threats
+is made by a judge LLM, which evaluates the opinions proposed by the experts.
+
+---
 """)
-    st.markdown("""---""")
     
     c1, c2 = st.columns([1, 1])
     with c1:

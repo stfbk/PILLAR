@@ -27,11 +27,16 @@ def init_state():
 def application_info():
     st.markdown("""
 In this section, you should describe as clearly and precisely as possible the
-application. Include technical details and information about database schemas,
-user roles, and any other relevant information. The more detailed the
-description, the more accurate the threat model will be.
+application, by entering all the information in the slots below. Include
+technical details and how the application works, as well as possible. In the
+Data policy section, you should describe how personal data is handled by the
+application, including how long it is retained. In the Database schema, you can
+specify the data which is collected and used by the application, including if
+it is encrypted at rest and whether it is considered sensitive. The more
+details you include, the more accurate the subsequent analysis.
+
+-----
 """)
-    st.markdown("""---""")
 
     # Two column layout for the main app content
     col1, col2, col3 = st.columns([1, 1, 1])

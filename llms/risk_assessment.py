@@ -34,7 +34,6 @@ def measures_gen_markdown(measures):
 def get_assessment(api_key, model, threat, inputs):
     client = OpenAI(api_key=api_key)
     
-    print(threat)
     response = client.chat.completions.create(
         model=model,
         response_format={"type": "json_object"},

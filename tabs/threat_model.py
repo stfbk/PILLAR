@@ -11,14 +11,23 @@ from llms.prompts import THREAT_MODEL_USER_PROMPT
 
 def threat_model():
     st.markdown("""
-A [LINDDUN](https://linddun.org/) privacy threat model helps identify and evaluate potential privacy threats to applications / systems. It provides a systematic approach to 
-understanding possible privacy threats and provides suggestions on how to mitigate the risk. Use this tab to generate a threat model using the LINDDUN methodology.
+A [LINDDUN](https://linddun.org/) privacy threat model helps identify and
+evaluate potential privacy threats to applications / systems. It provides a
+systematic approach to understanding possible privacy threats, classifying each
+threat in one of the seven categories which compose the LINDDUN acronym. Use
+this tab to generate a simple threat model with the LLM, which will provide a
+list of potential threats to your application, classified by LINDDUN category.
+
+---
 """)
-    st.markdown("""---""")
 
 
     # Create a submit button for Threat Modelling
-    threat_model_submit_button = st.button(label="Generate Threat Model")
+    threat_model_submit_button = st.button(
+        label="Generate Threat Model", 
+        disabled= not st.session_state["input"]["app_description"] and not st.session_state["dfd_only"], 
+        help="Generate a privacy threat model for the application."
+    )
 
     model_provider = st.session_state["model_provider"]
     
@@ -94,10 +103,6 @@ understanding possible privacy threats and provides suggestions on how to mitiga
         st.session_state["threat_model_output"] = markdown_output
         st.session_state["threat_model_threats"] = threat_model
 
-    # If the submit button is clicked and the user has not provided an application description
-    elif threat_model_submit_button and not st.session_state["input"]["app_description"] and not st.session_state["dfd_only"]:
-        st.error("Please enter your application details before submitting.")
-        
 
     if st.session_state["threat_model_output"] != "":
         st.markdown("# Privacy threat model")
