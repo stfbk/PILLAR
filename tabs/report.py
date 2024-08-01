@@ -26,7 +26,7 @@ Just fill in the required information and you will be able to download the PDF r
         st.text_area("High-level description", help="Enter a high-level description of the application", key="high_level_description")
     with col2:
         st.text_input("Application version", help="Enter the version of the application", key="app_version")
-        st.text_input("Date", help="Enter the date of the report", key="date")
+        st.date_input("Date", key="date", help="Enter the date of the report", format="DD/MM/YYYY")
         st.checkbox("Include graph in the report", help="Include the Data Flow Diagram in the report", key="include_graph")
     
 
@@ -53,20 +53,24 @@ def generate_report():
         
         
     if st.session_state["include_graph"] and st.session_state["is_graph_generated"]:
+        text+="## Data Flow Diagram\n\n"
+        text+="The Data Flow Diagram (DFD) is a graphical representation of the data flow within the application. To reduce ambiguity, the labels are close to the **tail** of the arrow they refer to.\n\n"
         graph = graphviz.Digraph(engine='fdp', format='svg')
         graph.attr(
             bgcolor="white",
             overlap="false",
-            K="1.5",
-            start=st.session_state["graph_seed"]
+            K="5",
+            start=st.session_state["graph_seed"],
+            splines="ortho",
         )
         graph.node_attr.update(
             color="black",
             fontcolor="black",
         )
         graph.edge_attr.update(
-            color="black",
-            fontcolor="black",
+            color="grey",
+            fontcolor="fuchsia",
+            arrowsize="0.5",
         )
         with graph.subgraph(name='cluster_0') as c:
             c.attr(
@@ -83,7 +87,7 @@ def generate_report():
         for (i, object) in enumerate(st.session_state["input"]["dfd"]):
             graph.node(object["from"], shape=f"{"box" if object["typefrom"] == "Entity" else "ellipse" if object["typefrom"] == "Process" else "cylinder"}")
             graph.node(object["to"], shape=f"{"box" if object["typeto"] == "Entity" else "ellipse" if object["typeto"] == "Process" else "cylinder"}")
-            graph.edge(object["from"], object["to"], label=f"DF{i}", constraint="false")
+            graph.edge(object["from"], object["to"], taillabel=f"DF{i}", constraint="false")
         text += f"![Data Flow Diagram](data:image/svg+xml,{urllib.parse.quote(graph.pipe(encoding="utf-8"))})\n"
     
     if st.session_state["threat_source"] == "threat_model":

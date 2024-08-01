@@ -25,6 +25,8 @@ represented as a list of dictionaries with keys 'from', 'typefrom', 'to',
 'typeto' and 'trusted', representing each edge. The 'trusted' key is a boolean
 value representing whether the edge stays inside the trusted boundary or traverses it.
 
+To avoid ambiguity, in the DFD the labels are close to the _tail_ of the arrow they refer to.
+
 ---
 """)
     if "dfd" not in st.session_state["input"]:
@@ -199,22 +201,24 @@ value representing whether the edge stays inside the trusted boundary or travers
 
 def update_graph():
     st.session_state["is_graph_generated"] = True
-    print(st.session_state["is_graph_generated"])
     graph = graphviz.Digraph(engine='fdp', format='svg')
     st.session_state["graph_seed"] = str(random.randint(0, 100))
     graph.attr(
         bgcolor=f"{st.get_option("theme.backgroundColor")}",
         overlap="false",
-        K="1.5",
+        K="2.5",
         start=st.session_state["graph_seed"],
+        splines="ortho",
     )
     graph.node_attr.update(
         color=f"{st.get_option("theme.primaryColor")}",
         fontcolor="white",
+        padding="0.4",
     )
     graph.edge_attr.update(
         color="white",
         fontcolor="white",
+        arrowsize="0.5",
     )
     with graph.subgraph(name='cluster_0') as c:
         c.attr(
@@ -231,7 +235,7 @@ def update_graph():
     for (i, object) in enumerate(st.session_state["input"]["dfd"]):
         graph.node(object["from"], shape=f"{"box" if object["typefrom"] == "Entity" else "ellipse" if object["typefrom"] == "Process" else "cylinder"}")
         graph.node(object["to"], shape=f"{"box" if object["typeto"] == "Entity" else "ellipse" if object["typeto"] == "Process" else "cylinder"}")
-        graph.edge(object["from"], object["to"], label=f"DF{i}", constraint="false")
+        graph.edge(object["from"], object["to"], taillabel=f"DF{i}", constraint="false")
         
         
     st.session_state["input"]["graph"] = graph
