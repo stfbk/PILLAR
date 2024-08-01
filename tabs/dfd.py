@@ -197,6 +197,7 @@ a list of dictionaries with keys 'from', 'typefrom', 'to', 'typeto' and
 
 def update_graph():
     st.session_state["is_graph_generated"] = True
+    print(st.session_state["is_graph_generated"])
     graph = graphviz.Digraph(engine='fdp', format='svg')
     st.session_state["graph_seed"] = str(random.randint(0, 100))
     graph.attr(

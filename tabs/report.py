@@ -7,7 +7,8 @@ from misc.utils import (
     match_color,
     match_number_color,
     match_letter,
-    match_number_category
+    match_number_category,
+    match_category_number,
 )
 from tabs.risk_assessment import measures_gen_markdown
 
@@ -121,8 +122,10 @@ def from_threat_model(text):
             text += f"**Category**: {color_html}{threat['threat_type']}</span>\n\n"
             text += f"**Reason for detection**: {threat['Reason']}\n\n"
             text += f"**Scenario**: {threat['Scenario']}\n\n"
-            text += f"**Suggested control measures**: \n\n{measures_gen_markdown(st.session_state["control_measures"][i])}\n\n"
-            text += f"**Impact assessment**: {st.session_state["assessments"][i]["impact"]}\n\n"
+            if st.session_state["control_measures"][i]:
+                text += f"**Suggested control measures**: \n\n{measures_gen_markdown(st.session_state["control_measures"][i])}\n\n"
+            if st.session_state["assessments"][i]["impact"]:
+                text += f"**Impact assessment**: {st.session_state["assessments"][i]["impact"]}\n\n"
 
     return text
 def from_linddun_go(text):
@@ -136,8 +139,31 @@ def from_linddun_go(text):
             text += f"**Category**: {color_html}{match_letter(threat["threat_type"])} - {match_number_category(threat["threat_type"])}</span>\n\n"
             text += f"**Threat description**: {threat['threat_description']}\n\n"
             text += f"**Reason for detection**: {threat['reason']}\n\n"
-            text += f"**Suggested control measures**: \n\n{measures_gen_markdown(st.session_state["control_measures"][i])}\n\n"
-            text += f"**Impact assessment**: {st.session_state["assessments"][i]["impact"]}\n\n"
+            if st.session_state["control_measures"][i]:
+                text += f"**Suggested control measures**: \n\n{measures_gen_markdown(st.session_state["control_measures"][i])}\n\n"
+            if st.session_state["assessments"][i]["impact"]:
+                text += f"**Impact assessment**: {st.session_state["assessments"][i]["impact"]}\n\n"
     return text
-def from_linddun_pro():
-    pass
+def from_linddun_pro(text):
+    text += "## Threats found with the LINDDUN Pro methodology\n"
+    for (i, threat) in enumerate(st.session_state["to_assess"]):
+        if st.session_state["to_report"][i]:
+            text += f"## Threat {i+1}: {threat["threat_title"]}\n\n"
+            color = match_number_color(match_category_number(threat["category"]))
+            color_html = f"<span style='background-color:{color};color:#ffffff;'>"
+
+            text += f"**Category**: {color_html}{match_letter(match_category_number(threat["category"]))} - {threat["category"]}</span>\n\n"
+            text += f"**DFD edge**:         "
+            if threat["threat_location"] == "source":
+                text += f"<u>{threat['edge']['from']}</u>, DF{threat["data_flow_number"]}, {threat['edge']['to']}\n\n"
+            elif threat["threat_location"] == "data_flow":
+                text += f"{threat['edge']['from']}, <u>DF{threat["data_flow_number"]}</u>, {threat['edge']['to']}\n\n"
+            elif threat["threat_location"] == "destination":
+                text += f"{threat['edge']['from']}, DF{threat["data_flow_number"]}, <u>{threat['edge']['to']}</u>\n\n"
+            text += f"**Threat tree involved nodes**: {threat['threat_tree_node']}\n\n"
+            text += f"**Threat description**: {threat['description']}\n\n"
+            if st.session_state["control_measures"][i]:
+                text += f"**Suggested control measures**: \n\n{measures_gen_markdown(st.session_state["control_measures"][i])}\n\n"
+            if st.session_state["assessments"][i]["impact"]:
+                text += f"**Impact assessment**: {st.session_state["assessments"][i]["impact"]}\n\n"
+    return text

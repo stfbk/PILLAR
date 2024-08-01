@@ -490,10 +490,13 @@ The output MUST be a JSON response with the following structure, with each expla
 
 {
 	"source_id": "The ids of the source node threat in the threat tree",
+	"source_title": "The title of the source threat, briefly explaining the threat",
     "source": "A detailed explanation of which threat of the specified category is possible at the source node.",
 	"data_flow_id": "The ids of the data flow threat in the threat tree",
+	"data_flow_title": "The title of the data flow threat, briefly explaining the threat",
     "data_flow": "A detailed explanation of which threat of the specified category is possible in the data flow.",
 	"destination_id": "The ids of the destination node threat in the threat",
+	"destination_title": "The title of the destination threat, briefly explaining the threat",
     "destination": "A detailed explanation of which threat of the specified category is possible at the destination node.",
 }
                 """

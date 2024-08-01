@@ -57,11 +57,35 @@ def risk_assessment():
         if st.button("Import LINDDUN Pro", help="Import the output of the LINDDUN Pro threat modeling to assess the risks.", disabled=empty):
             analyzed_edges = st.session_state["linddun_pro_threats"]
             to_assess = []
-            for edge in analyzed_edges:
+            for (i, edge) in enumerate(analyzed_edges):
                 for threats_of_categories in edge:
-                    to_assess.append({"category": threats_of_categories["category"], "description": threats_of_categories["source"]})
-                    to_assess.append({"category": threats_of_categories["category"], "description": threats_of_categories["data_flow"]})
-                    to_assess.append({"category": threats_of_categories["category"], "description": threats_of_categories["destination"]})
+                    to_assess.append({
+                        "category": threats_of_categories["category"], 
+                        "description": threats_of_categories["source"], 
+                        "edge": threats_of_categories["edge"], 
+                        "threat_tree_node": threats_of_categories["source_id"],
+                        "threat_title": threats_of_categories["source_title"],
+                        "threat_location": "source",
+                        "data_flow_number": i,
+                    })
+                    to_assess.append({
+                        "category": threats_of_categories["category"], 
+                        "description": threats_of_categories["data_flow"], 
+                        "edge": threats_of_categories["edge"], 
+                        "threat_tree_node": threats_of_categories["data_flow_id"],
+                        "threat_title": threats_of_categories["data_flow_title"],
+                        "threat_location": "data_flow",
+                        "data_flow_number": i,
+                    })
+                    to_assess.append({
+                        "category": threats_of_categories["category"], 
+                        "description": threats_of_categories["destination"],
+                        "edge": threats_of_categories["edge"], 
+                        "threat_tree_node": threats_of_categories["destination_id"],
+                        "threat_title": threats_of_categories["destination_title"],
+                        "threat_location": "destination",
+                        "data_flow_number": i,
+                    })
 
 
             st.session_state["to_assess"] = to_assess
