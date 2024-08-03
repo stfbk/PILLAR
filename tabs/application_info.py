@@ -26,7 +26,7 @@ def init_state():
 
 def application_info():
     st.markdown("""
-In this section, you should describe as clearly and precisely as possible the
+In this tab, you should describe as clearly and precisely as possible the
 application, by entering all the information in the slots below. Include
 technical details and how the application works, as well as possible. In the
 Data policy section, you should describe how personal data is handled by the
@@ -35,7 +35,7 @@ specify the data which is collected and used by the application, including if
 it is encrypted at rest and whether it is considered sensitive. The more
 details you include, the more accurate the subsequent analysis.
 
------
+---
 """)
 
     # Two column layout for the main app content

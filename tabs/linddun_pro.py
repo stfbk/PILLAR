@@ -7,11 +7,15 @@ from llms.linddun_pro import (
 
 def linddun_pro():
     st.markdown("""
-The LINDDUN Pro tab allows you to model the privacy threats associated with your application using the LINDDUN Pro methodology.
-First, you have to provide a Data Flow Diagram in the DFD tab. Then, choose which edges of the DFD to assess the risks for,
-and which LINDDUN threat category to look for. Finally, click the button below to generate the LINDDUN Pro threat modeling.
+The [LINDDUN Pro](https://linddun.org/pro/) tab allows you to model the privacy
+threats associated with your application using the LINDDUN Pro methodology.
+First, you have to provide a Data Flow Diagram in the DFD tab. Then, you can
+choose each specific edge to elicit threats on that data flow. You can choose
+the categories to look for, and provide a brief description of the data flow.
+Finally, click the button below to generate the LINDDUN Pro threat modeling.
+
+---
 """)
-    st.markdown("""---""")
     if "linddun_pro_output" not in st.session_state:
         st.session_state["linddun_pro_output"] = ""
     if "linddun_pro_threats" not in st.session_state:

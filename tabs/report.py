@@ -14,10 +14,12 @@ from tabs.risk_assessment import measures_gen_markdown
 
 def report():
     st.markdown("""
-Here you can download the complete report of the privacy threat modeling and risk assessment, after the previous steps have been completed.
-Just fill in the required information and you will be able to download the PDF report.
+In this tab you can download the complete report of the privacy threat modeling
+and risk assessment, after the previous steps have been completed. Just fill in
+the required general information and you will be able to download the PDF report.
+
+---
     """)
-    st.markdown("""---""")
 
     col1, col2 = st.columns([1, 1])
     with col1:

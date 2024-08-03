@@ -2,7 +2,6 @@ import streamlit as st
 from llms.linddun_go import linddun_go_gen_markdown
 from llms.threat_model import threat_model_gen_markdown
 from llms.risk_assessment import (
-    assessment_gen_markdown,
     get_assessment,
     get_control_measures,
     measures_gen_markdown,
@@ -12,12 +11,16 @@ from llms.risk_assessment import (
 
 def risk_assessment():
     st.markdown("""
-    The Risk Assessment tab allows you to assess the risks associated with your application.
-    First, you have to execute either a Threat Model or a LINDDUN Go simulation to generate the potential threats.
-    Then, import them through with the buttons below.
+This tab allows you to carry out impact assessment associated the threats found
+within your application. First, you have to execute privacy threat modeling in
+either the Threat Model, LINDDUN Go or LINDDUN Pro tabs, to generate the
+potential threats. Then, import the threats using the buttons below. You can
+then navigate through the threats, and generate an impact assessment and
+control measures for each one.
+
+---
 """
     )
-    st.markdown("""---""")
     if "to_assess" not in st.session_state:
         st.session_state["to_assess"] = []
     if "current_threat" not in st.session_state:
@@ -131,6 +134,7 @@ def risk_assessment():
                 st.session_state["openai_model"],
                 st.session_state["to_assess"][st.session_state["current_threat"]],
                 st.session_state["input"],
+                st.session_state["temperature"],
             )
             st.session_state["control_measures"][st.session_state["current_threat"]] = control_measures
     with col2:
@@ -145,6 +149,7 @@ def risk_assessment():
                 st.session_state["openai_model"],
                 st.session_state["to_assess"][st.session_state["current_threat"]],
                 st.session_state["input"],
+                st.session_state["temperature"],
             )
             st.session_state["assessments"][st.session_state["current_threat"]] = assessment
     

@@ -48,7 +48,7 @@ sidebar()
 # ------------------ Main App UI ------------------ #
 
 tab1, tab2, tab3, tab4, tab5, tab6, tab7 = st.tabs(
-    ["Application info", "DFD", "Threat Model", "LINDDUN Go", "LINDDUN Pro", "Risk Assessment", "Report"],
+    ["Application Info", "DFD", "Threat Model", "LINDDUN Go", "LINDDUN Pro", "Risk Assessment", "Report"],
 )
 
 with tab1:

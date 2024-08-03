@@ -4,6 +4,11 @@ def sidebar():
     st.sidebar.image("images/logo.png")
 
 # Add instructions on how to use the app to the sidebar
+    st.sidebar.markdown("By [Andrea Bissoli](https://www.linkedin.com/in/andrea-bissoli/) and [Majid Mollaeefar](https://www.linkedin.com/in/majid-mollaeefar/).")
+    # Add "Star on GitHub" link to the sidebar
+    st.sidebar.markdown(
+        "Star on GitHub: [![Star on GitHub](https://img.shields.io/github/stars/AndreaBissoli/linddun-gpt?style=social)](https://github.com/AndreaBissoli/linddun-gpt)"
+    )
     st.sidebar.header("How to use LINDDUN GPT")
     if "keys" not in st.session_state:
         st.session_state["keys"] = {}
@@ -158,9 +163,10 @@ privacy protection. LINDDUN GPT is a tool that aims to make privacy threat
 modelling more accessible and efficient for developers, helping them to
 identify and mitigate privacy risks in their applications, and ultimately
 improve the privacy protection of their users.
+
+---
 """
         )
-        st.markdown("""---""")
 
 
 # Add "Example Application Description" section to the sidebar
@@ -200,8 +206,77 @@ improve the privacy protection of their users.
             language="md"
         )
         st.markdown("""---""")
+    
 
 # Add "FAQs" section to the sidebar
     st.sidebar.header("FAQs")
+
+    with st.sidebar:
+        st.markdown(
+            """
+        ### **What is LINDDUN?**
+        [LINDDUN](https://linddun.org/) is a privacy threat modeling methodology that helps developers
+        identify and mitigate privacy risks in their applications, similar to
+        the STRIDE security threat modeling methodology. The LINDDUN acronym
+        stands for Linking, Identifying, Non-repudiation, Detecting, Data
+        disclosure, Unawareness and unintervenability, and Non-compliance.
+        LINDDUN GPT uses the LINDDUN methodology to generate threat models for
+        applications.
+        """
+        )
+        st.markdown(
+            """
+        ### **How does LINDDUN GPT work?**
+        When you enter an application description, other relevant details and
+        optionally a Data Flow Diagram, the tool will use an LLM to generate a
+        threat model for your application. The model uses the application
+        description and DFD and details to generate a list of potential threats
+        and then categorises each threat according to the LINDDUN methodology.
+        """
+        )
+        st.markdown(
+            """
+        ### **Do you store the application details provided?**
+        No, LINDDUN GPT does not store your application description or other
+        details. All entered data is deleted after you close the browser tab.
+        Of course, to query the LLM, a request containing the data is sent to
+        the respective API provider, and they may store the request data
+        according to their privacy policies.
+        """
+        )
+        st.markdown(
+            """
+        ### **Why does it take so long to generate a threat model?**
+        Since LINDDUN GPT uses Large Language Models (LLMs) to generate threat
+        models, the process can take some time, especially for complex
+        applications. The time taken depends on the complexity of the
+        application, the model provider, and the model used. Also, some
+        functionalities of LINDDUN GPT take more than others, such as the
+        multi-agent LINDDUN Go. Please be patient while the model generates the
+        threat model.
+        """
+        )
+        st.markdown(
+            """
+        ### **Are the threat models 100% accurate?**
+        No, the threat models are not 100% accurate. LINDDUN GPT uses Large
+        Language Models (LLMs) to generate its output. The LLMs are powerful
+        and are prompted in such a way that they generate relevant content, but
+        they sometimes make mistakes and are prone to 'hallucinations'
+        (generating irrelevant or inaccurate content). The output is meant
+        only as a starting point for identifying and addressing potential
+        privacy risks in your applications.
+        """
+        )
+        st.markdown(
+            """
+        ### **How can I improve the accuracy of the threat models?**
+        You can improve the accuracy of the threat models by providing a
+        detailed description of the application and selecting the correct
+        application type, authentication methods, and other details.
+        The more information you provide, the more accurate the threat models
+        will be.
+        """
+        )
 
 #with st.sidebar:
