@@ -1,11 +1,9 @@
 import streamlit as st
 
 def sidebar():
-    st.sidebar.image("images/logo2.jpg")
+    st.sidebar.image("images/temp.jpg")
 
-# Add instructions on how to use the app to the sidebar
     st.sidebar.markdown("By [Andrea Bissoli](https://www.linkedin.com/in/andrea-bissoli/) and [Majid Mollaeefar](https://www.linkedin.com/in/majid-mollaeefar/).")
-    # Add "Star on GitHub" link to the sidebar
     st.sidebar.markdown(
         "Star on GitHub: [![Star on GitHub](https://img.shields.io/github/stars/AndreaBissoli/linddun-gpt?style=social)](https://github.com/AndreaBissoli/linddun-gpt)"
     )
@@ -278,5 +276,3 @@ improve the privacy protection of their users.
         will be.
         """
         )
-
-#with st.sidebar:

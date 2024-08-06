@@ -33,7 +33,7 @@ the required general information and you will be able to download the PDF report
         
         font_options = ["Arial", "Courier", "Times New Roman", "Verdana"]
         st.selectbox("Font face", options=font_options, key="font")
-        st.slider("Font size", 8, 16, 12, key="font_size")
+        st.slider("Font size", 8, 24, 16, key="font_size")
     
 
     st.download_button(
@@ -162,10 +162,10 @@ def from_threat_model(text):
             text += f"**Category**: {color_html}{threat['threat_type']}</span>\n\n"
             text += f"**Reason for detection**: {threat['Reason']}\n\n"
             text += f"**Scenario**: {threat['Scenario']}\n\n"
-            if st.session_state["control_measures"][i]:
-                text += f"**Suggested control measures**: \n\n{measures_gen_markdown(st.session_state["control_measures"][i])}\n\n"
             if st.session_state["assessments"][i]["impact"]:
                 text += f"**Impact assessment**: {st.session_state["assessments"][i]["impact"]}\n\n"
+            if st.session_state["control_measures"][i]:
+                text += f"**Suggested control measures**: \n\n{measures_gen_markdown(st.session_state["control_measures"][i])}\n\n"
 
     return text
 def from_linddun_go(text):
@@ -179,10 +179,10 @@ def from_linddun_go(text):
             text += f"**Category**: {color_html}{match_letter(threat["threat_type"])} - {match_number_category(threat["threat_type"])}</span>\n\n"
             text += f"**Threat description**: {threat['threat_description']}\n\n"
             text += f"**Reason for detection**: {threat['reason']}\n\n"
-            if st.session_state["control_measures"][i]:
-                text += f"**Suggested control measures**: \n\n{measures_gen_markdown(st.session_state["control_measures"][i])}\n\n"
             if st.session_state["assessments"][i]["impact"]:
                 text += f"**Impact assessment**: {st.session_state["assessments"][i]["impact"]}\n\n"
+            if st.session_state["control_measures"][i]:
+                text += f"**Suggested control measures**: \n\n{measures_gen_markdown(st.session_state["control_measures"][i])}\n\n"
     return text
 def from_linddun_pro(text):
     text += "## Threats found with the LINDDUN Pro methodology\n"
@@ -202,8 +202,8 @@ def from_linddun_pro(text):
                 text += f"{threat['edge']['from']}, DF{threat["data_flow_number"]}, <u>{threat['edge']['to']}</u>\n\n"
             text += f"**Threat tree involved nodes**: {threat['threat_tree_node']}\n\n"
             text += f"**Threat description**: {threat['description']}\n\n"
-            if st.session_state["control_measures"][i]:
-                text += f"**Suggested control measures**: \n\n{measures_gen_markdown(st.session_state["control_measures"][i])}\n\n"
             if st.session_state["assessments"][i]["impact"]:
                 text += f"**Impact assessment**: {st.session_state["assessments"][i]["impact"]}\n\n"
+            if st.session_state["control_measures"][i]:
+                text += f"**Suggested control measures**: \n\n{measures_gen_markdown(st.session_state["control_measures"][i])}\n\n"
     return text
