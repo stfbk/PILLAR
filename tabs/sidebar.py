@@ -1,7 +1,7 @@
 import streamlit as st
 
 def sidebar():
-    st.sidebar.image("images/logo.png")
+    st.sidebar.image("images/logo2.jpg")
 
 # Add instructions on how to use the app to the sidebar
     st.sidebar.markdown("By [Andrea Bissoli](https://www.linkedin.com/in/andrea-bissoli/) and [Majid Mollaeefar](https://www.linkedin.com/in/majid-mollaeefar/).")

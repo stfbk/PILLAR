@@ -26,10 +26,14 @@ the required general information and you will be able to download the PDF report
         st.text_input("Application name", help="Enter the name of the application", key="app_name")
         st.text_input("Author", help="Enter the name of the author", key="author")
         st.text_area("High-level description", help="Enter a high-level description of the application", key="high_level_description")
+        st.checkbox("Include DFD graph in the report", help="Include the Data Flow Diagram in the report.", key="include_graph")
     with col2:
         st.text_input("Application version", help="Enter the version of the application", key="app_version")
         st.date_input("Date", key="date", help="Enter the date of the report", format="DD/MM/YYYY")
-        st.checkbox("Include graph in the report", help="Include the Data Flow Diagram in the report", key="include_graph")
+        
+        font_options = ["Arial", "Courier", "Times New Roman", "Verdana"]
+        st.selectbox("Font face", options=font_options, key="font")
+        st.slider("Font size", 8, 16, 12, key="font_size")
     
 
     st.download_button(
@@ -103,6 +107,36 @@ def generate_report():
 
     
     html = markdown.markdown(text, extensions=["markdown.extensions.tables"])
+    html_with_style = f"""
+<html>
+<head>
+<style type="text/css">
+body {{
+    font-family: {st.session_state["font"]};
+    font-size: {st.session_state["font_size"]}px;
+}}
+table {{
+    width: 100%;
+}}
+table, th, td {{
+    border: 1px solid black;
+    border-collapse: collapse;
+}}
+th, td {{
+    padding: 10px;
+    text-align: left;
+}}
+th {{
+    background-color: #f2f2f2;
+}}
+</style>
+</head>
+<body>
+    {html}
+</body>
+</html>
+    """
+    
     options = {
         'page-size': 'Letter',
         'margin-top': '0.75in',
@@ -110,10 +144,10 @@ def generate_report():
         'margin-bottom': '0.75in',
         'margin-left': '0.75in',
         'encoding': "UTF-8",
-        'no-outline': None
+        'no-outline': None,
     }
 
-    pdf = pdfkit.from_string(html, False, options=options)
+    pdf = pdfkit.from_string(html_with_style, False, options=options)
     return pdf
 
 
