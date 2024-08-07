@@ -1,7 +1,7 @@
 import streamlit as st
 
 def sidebar():
-    st.sidebar.image("images/logo1.png")
+    st.sidebar.image("images/logo-bottom.png")
 
     st.sidebar.markdown("By [Andrea Bissoli](https://www.linkedin.com/in/andrea-bissoli/) and [Majid Mollaeefar](https://www.linkedin.com/in/majid-mollaeefar/).")
     st.sidebar.markdown(
