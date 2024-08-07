@@ -1,7 +1,6 @@
 import streamlit as st
 from llms.threat_model import (
     get_threat_model_openai,
-    get_threat_model_azure,
     get_threat_model_google,
     get_threat_model_mistral,
     threat_model_gen_markdown,
@@ -59,15 +58,7 @@ list of potential threats to your application, classified by LINDDUN category.
             while retry_count < max_retries:
                 try:
                     # Call the relevant get_threat_model function with the generated prompt
-                    if model_provider == "Azure OpenAI Service":
-                        model_output = get_threat_model_azure(
-                            st.session_state["azure_api_endpoint"],
-                            st.session_state["keys"]["azure_api_key"],
-                            st.session_state["azure_api_version"],
-                            st.session_state["azure_deployment_name"],
-                            st.session_state["threat_model_prompt"],
-                        )
-                    elif model_provider == "OpenAI API":
+                    if model_provider == "OpenAI API":
                         model_output = get_threat_model_openai(
                             st.session_state["keys"]["openai_api_key"],
                             st.session_state["openai_model"], 

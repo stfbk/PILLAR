@@ -21,7 +21,7 @@ def sidebar():
 
         _, center, _ = st.columns([0.2, 1, 0.2]) # Columns to center the image
         with center:
-            st.image("images/logo1.png", width=200)
+            st.image("images/logo-bottom.png", width=200)
 
         st.markdown("""
     By [Andrea

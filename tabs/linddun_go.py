@@ -86,7 +86,6 @@ is made by a judge LLM, which evaluates the opinions proposed by the experts.
                             "openai_model": st.session_state["openai_model"],
                             "mistral_model": st.session_state["mistral_model"],
                             "google_model": None,
-                            "azure_deployment_name": None,
                         },
                         inputs, 
                         st.session_state["temperature"],

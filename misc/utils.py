@@ -1,4 +1,13 @@
 def match_color(threat_type):
+    """
+    This function matches the letter of a LINDDUN category to a hex color value, based on the LINDDUN color scheme.
+    
+    Args:
+        threat_type (str): The LINDDUN category, in the form of the first letter: "L", "I", "Nr", "D ", "Dd", "U" or "Nc".
+    
+    Returns:
+        str: The color associated with the category, as a hex value.
+    """
     if "L" in threat_type:
         return "#4570b3"
     elif "I" in threat_type:
@@ -16,7 +25,17 @@ def match_color(threat_type):
     else:
         return "#000000"
 
+
 def match_letter(threat_type_number):
+    """
+    This function matches the number of a LINDDUN category to the specific letter.
+
+    Args:
+        threat_type_number (int): The LINDDUN category, in the form of a number from 1 to 7.
+    
+    Returns:
+        str: The letter associated with the category, in the form of "L", "I", "Nr", "D ", "Dd", "U" or "Nc".
+    """
     if threat_type_number == 1:
         return "L"
     elif threat_type_number == 2:
@@ -33,10 +52,28 @@ def match_letter(threat_type_number):
         return "Nc"
 
 def match_number_color(threat_type_number):
+    """
+    This function matches the number of a LINDDUN category to the specific color, based on the LINDDUN color scheme.
+
+    Args:
+        threat_type_number (int): The LINDDUN category, in the form of a number from 1 to 7.
+    
+    Returns:
+        str: The color associated with the category, as a hex value.
+    """
     letter = match_letter(threat_type_number)
     return match_color(letter)
 
 def match_category_number(category):
+    """
+    This function matches the LINDDUN category to the specific number.
+
+    Args:
+        category (str): The LINDDUN category, in the form of "Linking", "Identifying", etc.
+    
+    Returns:
+        int: The number associated with the category, in the form of a number from 1 to 7.
+    """
     if category == "Linking":
         return 1
     elif category == "Identifying":
@@ -53,6 +90,15 @@ def match_category_number(category):
         return 7
 
 def match_number_category(threat_type_number):
+    """
+    This function matches the number of a LINDDUN category to the specific category.
+
+    Args:
+        threat_type_number (int): The LINDDUN category, in the form of a number from 1 to 7.
+    
+    Returns:
+        str: The category associated with the number, in the form of "Linking", "Identifying", etc.
+    """
     if threat_type_number == 1:
         return "Linking"
     elif threat_type_number == 2:

@@ -6,11 +6,11 @@ import base64
 import json
 import random
 from io import StringIO
-from llms.dfd import get_dfd
-
-from llms.threat_model import (
+from llms.dfd import (
+    get_dfd,
     get_image_analysis,
 )
+
     
 def dfd():
     st.markdown("""
