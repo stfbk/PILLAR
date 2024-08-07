@@ -64,6 +64,8 @@ def generate_report():
     text += f"| **Report author** | {st.session_state['author']} | **Date** | {st.session_state['date']} |\n"
     if st.session_state["high_level_description"]: # the high-level description is optional
         text += f"| **High-level Description** | {st.session_state['high_level_description']} | | |\n\n"
+    else:
+        text += f"\n\n"
 
         
         
