@@ -1,24 +1,42 @@
 import streamlit as st
 
 def sidebar():
-    st.sidebar.image("images/logo1.png")
-
-    st.sidebar.markdown("By [Andrea Bissoli](https://www.linkedin.com/in/andrea-bissoli/) and [Majid Mollaeefar](https://www.linkedin.com/in/majid-mollaeefar/).")
-    st.sidebar.markdown(
-        "Star on GitHub: [![Star on GitHub](https://img.shields.io/github/stars/AndreaBissoli/linddun-gpt?style=social)](https://github.com/AndreaBissoli/linddun-gpt)"
-    )
-    st.sidebar.header("How to use LINDDUN GPT")
+    # Initialize the session state for the sidebar
     if "keys" not in st.session_state:
+        # keys is a dictionary that will store the API keys, indexed such as
+        # "openai_api_key", "google_api_key", "mistral_api_key"
         st.session_state["keys"] = {}
     if "openai_model" not in st.session_state:
+        # openai_model is a string that will store the OpenAI model to use
         st.session_state["openai_model"] = "gpt-4o-mini"
     if "google_model" not in st.session_state:
+        # google_model is a string that will store the Google AI model to use
         st.session_state["google_model"] = "gemini-1.5-pro-latest"
     if "mistral_model" not in st.session_state:
+        # mistral_model is a string that will store the Mistral model to use
         st.session_state["mistral_model"] = "mistral-large-latest"
-
+        
+        
     with st.sidebar:
+
+        _, center, _ = st.columns([0.2, 1, 0.2]) # Columns to center the image
+        with center:
+            st.image("images/logo1.png", width=200)
+
+        st.markdown("""
+    By [Andrea
+    Bissoli](https://www.linkedin.com/in/andrea-bissoli/) and [Majid
+    Mollaeefar](https://www.linkedin.com/in/majid-mollaeefar/).
+        """)
+        st.markdown("""
+    Star on GitHub: [![Star on
+    GitHub](https://img.shields.io/github/stars/AndreaBissoli/linddun-gpt?style=social)](https://github.com/AndreaBissoli/linddun-gpt)
+            """)
+
+        st.header("How to use LINDDUN GPT")
+
         try:
+            # Load the API keys from the secrets file, if available
             openai_api_key = st.secrets["openai_api_key"]
             st.session_state["keys"]["openai_api_key"] = openai_api_key
             google_api_key = st.secrets["google_api_key"]
@@ -27,6 +45,8 @@ def sidebar():
             st.session_state["keys"]["mistral_api_key"] = mistral_api_key
         except Exception as e:
             st.warning("No secrets file found")
+            # If the API keys are not in the secrets file, initialize them as
+            # empty strings
             if "openai_api_key" not in st.session_state["keys"]:
                 st.session_state["keys"]["openai_api_key"] = ""
             if "google_api_key" not in st.session_state["keys"]:
@@ -36,6 +56,7 @@ def sidebar():
             openai_api_key = ""
             google_api_key = ""
             mistral_api_key = ""
+
         # Add model selection input field to the sidebar
         model_provider = st.selectbox(
             "Select your preferred model provider:",
@@ -47,6 +68,7 @@ def sidebar():
             key="model_provider",
             help="Select the model provider you would like to use. This will determine the models available for selection.",
         )
+
         st.markdown(
                 """
         1. Enter your [OpenAI API
@@ -63,6 +85,8 @@ def sidebar():
         5. Finally, download the complete report in the Report tab.
         """
             )
+        
+        # LLM configuration section, for each available LLM provider you can choose the model and insert the API key
         st.header("""Configure here the API keys and models you would like to use for the privacy threat modelling:""")
         llm_to_configure = st.selectbox(
             "Select LLM to configure:",
@@ -132,12 +156,13 @@ def sidebar():
                     st.session_state["mistral_model"] = mistral_model
 
         st.markdown("""---""")
+        
+        # Global temperature setting for the LLM interactions
         st.slider("Temperature setting", 0.0, 1.0, 0.7, key="temperature", help="The randomness of the model's responses. Lower values lead to more deterministic answers, higher values make the model more creative, but also more prone to hallucination.")
 
-# Add "About" section to the sidebar
-    st.sidebar.header("About")
 
-    with st.sidebar:
+        # About section
+        st.header("About")
         st.markdown(
             """Welcome to LINDDUN GPT, an AI-powered tool designed to help developers
         in privacy threat modelling for their applications, using the [LINDDUN](https://linddun.org/) methodology."""
@@ -167,10 +192,9 @@ improve the privacy protection of their users.
         )
 
 
-# Add "Example Application Description" section to the sidebar
-    st.sidebar.header("Example Application Description")
 
-    with st.sidebar:
+        # Example application description, to help users get started trying out the tool
+        st.header("Example Application Description")
         st.markdown(
             "Below is an example application description that you can use to test LINDDUN GPT:"
         )
@@ -206,10 +230,9 @@ improve the privacy protection of their users.
         st.markdown("""---""")
     
 
-# Add "FAQs" section to the sidebar
-    st.sidebar.header("FAQs")
 
-    with st.sidebar:
+        # FAQ section
+        st.header("FAQs")
         st.markdown(
             """
         ### **What is LINDDUN?**

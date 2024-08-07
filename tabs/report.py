@@ -13,6 +13,7 @@ from misc.utils import (
 from tabs.risk_assessment import measures_gen_markdown
 
 def report():
+
     st.markdown("""
 In this tab you can download the complete report of the privacy threat modeling
 and risk assessment, after the previous steps have been completed. Just fill in
@@ -46,22 +47,34 @@ the required general information and you will be able to download the PDF report
 
     
 def generate_report():
+    """
+    This function generates the PDF report based on the information provided by the user.
+    Returns:
+        PDF file: The PDF file with the report.
+    """
+
+    # Start the markdown text with the general information
     text="""# Privacy Threat Modeling and Risk Assessment Report\n"""
-    
     text += "## Report Details \n\n"
     
+    # Add the general information to the report as a table
     text += f"| | | | |\n"
     text += f"|------|-------|-----|-----|\n"
     text += f"| **Application Name** | {st.session_state['app_name']} | **Application Version** | {st.session_state['app_version']} |\n"
     text += f"| **Report author** | {st.session_state['author']} | **Date** | {st.session_state['date']} |\n"
-    if st.session_state["high_level_description"]:
+    if st.session_state["high_level_description"]: # the high-level description is optional
         text += f"| **High-level Description** | {st.session_state['high_level_description']} | | |\n\n"
 
         
         
+    # Add the DFD graph to the report. If the user has not generated the graph, it will not be included (because the graph is not available).
     if st.session_state["include_graph"] and st.session_state["is_graph_generated"]:
         text+="## Data Flow Diagram\n\n"
         text+="The Data Flow Diagram (DFD) is a graphical representation of the data flow within the application. To reduce ambiguity, the labels are close to the **tail** of the arrow they refer to.\n\n"
+        
+        # Generate the graph using Graphviz. The configuration is different,
+        # for some aspects, from the one used in the DFD tab, thus some code is
+        # repeated here.
         graph = graphviz.Digraph(engine='fdp', format='svg')
         graph.attr(
             bgcolor="white",
@@ -95,8 +108,11 @@ def generate_report():
             graph.node(object["from"], shape=f"{"box" if object["typefrom"] == "Entity" else "ellipse" if object["typefrom"] == "Process" else "cylinder"}")
             graph.node(object["to"], shape=f"{"box" if object["typeto"] == "Entity" else "ellipse" if object["typeto"] == "Process" else "cylinder"}")
             graph.edge(object["from"], object["to"], taillabel=f"DF{i}", constraint="false")
+
+        # Add the graph to the report as an SVG image
         text += f"![Data Flow Diagram](data:image/svg+xml,{urllib.parse.quote(graph.pipe(encoding="utf-8"))})\n"
     
+    # Add the threats found with the selected methodology to the report
     if st.session_state["threat_source"] == "threat_model":
         text = from_threat_model(text)
     elif st.session_state["threat_source"] == "linddun_go":
@@ -104,10 +120,9 @@ def generate_report():
     elif st.session_state["threat_source"] == "linddun_pro":
         text = from_linddun_pro(text)
     
-
-
-    
+    # Convert the markdown text to HTML
     html = markdown.markdown(text, extensions=["markdown.extensions.tables"])
+    # Add the CSS styles to the HTML
     html_with_style = f"""
 <html>
 <head>
@@ -148,18 +163,20 @@ th {{
         'no-outline': None,
     }
 
-    pdf = pdfkit.from_string(html_with_style, False, options=options)
-    return pdf
+    # Generate the PDF report with the styled HTML content and the specified options
+    return pdfkit.from_string(html_with_style, False, options=options)
 
 
 def from_threat_model(text):
+    """
+    This function generates the markdown text for the threats found with the simple threat model.
+    """
     text += "## Threats found with the simple threat model\n"
     for (i, threat) in enumerate(st.session_state["to_assess"]):
         if st.session_state["to_report"][i]:
             text += f"## Threat {i+1}: {threat["title"]}\n\n"
             color = match_color(threat["threat_type"])
             color_html = f"<span style='background-color:{color};color:#ffffff;'>"
-
             text += f"**Category**: {color_html}{threat['threat_type']}</span>\n\n"
             text += f"**Reason for detection**: {threat['Reason']}\n\n"
             text += f"**Scenario**: {threat['Scenario']}\n\n"
@@ -169,14 +186,17 @@ def from_threat_model(text):
                 text += f"**Suggested control measures**: \n\n{measures_gen_markdown(st.session_state["control_measures"][i])}\n\n"
 
     return text
+
 def from_linddun_go(text):
+    """
+    This function generates the markdown text for the threats found with the LINDDUN Go methodology.
+    """
     text += "## Threats found with the LINDDUN Go methodology\n"
     for (i, threat) in enumerate(st.session_state["to_assess"]):
         if st.session_state["to_report"][i]:
             text += f"## Threat {i+1}: {threat["threat_title"]}\n\n"
             color = match_number_color(threat["threat_type"])
             color_html = f"<span style='background-color:{color};color:#ffffff;'>"
-
             text += f"**Category**: {color_html}{match_letter(threat["threat_type"])} - {match_number_category(threat["threat_type"])}</span>\n\n"
             text += f"**Threat description**: {threat['threat_description']}\n\n"
             text += f"**Reason for detection**: {threat['reason']}\n\n"
@@ -184,17 +204,22 @@ def from_linddun_go(text):
                 text += f"**Impact assessment**: {st.session_state["assessments"][i]["impact"]}\n\n"
             if st.session_state["control_measures"][i]:
                 text += f"**Suggested control measures**: \n\n{measures_gen_markdown(st.session_state["control_measures"][i])}\n\n"
+
     return text
+
 def from_linddun_pro(text):
+    """
+    This function generates the markdown text for the threats found with the LINDDUN Pro methodology.
+    """
     text += "## Threats found with the LINDDUN Pro methodology\n"
     for (i, threat) in enumerate(st.session_state["to_assess"]):
         if st.session_state["to_report"][i]:
             text += f"## Threat {i+1}: {threat["threat_title"]}\n\n"
             color = match_number_color(match_category_number(threat["category"]))
             color_html = f"<span style='background-color:{color};color:#ffffff;'>"
-
             text += f"**Category**: {color_html}{match_letter(match_category_number(threat["category"]))} - {threat["category"]}</span>\n\n"
             text += f"**DFD edge**:         "
+            # Underline the source, data flow, or destination node in the edge, depending on the threat location
             if threat["threat_location"] == "source":
                 text += f"<u>{threat['edge']['from']}</u>, DF{threat["data_flow_number"]}, {threat['edge']['to']}\n\n"
             elif threat["threat_location"] == "data_flow":
@@ -207,4 +232,5 @@ def from_linddun_pro(text):
                 text += f"**Impact assessment**: {st.session_state["assessments"][i]["impact"]}\n\n"
             if st.session_state["control_measures"][i]:
                 text += f"**Suggested control measures**: \n\n{measures_gen_markdown(st.session_state["control_measures"][i])}\n\n"
+
     return text

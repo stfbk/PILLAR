@@ -10,6 +10,19 @@ from llms.prompts import THREAT_MODEL_USER_PROMPT
 
 
 def threat_model():
+    # Initialize the session state for the Threat Model tab
+    if "threat_model_output" not in st.session_state:
+        # "threat_model_output" is a string that will store the Markdown output of the threat model
+        st.session_state["threat_model_output"] = ""
+    if "threat_model_threats" not in st.session_state:
+        # "threat_model_threats" is a list of dictionaries that will store the JSON output of the threat model.
+        # Each dictionary represents a threat, and contains the following keys:
+        # - "title": string. The title of the threat.
+        # - "threat_type": string. The LINDDUN category of the threat, such as "L - Linking"
+        # - "Scenario": string. The scenario in which the threat occurs.
+        # - "Reason": string. The reason for the detection of the threat.
+        st.session_state["threat_model_threats"] = []
+
     st.markdown("""
 A [LINDDUN](https://linddun.org/) privacy threat model helps identify and
 evaluate potential privacy threats to applications / systems. It provides a
@@ -21,7 +34,6 @@ list of potential threats to your application, classified by LINDDUN category.
 ---
 """)
 
-
     # Create a submit button for Threat Modelling
     threat_model_submit_button = st.button(
         label="Generate Threat Model", 
@@ -31,12 +43,9 @@ list of potential threats to your application, classified by LINDDUN category.
 
     model_provider = st.session_state["model_provider"]
     
-    if "threat_model_output" not in st.session_state:
-        st.session_state["threat_model_output"] = ""
-    if "threat_model_threats" not in st.session_state:
-        st.session_state["threat_model_threats"] = []
-
-    # If the Generate Threat Model button is clicked and the user has provided an application description
+    # If the Generate Threat Model button is clicked and the user has provided
+    # an application description or a DFD in dfd_only mode, generate the threat
+    # model
     if threat_model_submit_button and (st.session_state["input"]["app_description"] or st.session_state["dfd_only"]):
         inputs = st.session_state["input"]
         threat_model_prompt = THREAT_MODEL_USER_PROMPT(
@@ -80,11 +89,11 @@ list of potential threats to your application, classified by LINDDUN category.
                             st.session_state["temperature"],
                         )
 
-                    # Access the threat model from the parsed content
+                    # Access the threat model from the parsed content, or set it to an empty list if not found
                     threat_model = model_output.get("threat_model", [])
 
                     # Save the threat model to the session state for later use.
-                    st.session_state["threat_model"] = threat_model
+                    st.session_state["threat_model_threats"] = threat_model
                     break  # Exit the loop if successful
                 except Exception as e:
                     retry_count += 1
@@ -101,9 +110,9 @@ list of potential threats to your application, classified by LINDDUN category.
         # Convert the threat model JSON to Markdown
         markdown_output = threat_model_gen_markdown(threat_model)
         st.session_state["threat_model_output"] = markdown_output
-        st.session_state["threat_model_threats"] = threat_model
 
 
+    # If present, display the threat model output
     if st.session_state["threat_model_output"] != "":
         st.markdown("# Privacy threat model")
         # Display the threat model in Markdown
