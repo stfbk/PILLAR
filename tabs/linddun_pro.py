@@ -6,27 +6,6 @@ from llms.linddun_pro import (
 
 
 def linddun_pro():
-    # Initialize session state for the LINDDUN Pro tab
-    if "linddun_pro_output" not in st.session_state:
-        # "linddun_pro_output" is a string used to store the markdown output of the LINDDUN Pro threat model
-        st.session_state["linddun_pro_output"] = ""
-    if "linddun_pro_threats" not in st.session_state:
-        # "linddun_pro_threats" is a list of lists of dictionaries used to store the threats for each edge in the DFD.
-        # The list has the same length as the DFD, and each element is a list of threats for the corresponding edge, one for each of the LINDDUN categories.
-        # Thus, the structure is a matrix of N rows (one for each edge) and 7 columns (one for each LINDDUN category), where each cell is a dictionary with the threat information.
-        # The dictionary contains the following keys:
-        # - "category": string. The category of the threat, such as "Linking".
-        # - "source_id": string. The ID of the source of the threat.
-        # - "source_title": string. The title of the threat at the source.
-        # - "source": string. The description of the threat at the source.
-        # - "data_flow_id": string. The ID of the data flow of the threat.
-        # - "data_flow_title": string. The title of the threat at the data flow.
-        # - "data_flow": string. The description of the threat at the data flow.
-        # - "destination_id": string. The ID of the destination of the threat.
-        # - "destination_title": string. The title of the threat at the destination.
-        # - "destination": string. The description of the threat at the destination.
-        # - "edge": dictionary. The edge of the DFD that the threat is associated with, with the same keys as the DFD edge.
-        st.session_state["linddun_pro_threats"] = []
 
     # Check if the number of edges in the DFD has changed, and update the threats list accordingly
     if len(st.session_state["linddun_pro_threats"]) != len(st.session_state["input"]["dfd"]):

@@ -1,20 +1,6 @@
 import streamlit as st
 
 def sidebar():
-    # Initialize the session state for the sidebar
-    if "keys" not in st.session_state:
-        # keys is a dictionary that will store the API keys, indexed such as
-        # "openai_api_key", "google_api_key", "mistral_api_key"
-        st.session_state["keys"] = {}
-    if "openai_model" not in st.session_state:
-        # openai_model is a string that will store the OpenAI model to use
-        st.session_state["openai_model"] = "gpt-4o-mini"
-    if "google_model" not in st.session_state:
-        # google_model is a string that will store the Google AI model to use
-        st.session_state["google_model"] = "gemini-1.5-pro-latest"
-    if "mistral_model" not in st.session_state:
-        # mistral_model is a string that will store the Mistral model to use
-        st.session_state["mistral_model"] = "mistral-large-latest"
         
         
     with st.sidebar:

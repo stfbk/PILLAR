@@ -9,18 +9,6 @@ from llms.prompts import THREAT_MODEL_USER_PROMPT
 
 
 def threat_model():
-    # Initialize the session state for the Threat Model tab
-    if "threat_model_output" not in st.session_state:
-        # "threat_model_output" is a string that will store the Markdown output of the threat model
-        st.session_state["threat_model_output"] = ""
-    if "threat_model_threats" not in st.session_state:
-        # "threat_model_threats" is a list of dictionaries that will store the JSON output of the threat model.
-        # Each dictionary represents a threat, and contains the following keys:
-        # - "title": string. The title of the threat.
-        # - "threat_type": string. The LINDDUN category of the threat, such as "L - Linking"
-        # - "Scenario": string. The scenario in which the threat occurs.
-        # - "Reason": string. The reason for the detection of the threat.
-        st.session_state["threat_model_threats"] = []
 
     st.markdown("""
 A [LINDDUN](https://linddun.org/) privacy threat model helps identify and

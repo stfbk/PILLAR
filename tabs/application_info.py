@@ -1,58 +1,9 @@
 import streamlit as st
 import graphviz
 
-def init_state():
-    """ 
-    Initialize the "input" session state for the Application Info tab. The
-    "input" session state is a dictionary that stores all the user input for
-    the application information. The dictionary has the following keys
-    - app_description: string.  A detailed description of the application
-    - app_type: string. The type of the application
-    - authentication: list. The authentication methods supported by the
-      application
-    - has_database: bool. Whether the application uses a database
-    - database: list of dict. The type of data stored in the database. Each
-      dict has the following keys:
-        - data_type: string. The type of data stored in the database
-        - encryption: bool. Whether the data type is encrypted
-        - sensitive: bool. Whether the data is considered sensitive
-        - notes: string. Additional information about the data type
-    - data_policy: string. The data policy of the application
-    - dfd: list of dict. The Data Flow Diagram of the application. Each dict
-      has the following keys:
-        - from: string. The entity where the data flow starts
-        - typefrom: string. The type of the entity where the data flow starts
-        - to: string. The entity where the data flow ends
-        - typeto: string. The type of the entity where the data flow ends
-        - trusted: bool. Whether the data flow is trusted
-    - graph: graphviz.Digraph. The graph representation of the Data Flow
-      Diagram, as a graphviz Digraph object """
-    st.session_state["input"]["app_description"] = ""
-    st.session_state["input"]["app_type"] = ""
-    st.session_state["input"]["authentication"] = []
-    st.session_state["input"]["has_database"] = False
-    st.session_state["input"]["database"] = None
-    st.session_state["input"]["data_policy"] = ""
-    st.session_state["input"]["dfd"] = [ 
-        {"from": "User", "typefrom": "Entity", "to": "Application", "typeto": "Process", "trusted": True },
-    ]
-    st.session_state["input"]["graph"] = graphviz.Digraph()
-    st.session_state["input"]["graph"].attr(
-        bgcolor=f"{st.get_option("theme.backgroundColor")}",
-    )
 
 
 def application_info():
-    # Initialize the session state for the Application Info tab
-    if "input" not in st.session_state:
-        # "input" is a dictionary that stores all the user input for the
-        # application information
-        st.session_state["input"] = {}
-        init_state()
-    if "dfd_only" not in st.session_state:
-        # "dfd_only" is a boolean that indicates whether only the DFD is
-        # needed, in order to disable the application description
-        st.session_state["dfd_only"] = False
 
     st.markdown("""
 In this tab, you should describe as clearly and precisely as possible the

@@ -29,16 +29,6 @@ To avoid ambiguity, in the DFD the labels are close to the _tail_ of the arrow t
 
 ---
 """)
-    # Initialize the session state for the DFD tab
-    if "is_graph_generated" not in st.session_state:
-        # "is_graph_generated" is a boolean that indicates whether the graph
-        # has already been generated, to know if it has been updated at least
-        # once
-        st.session_state["is_graph_generated"] = False
-    if "graph_seed" not in st.session_state:
-        # "graph_seed" is a string that stores a random seed to generate the
-        # graph, such that it changes every time the graph is updated
-        st.session_state["graph_seed"] = str(random.randint(0, 100))
 
     # Never have an empty DFD, it breaks the data editor
     if not st.session_state["input"]["dfd"]: 
