@@ -41,25 +41,26 @@ Finally, click the button below to generate the LINDDUN Pro threat modeling.
         )
         st.text_area("Data flow description", help="Describe in detail the data flow for the selected edge.", key="data_flow_description", placeholder="Explain what is transferred between source and destination and how it is processed.")
         if st.button("Analyze"):
-            for category in st.session_state["threat_categories"]:
-                new_threat = get_linddun_pro(
-                        st.session_state["keys"]["openai_api_key"],
-                        st.session_state["openai_model"],
-                        st.session_state["input"]["dfd"],
-                        st.session_state["input"]["dfd"][st.session_state["edge_num"]],
-                        category,
-                        st.session_state["data_flow_description"],
-                        st.session_state["temperature"],
-                    )
-                new_threat["edge"] = st.session_state["input"]["dfd"][st.session_state["edge_num"]]
-                new_threat["category"] = category
-                flag = False
-                for (i, threat) in enumerate(st.session_state["linddun_pro_threats"][st.session_state["edge_num"]]):
-                    if new_threat["category"] == threat["category"]:
-                        flag = True
-                        st.session_state["linddun_pro_threats"][st.session_state["edge_num"]][i] = new_threat
-                if not flag:
-                    st.session_state["linddun_pro_threats"][st.session_state["edge_num"]].append(new_threat)
+            with st.spinner("Eliciting threats in the data flow..."):
+                for category in st.session_state["threat_categories"]:
+                    new_threat = get_linddun_pro(
+                            st.session_state["keys"]["openai_api_key"],
+                            st.session_state["openai_model"],
+                            st.session_state["input"]["dfd"],
+                            st.session_state["input"]["dfd"][st.session_state["edge_num"]],
+                            category,
+                            st.session_state["data_flow_description"],
+                            st.session_state["temperature"],
+                        )
+                    new_threat["edge"] = st.session_state["input"]["dfd"][st.session_state["edge_num"]]
+                    new_threat["category"] = category
+                    flag = False
+                    for (i, threat) in enumerate(st.session_state["linddun_pro_threats"][st.session_state["edge_num"]]):
+                        if new_threat["category"] == threat["category"]:
+                            flag = True
+                            st.session_state["linddun_pro_threats"][st.session_state["edge_num"]][i] = new_threat
+                    if not flag:
+                        st.session_state["linddun_pro_threats"][st.session_state["edge_num"]].append(new_threat)
     st.markdown("## Threats for the specified edge")
     if st.session_state["linddun_pro_threats"][st.session_state["edge_num"]]:
         markdown = linddun_pro_gen_markdown(st.session_state["linddun_pro_threats"][st.session_state["edge_num"]])

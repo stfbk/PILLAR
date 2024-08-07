@@ -128,15 +128,16 @@ control measures for each one.
         )
     col1, col2 = st.columns([0.2, 0.8])
     with col1:
-        if st.button("Impact assessment", help="Generate an assessment of the impact of the current threat, which can then be modified."):
-            assessment = get_assessment(
-                st.session_state["keys"]["openai_api_key"],
-                st.session_state["openai_model"],
-                st.session_state["to_assess"][st.session_state["current_threat"]],
-                st.session_state["input"],
-                st.session_state["temperature"],
-            )
-            st.session_state["assessments"][st.session_state["current_threat"]] = assessment
+        if st.button("Impact assessment", help="Generate an assessment of the impact of the current threat, which can then be modified.", disabled=not st.session_state["to_assess"]):
+            with st.spinner("Assessing impact..."):
+                assessment = get_assessment(
+                    st.session_state["keys"]["openai_api_key"],
+                    st.session_state["openai_model"],
+                    st.session_state["to_assess"][st.session_state["current_threat"]],
+                    st.session_state["input"],
+                    st.session_state["temperature"],
+                )
+                st.session_state["assessments"][st.session_state["current_threat"]] = assessment
     
     with col2:
         if st.session_state["assessments"]:
@@ -152,15 +153,16 @@ control measures for each one.
     
     col1, col2 = st.columns([0.2, 0.8])
     with col1:
-        if st.button("Control suggestions", help="Get control measures for the current threat, based on [privacy patterns](https://privacypatterns.org/)."):
-            control_measures = get_control_measures(
-                st.session_state["keys"]["openai_api_key"],
-                st.session_state["openai_model"],
-                st.session_state["to_assess"][st.session_state["current_threat"]],
-                st.session_state["input"],
-                st.session_state["temperature"],
-            )
-            st.session_state["control_measures"][st.session_state["current_threat"]] = control_measures
+        if st.button("Control suggestions", help="Get control measures for the current threat, based on [privacy patterns](https://privacypatterns.org/).", disabled=not st.session_state["to_assess"]):
+            with st.spinner("Generating control measures..."):
+                control_measures = get_control_measures(
+                    st.session_state["keys"]["openai_api_key"],
+                    st.session_state["openai_model"],
+                    st.session_state["to_assess"][st.session_state["current_threat"]],
+                    st.session_state["input"],
+                    st.session_state["temperature"],
+                )
+                st.session_state["control_measures"][st.session_state["current_threat"]] = control_measures
     with col2:
         if st.session_state["control_measures"] and st.session_state["control_measures"][st.session_state["current_threat"]] != []:
             st.markdown(measures_gen_markdown(st.session_state["control_measures"][st.session_state["current_threat"]]), unsafe_allow_html=True)

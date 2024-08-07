@@ -23,13 +23,13 @@ the required general information and you will be able to download the PDF report
 
     col1, col2 = st.columns([1, 1])
     with col1:
-        st.text_input("Application name", help="Enter the name of the application", key="app_name")
-        st.text_input("Author", help="Enter the name of the author", key="author")
-        st.text_area("High-level description", help="Enter a high-level description of the application", key="high_level_description")
+        st.text_input("Application name", help="Enter the name of the application.", key="app_name")
+        st.text_input("Author", help="Enter the name of the author.", key="author")
+        st.text_area("High-level description (optional)", help="Enter a high-level description of the application, if you want to include it in the report.", key="high_level_description")
         st.checkbox("Include DFD graph in the report", help="Include the Data Flow Diagram in the report.", key="include_graph")
     with col2:
-        st.text_input("Application version", help="Enter the version of the application", key="app_version")
-        st.date_input("Date", key="date", help="Enter the date of the report", format="DD/MM/YYYY")
+        st.text_input("Application version", help="Enter the version of the application.", key="app_version")
+        st.date_input("Date", key="date", help="Enter the date of the report.", format="YYYY/MM/DD")
         
         font_options = ["Arial", "Courier", "Times New Roman", "Verdana"]
         st.selectbox("Font face", options=font_options, key="font")
@@ -41,7 +41,7 @@ the required general information and you will be able to download the PDF report
         data=generate_report(),
         file_name="report.pdf",
         mime="application/pdf",
-        disabled=not (st.session_state.app_name and st.session_state.author and st.session_state.high_level_description and st.session_state.app_version and st.session_state.date),
+        disabled=not (st.session_state.app_name and st.session_state.author and st.session_state.app_version and st.session_state.date),
     )
 
     
@@ -54,7 +54,8 @@ def generate_report():
     text += f"|------|-------|-----|-----|\n"
     text += f"| **Application Name** | {st.session_state['app_name']} | **Application Version** | {st.session_state['app_version']} |\n"
     text += f"| **Report author** | {st.session_state['author']} | **Date** | {st.session_state['date']} |\n"
-    text += f"| **High-level Description** | {st.session_state['high_level_description']} | | |\n\n"
+    if st.session_state["high_level_description"]:
+        text += f"| **High-level Description** | {st.session_state['high_level_description']} | | |\n\n"
 
         
         
