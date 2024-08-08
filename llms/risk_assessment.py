@@ -118,7 +118,7 @@ def choose_control_measures(api_key, model, threat, inputs, temperature):
         list: The list of control measures. Each measure is a string, the title of the chosen privacy pattern.
     """
     client = OpenAI(api_key=api_key)
-    with open("privacypatterns.json", "r") as f:
+    with open("misc/privacypatterns.json", "r") as f:
         patterns = json.load(f)
         # for each pattern inside the "patterns" list, keep only "title", "excerpt" and "Related Patterns"
         patterns = [{"title": p["title"], "excerpt": p["excerpt"], "related_patterns": p["sections"]["Related Patterns"] if "Related Patterns" in p["sections"] else None} for p in patterns["patterns"]]
