@@ -64,8 +64,8 @@ Finally, click the button below to generate the LINDDUN Pro threat modeling.
                         st.session_state["linddun_pro_threats"][st.session_state["edge_num"]].append(new_threat)
                         
     # Display the threats for the selected edge
-    st.markdown("## Threats for the specified edge")
     if st.session_state["linddun_pro_threats"][st.session_state["edge_num"]]:
+        st.markdown(f"### Threats found for DF{st.session_state["edge_num"]}")
         markdown = linddun_pro_gen_markdown(st.session_state["linddun_pro_threats"][st.session_state["edge_num"]])
         st.markdown(markdown, unsafe_allow_html=True)
         st.download_button(

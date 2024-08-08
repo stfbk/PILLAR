@@ -100,7 +100,7 @@ details you include, the more accurate the subsequent analysis.
             "data_type": st.column_config.TextColumn("Type", help="The type of data stored in the database.", width="medium", required=True),
             "encryption": st.column_config.CheckboxColumn("Encrypted", help="Whether the data type is encrypted.", width="small", required=True, default=True),
             "sensitive": st.column_config.CheckboxColumn("Sensitive", help="Whether the data is to be considered sensitive.", width="small", required=True, default=True),
-            "notes": st.column_config.TextColumn("Notes", help="Enter any additional information which might be important in the privacy realm, such as the data's collection frequency.", width="medium", required=False, default=None),
+            "notes": st.column_config.TextColumn("Notes", help="Enter any additional information which might be important in the privacy realm, such as the data's collection frequency.", width="medium", required=False, default=""),
         },
         # Allow the user to add or remove rows, modifying the database schema
         num_rows="dynamic",

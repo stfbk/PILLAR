@@ -218,7 +218,7 @@ To avoid ambiguity, in the DFD the labels are close to the _tail_ of the arrow t
             "typefrom": st.column_config.SelectboxColumn("Type", help="The type of the starting element.", width="medium", required=True, options=["Entity", "Data store", "Process"]),
             "to": st.column_config.TextColumn("To", help="The destination of the edge.", width="medium", required=True),
             "typeto": st.column_config.SelectboxColumn("Type", help="The type of the destination element.", width="medium", required=True, options=["Entity", "Data store", "Process"]),
-            "trusted": st.column_config.CheckboxColumn("Trusted", help="Whether the edge stays inside the trusted boundary (true) or traverses it (false).", width="medium"),
+            "trusted": st.column_config.CheckboxColumn("Trusted", help="Whether the edge stays inside the trusted boundary (true) or traverses it (false).", width="medium", required=True, default=False),
         },
         key="edges",
         num_rows="dynamic",
