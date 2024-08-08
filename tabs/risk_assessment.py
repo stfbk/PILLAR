@@ -97,14 +97,15 @@ control measures for each one.
             st.session_state["to_report"] = [False for _ in st.session_state["to_assess"]]
             st.session_state["current_threat"] = 0
             
+    st.markdown("---")
         
     
     col1, col2, col3 = st.columns([0.1,0.8,0.1])
     with col1:
-        if st.button("<", help="Go to the previous threat."):
+        if st.button("<", help="Go to the previous threat.", disabled=st.session_state["current_threat"] <= 0):
             st.session_state["current_threat"] = max(0, st.session_state["current_threat"] - 1)
     with col3:
-        if st.button(r"\>", help="Go to the next threat."):
+        if st.button(r"\>", help="Go to the next threat.", disabled=st.session_state["current_threat"] >= len(st.session_state["to_assess"]) - 1):
             st.session_state["current_threat"] = min(len(st.session_state["to_assess"]) - 1, st.session_state["current_threat"] + 1)
     with col2:
         if st.session_state["to_assess"]:

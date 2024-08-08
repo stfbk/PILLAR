@@ -62,7 +62,9 @@ def sidebar():
            key](https://makersuite.google.com/app/apikey) and/or [Mistral API
            key](https://console.mistral.ai/api-keys/) below. Also, choose the
            models you would like to use for each provider.
-        2. Provide details of the application that you would like to privacy threat model, both in the Application Info and DFD tabs.
+        2. Provide details of the application that you would like to privacy
+           threat model, in the Application Info and DFD tabs (some features
+           only require one of these).
         3. Generate a privacy threat model with different methods, choosing the
            Threat model, LINDDUN Go or LINDDUN Pro tab. You can use more than
            one tab to compare the results.
