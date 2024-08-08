@@ -201,13 +201,13 @@ def init_session_state():
         
 # Streamlit configuration
 st.set_page_config(
-    page_title="LINDDUN GPT",
-    page_icon=":shield:",
+    page_title="P.I.L.L.A.R.",
+    page_icon="images/logo1.png",
     layout="wide",
     initial_sidebar_state="expanded",
 )
 
-# Init the session state
+# Initialization for the whole app
 init_session_state()
 
 # Call all the UI functions

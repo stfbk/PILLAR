@@ -19,7 +19,7 @@ def sidebar():
     GitHub](https://img.shields.io/github/stars/AndreaBissoli/linddun-gpt?style=social)](https://github.com/AndreaBissoli/linddun-gpt)
             """)
 
-        st.header("How to use LINDDUN GPT")
+        st.header("How to use P.I.L.L.A.R.")
 
         try:
             # Load the API keys from the secrets file, if available
@@ -150,25 +150,30 @@ def sidebar():
         # About section
         st.header("About")
         st.markdown(
-            """Welcome to LINDDUN GPT, an AI-powered tool designed to help developers
-        in privacy threat modelling for their applications, using the [LINDDUN](https://linddun.org/) methodology."""
+            """
+        Welcome to P.I.L.L.A.R., an AI-powered tool designed to help developers
+        in privacy threat modelling for their applications, using the [LINDDUN](https://linddun.org/) methodology.
+        P.I.L.L.A.R. is an acronym for:
+
+        **P**rivacy risk **I**dentification with **L**INDDUN and **L**LM **A**nalysis **R**eport
+        """
         )
         st.markdown(
             """
 Privacy threat modelling is a key activity in the software development
-lifecycle, but is often overlooked or poorly executed. LINDDUN GPT aims
+lifecycle, but is often overlooked or poorly executed. P.I.L.L.A.R. aims
 to help teams produce more comprehensive threat models by
 leveraging the power of Large Language Models (LLMs) to generate a
 threat list for an application based on the details provided, analyzing threats
-specified by the LINDDUN scheme. To do so, LINDDUN GPT leverages different
+specified by the LINDDUN scheme. To do so, P.I.L.L.A.R. leverages different
 LINDDUN methodologies, such as LINDDUN Go and LINDDUN Pro, to generate a list
 of threats based on the application's Data Flow Diagram and description. Once
-the threat list has been generated, LINDDUN GPT allows users to analyze each
+the threat list has been generated, P.I.L.L.A.R. allows users to analyze each
 threat individually, generating control measures and assessing the impact of
 each threat. Finally, users can complete the privacy threat modeling process by
 downloading a complete report of the privacy threat modeling and risk
 assessment, which allows for a subsequent improvement of the application's
-privacy protection. LINDDUN GPT is a tool that aims to make privacy threat
+privacy protection. P.I.L.L.A.R. is a tool that aims to make privacy threat
 modelling more accessible and efficient for developers, helping them to
 identify and mitigate privacy risks in their applications, and ultimately
 improve the privacy protection of their users.
@@ -182,7 +187,7 @@ improve the privacy protection of their users.
         # Example application description, to help users get started trying out the tool
         st.header("Example Application Description")
         st.markdown(
-            "Below is an example application description that you can use to test LINDDUN GPT:"
+            "Below is an example application description that you can use to test P.I.L.L.A.R.:"
         )
         st.code(
             """
@@ -227,13 +232,13 @@ improve the privacy protection of their users.
         the STRIDE security threat modeling methodology. The LINDDUN acronym
         stands for Linking, Identifying, Non-repudiation, Detecting, Data
         disclosure, Unawareness and unintervenability, and Non-compliance.
-        LINDDUN GPT uses the LINDDUN methodology to generate threat models for
+        P.I.L.L.A.R. uses the LINDDUN methodology to generate threat models for
         applications.
         """
         )
         st.markdown(
             """
-        ### **How does LINDDUN GPT work?**
+        ### **How does P.I.L.L.A.R. work?**
         When you enter an application description, other relevant details and
         optionally a Data Flow Diagram, the tool will use an LLM to generate a
         threat model for your application. The model uses the application
@@ -244,7 +249,7 @@ improve the privacy protection of their users.
         st.markdown(
             """
         ### **Do you store the application details provided?**
-        No, LINDDUN GPT does not store your application description or other
+        No, P.I.L.L.A.R. does not store your application description or other
         details. All entered data is deleted after you close the browser tab.
         Of course, to query the LLM, a request containing the data is sent to
         the respective API provider, and they may store the request data
@@ -254,11 +259,11 @@ improve the privacy protection of their users.
         st.markdown(
             """
         ### **Why does it take so long to generate a threat model?**
-        Since LINDDUN GPT uses Large Language Models (LLMs) to generate threat
+        Since P.I.L.L.A.R. uses Large Language Models (LLMs) to generate threat
         models, the process can take some time, especially for complex
         applications. The time taken depends on the complexity of the
         application, the model provider, and the model used. Also, some
-        functionalities of LINDDUN GPT take more than others, such as the
+        functionalities of P.I.L.L.A.R. take more than others, such as the
         multi-agent LINDDUN Go. Please be patient while the model generates the
         threat model.
         """
@@ -266,7 +271,7 @@ improve the privacy protection of their users.
         st.markdown(
             """
         ### **Are the threat models 100% accurate?**
-        No, the threat models are not 100% accurate. LINDDUN GPT uses Large
+        No, the threat models are not 100% accurate. P.I.L.L.A.R. uses Large
         Language Models (LLMs) to generate its output. The LLMs are powerful
         and are prompted in such a way that they generate relevant content, but
         they sometimes make mistakes and are prone to 'hallucinations'
