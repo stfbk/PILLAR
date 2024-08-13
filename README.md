@@ -65,7 +65,7 @@ modeling of the application.
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE.txt)
+This project is licensed under the Apache License, Version 2.0 - see the [LICENSE](LICENSE.txt)
 file for details.
 
 ## Contacts
