@@ -25,9 +25,9 @@ is made by a judge LLM, which evaluates the opinions proposed by the experts.
     
     c1, c2 = st.columns([1, 1])
     with c1:
+        threats_to_analyze = st.slider("Number of cards to analyze", 1, st.session_state["max_threats"], 3)
         multiagent_linddun_go = st.checkbox("Use multiple LLM agents to simulate LINDDUN Go with a team of experts")
         rounds = st.slider("Number of rounds", 1, 5, 3, disabled=not multiagent_linddun_go)
-        threats_to_analyze = st.slider("Number of threats to analyze", 1, st.session_state["max_threats"], 3, disabled=not multiagent_linddun_go)
         
         # Add the available LLMs to the multiagent simulation
         available_llms = []
@@ -76,6 +76,7 @@ is made by a judge LLM, which evaluates the opinions proposed by the experts.
                         st.session_state["keys"]["openai_api_key"], 
                         st.session_state["openai_model"], 
                         inputs,
+                        threats_to_analyze,
                         st.session_state["temperature"],
                     )
             except Exception as e:

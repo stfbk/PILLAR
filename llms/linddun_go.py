@@ -63,7 +63,7 @@ def get_deck(file="misc/deck.json"):
     return deck["cards"]
 
 
-def get_linddun_go(api_key, model_name, inputs, temperature):
+def get_linddun_go(api_key, model_name, inputs, threats_to_analyze, temperature):
     """
     This function generates a single-agent LINDDUN threat model from the prompt.
 
@@ -71,6 +71,7 @@ def get_linddun_go(api_key, model_name, inputs, temperature):
         api_key (str): The OpenAI API key.
         model_name (str): The OpenAI model to use.
         inputs (dict): The inputs to the model, a dictionary with the same keys as the one in the Application Info tab.
+        threats_to_analyze (int): The number of threats to analyze.
         temperature (float): The temperature to use for the model.
     
     Returns:
@@ -85,11 +86,13 @@ def get_linddun_go(api_key, model_name, inputs, temperature):
     client = OpenAI(api_key=api_key)
     deck = get_deck()
     
+    # Shuffle the deck of cards, simulating the experience of drawing cards from the deck
+    random.shuffle(deck)
 
     threats = []
 
     # For each card, ask the associated questions to the LLM
-    for card in deck:
+    for card in deck[0:threats_to_analyze]:
         question = "\n".join(card["questions"])
         title = card["title"]
         description = card["description"]
