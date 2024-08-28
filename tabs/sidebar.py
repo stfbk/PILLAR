@@ -158,6 +158,8 @@ def sidebar():
         P.I.L.L.A.R. is an acronym for:
 
         **P**rivacy risk **I**dentification with **L**INDDUN and **L**LM **A**nalysis **R**eport
+        
+        You can download the Tool Architecture diagram png [here](/app/static/ToolArchitecture.png).
         """
         )
         st.markdown(

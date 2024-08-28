@@ -41,6 +41,14 @@ providers are [MistralAI](https://console.mistral.ai/api-keys) and [Google
 Gemini](https://makersuite.google.com/app/apikey). If you would like to see
 more LLM providers supported, feel free to open an issue or a pull request.
 
+## Tool Architecture
+
+<img src="images/Tool Architecture.png" width="" height="" />
+
+This is the tool architecture, highliting the different components of the tool
+and the expected usage flow.
+
+
 ## Features
 
 - **Application Description**: Provide a natural language description of your
