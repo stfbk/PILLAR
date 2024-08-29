@@ -170,7 +170,7 @@ def get_control_measures(api_key, model, threat, inputs, temperature):
     """
     measures = choose_control_measures(api_key, model, threat, inputs, temperature)
     chosen = []
-    with open("privacypatterns.json", "r") as f:
+    with open("misc/privacypatterns.json", "r") as f:
         patterns = json.load(f)["patterns"]
 
     for pattern in patterns:
