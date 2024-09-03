@@ -107,6 +107,9 @@ def init_session_state():
         st.session_state["input"]["graph"].attr(
             bgcolor=f"{st.get_option("theme.backgroundColor")}",
         )
+    if "backup_database" not in st.session_state:
+        # "backup_database" is a list of dictionaries that stores the backup of the database information, to be able to restore it if needed
+        st.session_state["backup_database"] = st.session_state["input"]["database"].copy()
     if "dfd_only" not in st.session_state:
         # "dfd_only" is a boolean that indicates whether only the DFD is
         # needed, in order to disable the application description

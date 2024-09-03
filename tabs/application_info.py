@@ -100,8 +100,12 @@ details you include, the more accurate the subsequent analysis.
 
 
     has_database = st.checkbox("Describe collected data", value=True, disabled=st.session_state["dfd_only"])
+    has_database_toggled = False
     if has_database != st.session_state["input"]["has_database"]:
+        has_database_toggled = True # The user has toggled the checkbox
         st.session_state["input"]["has_database"] = has_database
+        
+
     col1, col2 = st.columns([0.8, 0.2])
     with col1:
         st.markdown("""
@@ -229,8 +233,17 @@ details you include, the more accurate the subsequent analysis.
         on_change=update_schema,
     )
 
-    # Set the collected data schema in the session state
+
+
     # If the user has unchecked the "has_database" checkbox, set the collected data
     # schema to None
-    database = None if not has_database else database
-
+    if has_database_toggled and not has_database:
+        st.session_state["backup_database"] = st.session_state["input"]["database"]
+        st.session_state["input"]["database"] = None
+    # If the user has checked the "has_database" checkbox, restore the collected
+    # data schema from the backup
+    elif has_database_toggled and has_database:
+        st.session_state["input"]["database"] = st.session_state["backup_database"]
+        st.session_state["backup_database"] = None
+        st.rerun()
+    
