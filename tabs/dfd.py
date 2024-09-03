@@ -174,10 +174,7 @@ To avoid ambiguity, in the DFD the labels are close to the _tail_ of the arrow t
                     st.session_state["input"]["dfd"] = dfd
                     for edge in st.session_state["input"]["dfd"]:
                         # Convert the "trusted" key to a boolean, otherwise it will be a string
-                        if edge["trusted"] == "true":
-                            edge["trusted"] = True
-                        else:
-                            edge["trusted"] = False
+                        edge["trusted"] = edge["trusted"].lower() == "True"
                     # If the user does not remove the uploaded file, the DFD will not change until they do
                     st.info("Please remove the uploaded file to modify the DFD from the table.")
                 except Exception as e:

@@ -63,16 +63,17 @@ def init_session_state():
         # The dictionary has the following keys:
         #   - app_description: string.  A detailed description of the application
         #   - app_type: string. The type of the application
-        #   - authentication: list. The authentication methods supported by the
-        #       application
-        #   - has_database: bool. Whether the application uses a database
+        #   - types_of_data: list. The types of data collected by the application
+        #   - has_database: bool. Whether the application describes the data collected 
         #   - database: list of dict. The type of data stored in the database. Each
         #       dict has the following keys:
         #       - data_type: string. The type of data stored in the database
         #       - encryption: bool. Whether the data type is encrypted
         #       - sensitive: bool. Whether the data is considered sensitive
         #       - notes: string. Additional information about the data type
-        #   - data_policy: string. The data policy of the application
+        #   - data_policy: string. The data retention and deletion policy of the 
+        #       application
+        #   - user_data_control: string. The actions the user can perform on their data
         #   - dfd: list of dict. The Data Flow Diagram of the application. Each dict
         #       has the following keys:
         #       - from: string. The entity where the data flow starts
@@ -84,10 +85,21 @@ def init_session_state():
         #       Diagram, as a graphviz Digraph object
         st.session_state["input"]["app_description"] = ""
         st.session_state["input"]["app_type"] = ""
-        st.session_state["input"]["authentication"] = []
+        st.session_state["input"]["types_of_data"] = []
         st.session_state["input"]["has_database"] = False
-        st.session_state["input"]["database"] = None
+        st.session_state["input"]["database"] = [
+            {"data_type": "Name", "encryption": True, "sensitive": True, "storage_location": "", "third_party": False, "purpose": "", "notes": ""},
+            {"data_type": "Email", "encryption": True, "sensitive": True, "storage_location": "", "third_party": False, "purpose": "", "notes": ""},
+            {"data_type": "Password", "encryption": True, "sensitive": True, "storage_location": "", "third_party": False, "purpose": "", "notes": ""},
+            {"data_type": "Address", "encryption": True, "sensitive": True, "storage_location": "", "third_party": False, "purpose": "", "notes": ""},
+            {"data_type": "Location", "encryption": True, "sensitive": True, "storage_location": "", "third_party": False, "purpose": "", "notes": ""},
+            {"data_type": "Phone number", "encryption": True, "sensitive": True, "storage_location": "", "third_party": False, "purpose": "", "notes": ""},
+            {"data_type": "Date of Birth", "encryption": True, "sensitive": True, "storage_location": "", "third_party": False, "purpose": "", "notes": ""},
+            {"data_type": "ID card number", "encryption": True, "sensitive": True, "storage_location": "", "third_party": False, "purpose": "", "notes": ""},
+            {"data_type": "Last access time", "encryption": True, "sensitive": True, "storage_location": "", "third_party": False, "purpose": "", "notes": ""},
+        ]
         st.session_state["input"]["data_policy"] = ""
+        st.session_state["input"]["user_data_control"] = ""
         st.session_state["input"]["dfd"] = [ 
             {"from": "User", "typefrom": "Entity", "to": "Application", "typeto": "Process", "trusted": True },
         ]

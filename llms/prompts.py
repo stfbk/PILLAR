@@ -108,7 +108,7 @@ def LINDDUN_GO_USER_PROMPT(inputs, question, title, description):
 		prompt =  f"""
 '''
 APPLICATION TYPE: {inputs["app_type"]}
-AUTHENTICATION METHODS: {inputs["authentication"]}
+TYPES OF DATA: {inputs["types_of_data"]}
 APPLICATION DESCRIPTION: {inputs["app_description"]}
 {f"""
 The user has also provided a Data Flow Diagram to describe the application.
@@ -120,6 +120,7 @@ inside or outside the trusted boundary. This is the DFD provided:
 """ if inputs["use_dfd"] else ""}
 DATABASE_SCHEMA: {inputs["database"]}
 DATA POLICY: {inputs["data_policy"]}
+USER DATA CONTROL: {inputs["user_data_control"]}
 QUESTIONS: {question}
 THREAT_TITLE: {title}
 THREAT_DESCRIPTION: {description}
@@ -314,7 +315,7 @@ def THREAT_MODEL_USER_PROMPT(
 		prompt = f"""
 '''
 APPLICATION TYPE: {inputs["app_type"]}
-AUTHENTICATION METHODS: {inputs["authentication"]}
+TYPES OF DATA: {inputs["types_of_data"]}
 APPLICATION DESCRIPTION: {inputs["app_description"]}
 {f"""
 The user has also provided a Data Flow Diagram to describe the application.
@@ -326,6 +327,7 @@ inside or outside the trusted boundary. This is the DFD provided:
 """ if inputs["use_dfd"] else ""}
 DATABASE SCHEMA: {inputs["database"]}
 DATA POLICY: {inputs["data_policy"]}
+USER DATA CONTROL: {inputs["user_data_control"]}
 '''
 """
 	else:
