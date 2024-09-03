@@ -231,6 +231,21 @@ st.set_page_config(
     page_icon="images/logo1.png",
     layout="wide",
     initial_sidebar_state="expanded",
+    menu_items={
+            'Report a bug': "https://github.com/AndreaBissoli/PILLAR/issues",
+            'About': """
+**PILLAR** (**P**rivacy risk **I**dentification with **L**INDDUN and **L**LM
+**A**nalysis **R**eport) is a tool developed by [Andrea Bissoli](https://www.linkedin.com/in/andrea-bissoli/) 
+under the supervision of
+[Dr. Majid Mollaeefar](https://www.linkedin.com/in/majid-mollaeefar/) as an
+internship project for [Fondazione Bruno Kessler](https://www.fbk.eu/). The
+tool is designed to help developers and security professionals to assess the
+privacy and information leakage risks of their applications. It provides a
+user-friendly interface to create Data Flow Diagrams, generate threat models,
+and perform risk assessments based on the LINDDUN methodology. The tool is
+open-source and can be found on
+[GitHub](https://github.com/AndreaBissoli/PILLAR).""",
+    }
 )
 
 # Initialization for the whole app
