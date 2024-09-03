@@ -161,22 +161,31 @@ Example input format:
 APPLICATION TYPE: Web | Mobile | Desktop | Cloud | IoT | Other application
 AUTHENTICATION METHODS: SSO | MFA | OAUTH2 | Basic | None
 APPLICATION DESCRIPTION: the general application description, sometimes with a Data Flow Diagram
-DATABASE SCHEMA: the database schema used by the application to contain the data, or none if no database is used, in this JSON format:
+DATABASE SCHEMA: the database schema used by the application to contain the
+data, or none if no database is used, in this JSON format:
 {[
 {
 	'data_type': 'Name',
 	'encryption': True,
 	'sensitive': True,
+	'storage_location': 'Server-side database',
+	'third_party': False,
+	'purpose': 'User authentication, User profile',
 	'notes': 'Collected only once'
 },
 {
 	'data_type': 'Email',
 	'encryption': True,
 	'sensitive': False,
+	'storage_location': 'Device',
+	'third_party': True,
+	'purpose': 'User communication, Marketing, shared with <name of third party>',
 	'notes': ''
 },
+/// other data types...
 ]}
 DATA POLICY: the data policy of the application
+USER DATA CONTROL: the control the user has over their data
 QUESTIONS: the questions associated with the threat, which you need to answer
 THREAT_TITLE: the threat title
 THREAT_DESCRIPTION: the threat description
@@ -273,16 +282,24 @@ data, or none if no database is used, in this JSON format:
 	'data_type': 'Name',
 	'encryption': True,
 	'sensitive': True,
+	'storage_location': 'Server-side database',
+	'third_party': False,
+	'purpose': 'User authentication, User profile',
 	'notes': 'Collected only once'
 },
 {
 	'data_type': 'Email',
 	'encryption': True,
 	'sensitive': False,
+	'storage_location': 'Device',
+	'third_party': True,
+	'purpose': 'User communication, Marketing, shared with <name of third party>',
 	'notes': ''
 },
+/// other data types...
 ]}
 DATA POLICY: the data policy of the application
+USER DATA CONTROL: the control the user has over their data
 '''
 
 Example of expected JSON response format:
@@ -377,16 +394,24 @@ data, or none if no database is used, in this JSON format:
 	'data_type': 'Name',
 	'encryption': True,
 	'sensitive': True,
+	'storage_location': 'Server-side database',
+	'third_party': False,
+	'purpose': 'User authentication, User profile',
 	'notes': 'Collected only once'
 },
 {
 	'data_type': 'Email',
 	'encryption': True,
 	'sensitive': False,
+	'storage_location': 'Device',
+	'third_party': True,
+	'purpose': 'User communication, Marketing, shared with <name of third party>',
 	'notes': ''
 },
+/// other data types...
 ]}
 DATA POLICY: the data policy of the application
+USER DATA CONTROL: the control the user has over their data
 '''
 
 You MUST reply with a json-formatted list of dictionaries under the "dfd"
@@ -571,16 +596,24 @@ data, or none if no database is used, in this JSON format:
 	'data_type': 'Name',
 	'encryption': True,
 	'sensitive': True,
+	'storage_location': 'Server-side database',
+	'third_party': False,
+	'purpose': 'User authentication, User profile',
 	'notes': 'Collected only once'
 },
 {
 	'data_type': 'Email',
 	'encryption': True,
 	'sensitive': False,
+	'storage_location': 'Device',
+	'third_party': True,
+	'purpose': 'User communication, Marketing, shared with <name of third party>',
 	'notes': ''
 },
+/// other data types...
 ]}
 DATA POLICY: the data policy of the application
+USER DATA CONTROL: the control the user has over their data
 '''
 
 The threat is structured as follows, enclosed in triple quotes:
@@ -616,19 +649,27 @@ DATABASE SCHEMA: the database schema used by the application to contain the
 data, or none if no database is used, in this JSON format:
 {[
 {
-    'data_type': 'Name',
-    'encryption': True,
-    'sensitive': True,
-    'notes': 'Collected only once'
+	'data_type': 'Name',
+	'encryption': True,
+	'sensitive': True,
+	'storage_location': 'Server-side database',
+	'third_party': False,
+	'purpose': 'User authentication, User profile',
+	'notes': 'Collected only once'
 },
 {
-    'data_type': 'Email',
-    'encryption': True,
-    'sensitive': False,
-    'notes': ''
+	'data_type': 'Email',
+	'encryption': True,
+	'sensitive': False,
+	'storage_location': 'Device',
+	'third_party': True,
+	'purpose': 'User communication, Marketing, shared with <name of third party>',
+	'notes': ''
 },
+/// other data types...
 ]}
 DATA POLICY: the data policy of the application
+USER DATA CONTROL: the control the user has over their data
 '''
 
 The threat is structured as follows, enclosed in triple quotes:
@@ -675,19 +716,27 @@ DATABASE SCHEMA: the database schema used by the application to contain the
 data, or none if no database is used, in this JSON format:
 {[
 {
-    'data_type': 'Name',
-    'encryption': True,
-    'sensitive': True,
-    'notes': 'Collected only once'
+	'data_type': 'Name',
+	'encryption': True,
+	'sensitive': True,
+	'storage_location': 'Server-side database',
+	'third_party': False,
+	'purpose': 'User authentication, User profile',
+	'notes': 'Collected only once'
 },
 {
-    'data_type': 'Email',
-    'encryption': True,
-    'sensitive': False,
-    'notes': ''
+	'data_type': 'Email',
+	'encryption': True,
+	'sensitive': False,
+	'storage_location': 'Device',
+	'third_party': True,
+	'purpose': 'User communication, Marketing, shared with <name of third party>',
+	'notes': ''
 },
+/// other data types...
 ]}
 DATA POLICY: the data policy of the application
+USER DATA CONTROL: the control the user has over their data
 '''
 
 The threat is structured as follows, enclosed in triple quotes:
