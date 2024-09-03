@@ -30,6 +30,11 @@ details you include, the more accurate the subsequent analysis.
 
 ---
 """)
+    # Never have an empty schema, it breaks the data editor
+    if not st.session_state["input"]["database"]: 
+        st.session_state["input"]["database"] = [
+            { "data_type": "", "encryption": False, "sensitive": False, "storage_location": "", "third_party": False, "purpose": "", "notes": "" },
+        ]
 
     col1, col2, col3 = st.columns([1, 1, 1])
 
@@ -110,7 +115,8 @@ details you include, the more accurate the subsequent analysis.
             "Upload CSV file", 
             type=["csv"], 
             help="Upload a CSV file containing the collected data, in the format of a list of dictionaries with keys 'data_type', 'encryption', 'sensitive', 'storage_location', 'third_party', 'purpose', and 'notes'.",
-            key="database_file"
+            key="database_file",
+            disabled=st.session_state["dfd_only"] or not st.session_state["input"]["has_database"],
         )
         if uploaded_file is not None:
             try:
