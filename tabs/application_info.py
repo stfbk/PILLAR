@@ -98,47 +98,6 @@ details you include, the more accurate the subsequent analysis.
         if data_policy != st.session_state["input"]["data_policy"]:
             st.session_state["input"]["data_policy"] = data_policy
 
-
-    has_database = st.checkbox("Describe collected data", value=True, disabled=st.session_state["dfd_only"])
-    has_database_toggled = False
-    if has_database != st.session_state["input"]["has_database"]:
-        has_database_toggled = True # The user has toggled the checkbox
-        st.session_state["input"]["has_database"] = has_database
-        
-
-    col1, col2 = st.columns([0.8, 0.2])
-    with col1:
-        st.markdown("""
-        Describe the data that is used by the application. You can specify the data
-        types, whether they are encrypted, whether they are considered sensitive,
-        and any additional notes. You can add or remove rows as needed.
-        """
-        )
-    with col2:
-        uploaded_file = st.file_uploader(
-            "Upload CSV file", 
-            type=["csv"], 
-            help="Upload a CSV file containing the collected data, in the format of a list of dictionaries with keys 'data_type', 'encryption', 'sensitive', 'storage_location', 'third_party', 'purpose', and 'notes'.",
-            key="database_file",
-            disabled=st.session_state["dfd_only"] or not st.session_state["input"]["has_database"],
-        )
-        if uploaded_file is not None:
-            try:
-                # Read the uploaded file as a CSV, transform it into a list of dictionaries and store it in the session state
-                reader = csv.DictReader(StringIO(uploaded_file.getvalue().decode("utf-8-sig")), delimiter=",")
-                schema_file = list(reader)
-                st.session_state["input"]["database"] = schema_file
-                for row in st.session_state["input"]["database"]:
-                    # Convert the keys to a boolean, otherwise it will be a string
-                    row["encryption"] = row["encryption"].lower() == "true"
-                    row["sensitive"] = row["sensitive"].lower() == "true"
-                    row["third_party"] = row["third_party"].lower() == "true"
-                # If the user does not remove the uploaded file, the schema will not change until they do
-                st.info("Please remove the uploaded file to modify the schema from the table.")
-            except Exception as e:
-                st.error(f"Error reading the uploaded file: {e}")
-                
-
     def update_schema():
         """
         Update the schema with the changes made in the data editor. This is needed
@@ -192,8 +151,8 @@ details you include, the more accurate the subsequent analysis.
             "data_type": [],
             "encryption": [],
             "sensitive": [],
-            "storage_location": [],
             "third_party": [],
+            "storage_location": [],
             "purpose": [],
             "notes": [],
         }
@@ -207,31 +166,86 @@ details you include, the more accurate the subsequent analysis.
             new_dict["purpose"].append(object["purpose"])
             new_dict["notes"].append(object["notes"])
         return new_dict
+    
 
-    # The data_editor widget allows the user to input the database schema The
-    # database schema is a list of dictionaries, where each dictionary
-    # represents a data type The variable database returns the list of
-    # dictionaries
-    database = st.data_editor(
-        data=pd.DataFrame().from_dict(format_correct(st.session_state["input"]["database"])),
-        column_config={
-            # Configuration for the columns in the data_editor widget
-            "data_type": st.column_config.TextColumn("Type", help="The type of data stored in the database.", width=None, required=True),
-            "encryption": st.column_config.CheckboxColumn("Encrypted", help="Whether the data type is encrypted.", width=None, required=True, default=True),
-            "sensitive": st.column_config.CheckboxColumn("Sensitive", help="Whether the data is to be considered sensitive.", width=None, required=True, default=True),
-            "storage_location": st.column_config.TextColumn("Storage Location", help="The location where the data is stored, such as a server-side database, the user's device or a cloud service.", width=None, required=False, default=""),
-            "third_party": st.column_config.CheckboxColumn("Third Party", help="Whether the data is shared with a third party.", width=None, required=True, default=False),
-            "purpose": st.column_config.TextColumn("Purpose", help="The purpose for which the data is collected, such as user authentication or personalization. If it is shared with third parties, also specify them and their purposes.", width="medium", required=False, default=""),
-            "notes": st.column_config.TextColumn("Additional Notes", help="Enter any additional information which might be important in the privacy realm, such as the data's collection frequency or for how long it is decrypted when used.", width="medium", required=False, default=""),
-        },
-        # Allow the user to add or remove rows, modifying the database schema
-        num_rows="dynamic",
-        # Disable the widget if the application is in DFD-only mode or if the
-        # user has unchecked the "has_database" checkbox
-        disabled=not has_database or st.session_state["dfd_only"],
-        key="database",
-        on_change=update_schema,
-    )
+
+    st.text("")
+    st.text("")
+    st.text("")
+    st.text("")
+    st.text("")
+    st.text("")
+
+    has_database = st.checkbox("Describe collected data", value=True, disabled=st.session_state["dfd_only"])
+    has_database_toggled = False
+    if has_database != st.session_state["input"]["has_database"]:
+        has_database_toggled = True # The user has toggled the checkbox
+        st.session_state["input"]["has_database"] = has_database
+    
+        
+
+    if has_database:
+        st.markdown("""
+        Describe the data that is used by the application. You can specify the data
+        types, whether they are encrypted, whether they are considered sensitive,
+        whether they are shared with third parties, the location where they are
+        stored, the purpose for collection and any additional notes. You can add or
+        remove rows as needed.
+
+        ---
+        """
+        )
+        col1, col2 = st.columns([1, 2])
+        with col1:
+            uploaded_file = st.file_uploader(
+                "Upload CSV file", 
+                type=["csv"], 
+                help="Upload a CSV file containing the collected data, in the format of a list of dictionaries with keys 'data_type', 'encryption', 'sensitive', 'storage_location', 'third_party', 'purpose', and 'notes'.",
+                key="database_file",
+                disabled=st.session_state["dfd_only"] or not st.session_state["input"]["has_database"],
+            )
+        if uploaded_file is not None:
+            try:
+                # Read the uploaded file as a CSV, transform it into a list of dictionaries and store it in the session state
+                reader = csv.DictReader(StringIO(uploaded_file.getvalue().decode("utf-8-sig")), delimiter=",")
+                schema_file = list(reader)
+                st.session_state["input"]["database"] = schema_file
+                for row in st.session_state["input"]["database"]:
+                    # Convert the keys to a boolean, otherwise it will be a string
+                    row["encryption"] = row["encryption"].lower() == "true"
+                    row["sensitive"] = row["sensitive"].lower() == "true"
+                    row["third_party"] = row["third_party"].lower() == "true"
+                # If the user does not remove the uploaded file, the schema will not change until they do
+                st.info("Please remove the uploaded file to modify the schema from the table.")
+            except Exception as e:
+                st.error(f"Error reading the uploaded file: {e}")
+                
+
+
+        # The data_editor widget allows the user to input the database schema The
+        # database schema is a list of dictionaries, where each dictionary
+        # represents a data type The variable database returns the list of
+        # dictionaries
+        database = st.data_editor(
+            data=pd.DataFrame().from_dict(format_correct(st.session_state["input"]["database"])),
+            column_config={
+                # Configuration for the columns in the data_editor widget
+                "data_type": st.column_config.TextColumn("Type", help="The type of data stored in the database.", width=None, required=True),
+                "encryption": st.column_config.CheckboxColumn("Encrypted", help="Whether the data type is encrypted.", width=None, required=True, default=True),
+                "sensitive": st.column_config.CheckboxColumn("Sensitive", help="Whether the data is to be considered sensitive.", width=None, required=True, default=True),
+                "third_party": st.column_config.CheckboxColumn("Third Party", help="Whether the data is shared with a third party.", width=None, required=True, default=False),
+                "storage_location": st.column_config.TextColumn("Storage Location", help="The location where the data is stored, such as a server-side database, the user's device or a cloud service.", width=None, required=False, default=""),
+                "purpose": st.column_config.TextColumn("Purpose", help="The purpose for which the data is collected, such as user authentication or personalization. If it is shared with third parties, also specify them and their purposes.", width="medium", required=False, default=""),
+                "notes": st.column_config.TextColumn("Additional Notes", help="Enter any additional information which might be important in the privacy realm, such as the data's collection frequency or for how long it is decrypted when used.", width="medium", required=False, default=""),
+            },
+            # Allow the user to add or remove rows, modifying the database schema
+            num_rows="dynamic",
+            # Disable the widget if the application is in DFD-only mode or if the
+            # user has unchecked the "has_database" checkbox
+            disabled=not has_database or st.session_state["dfd_only"],
+            key="database",
+            on_change=update_schema,
+        )
 
 
 

@@ -88,15 +88,15 @@ def init_session_state():
         st.session_state["input"]["types_of_data"] = []
         st.session_state["input"]["has_database"] = False
         st.session_state["input"]["database"] = [
-            {"data_type": "Name", "encryption": True, "sensitive": True, "storage_location": "", "third_party": False, "purpose": "", "notes": ""},
-            {"data_type": "Email", "encryption": True, "sensitive": True, "storage_location": "", "third_party": False, "purpose": "", "notes": ""},
-            {"data_type": "Password", "encryption": True, "sensitive": True, "storage_location": "", "third_party": False, "purpose": "", "notes": ""},
-            {"data_type": "Address", "encryption": True, "sensitive": True, "storage_location": "", "third_party": False, "purpose": "", "notes": ""},
-            {"data_type": "Location", "encryption": True, "sensitive": True, "storage_location": "", "third_party": False, "purpose": "", "notes": ""},
-            {"data_type": "Phone number", "encryption": True, "sensitive": True, "storage_location": "", "third_party": False, "purpose": "", "notes": ""},
-            {"data_type": "Date of Birth", "encryption": True, "sensitive": True, "storage_location": "", "third_party": False, "purpose": "", "notes": ""},
-            {"data_type": "ID card number", "encryption": True, "sensitive": True, "storage_location": "", "third_party": False, "purpose": "", "notes": ""},
-            {"data_type": "Last access time", "encryption": True, "sensitive": True, "storage_location": "", "third_party": False, "purpose": "", "notes": ""},
+            {"data_type": "Name", "encryption": True, "sensitive": True, "third_party": False, "storage_location": "", "purpose": "", "notes": ""},
+            {"data_type": "Email", "encryption": True, "sensitive": True, "third_party": False, "storage_location": "", "purpose": "", "notes": ""},
+            {"data_type": "Password", "encryption": True, "sensitive": True, "third_party": False, "storage_location": "", "purpose": "", "notes": ""},
+            {"data_type": "Address", "encryption": True, "sensitive": True, "third_party": False, "storage_location": "", "purpose": "", "notes": ""},
+            {"data_type": "Location", "encryption": True, "sensitive": True, "third_party": False, "storage_location": "", "purpose": "", "notes": ""},
+            {"data_type": "Phone number", "encryption": True, "sensitive": True, "third_party": False, "storage_location": "", "purpose": "", "notes": ""},
+            {"data_type": "Date of Birth", "encryption": True, "sensitive": True, "third_party": False, "storage_location": "", "purpose": "", "notes": ""},
+            {"data_type": "ID card number", "encryption": True, "sensitive": True, "third_party": False, "storage_location": "", "purpose": "", "notes": ""},
+            {"data_type": "Last access time", "encryption": True, "sensitive": True, "third_party": False, "storage_location": "", "purpose": "", "notes": ""},
         ]
         st.session_state["input"]["data_policy"] = ""
         st.session_state["input"]["user_data_control"] = ""

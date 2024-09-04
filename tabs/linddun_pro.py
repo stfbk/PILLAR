@@ -90,7 +90,7 @@ Finally, click the button below to generate the LINDDUN Pro threat modeling.
         st.session_state["linddun_pro_output"] = markdown
 
     else:
-        st.markdown("No threats found for the specified edge yet, provide the necessary information and press the analyze button to find some.")
+        st.info("No threats found for the specified edge yet, provide the necessary information and press the analyze button to find some.")
     
     
     
