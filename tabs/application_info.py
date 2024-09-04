@@ -15,6 +15,7 @@ import streamlit as st
 import csv
 from io import StringIO
 import pandas as pd
+from misc.utils import format_correct
 
 def application_info():
 
@@ -33,7 +34,7 @@ details you include, the more accurate the subsequent analysis.
     # Never have an empty schema, it breaks the data editor
     if not st.session_state["input"]["database"]: 
         st.session_state["input"]["database"] = [
-            { "data_type": "", "encryption": False, "sensitive": False, "storage_location": "", "third_party": False, "purpose": "", "notes": "" },
+            { "data_type": "", "encryption": False, "sensitive": False, "third_party": False, "storage_location": "", "purpose": "", "notes": "" },
         ]
 
     col1, col2, col3 = st.columns([1, 1, 1])
@@ -125,48 +126,6 @@ details you include, the more accurate the subsequent analysis.
         # Update the schema in the session state   
         st.session_state["input"]["database"] = state
 
-    def format_correct(state):
-        """
-        This function formats the schema in the correct format for the data
-        editor. It takes the schema in the format of a list of dictionaries and
-        returns a dictionary with keys "data_type", "encryption", "sensitive",
-        "storage_location", "third_party", "purpose", "notes", indicating the
-        columns of the data editor. Thus, it transforms the DFD from a list of
-        dictionaries to a dictionary of lists, or essentially from a row-based
-        to a column-based format.
-        
-        Args:
-            state (list): The DFD in the format of a list of dictionaries, with
-                keys "data_type", "encryption", "sensitive", "storage_location",
-                "third_party", "purpose", and "notes".
-        Returns:
-            dict: The DFD in the format of a dictionary of lists, with keys
-                "data_type", "encryption", "sensitive", "storage_location",
-                "third_party", "purpose", and "notes", where each list represents a
-                column of the data editor.
-        """
-        
-        # Create a new dictionary with the correct format
-        new_dict = {
-            "data_type": [],
-            "encryption": [],
-            "sensitive": [],
-            "third_party": [],
-            "storage_location": [],
-            "purpose": [],
-            "notes": [],
-        }
-        # For each row, append the values to the corresponding list
-        for object in state:
-            new_dict["data_type"].append(object["data_type"])
-            new_dict["encryption"].append(object["encryption"])
-            new_dict["sensitive"].append(object["sensitive"])
-            new_dict["storage_location"].append(object["storage_location"])
-            new_dict["third_party"].append(object["third_party"])
-            new_dict["purpose"].append(object["purpose"])
-            new_dict["notes"].append(object["notes"])
-        return new_dict
-    
 
 
     st.text("")

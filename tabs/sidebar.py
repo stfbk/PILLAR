@@ -172,7 +172,7 @@ def sidebar():
 
         **P**rivacy risk **I**dentification with **L**INDDUN and **L**LM **A**nalysis **R**eport
         
-        You can download the Tool Architecture diagram png [here](/app/static/ToolArchitecture.png).
+        You can download the Tool Architecture diagram [here](/app/static/ToolArchitectureV2.svg).
         """
         )
         st.markdown(

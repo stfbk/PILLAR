@@ -126,3 +126,30 @@ def match_number_category(threat_type_number):
         return "Unawareness and unintervenability"
     elif threat_type_number == 7:
         return "Non-compliance"
+
+
+
+def format_correct(state):
+    """
+    This function formats the schema in the correct format for the data
+    editor. It takes the schema in the format of a list of dictionaries and
+    returns a dictionary with the same keys as the elements, indicating the
+    columns of the data editor. Thus, it transforms the DFD from a list of
+    dictionaries to a dictionary of lists, or essentially from a row-based
+    to a column-based format.
+    
+    Args:
+        state (list): The DFD in the format of a list of dictionaries, with
+            each dictionary representing a row of the data editor. Each dictionary
+            must have the same keys.
+    Returns:
+        dict: The DFD in the format of a dictionary of lists, with the same
+            keys as the elements in the list of dictionaries, where each list
+            represents a column of the data editor.
+    """
+    
+    # Extract keys directly from the first dictionary in the state list
+    keys = state[0].keys()
+    
+    # Use dictionary comprehension and zip to transpose the list of dictionaries
+    return {key: [d[key] for d in state] for key in keys}
