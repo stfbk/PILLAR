@@ -23,6 +23,7 @@ from llms.dfd import (
     get_dfd,
     get_image_analysis,
 )
+from misc.utils import format_correct
 
     
 def dfd():
@@ -182,43 +183,6 @@ To avoid ambiguity, in the DFD the labels are close to the _tail_ of the arrow t
     with col2:
         # Display the DFD as a graph
         st.graphviz_chart(st.session_state["input"]["graph"])
-        
-        
-    def format_correct(state):
-        """
-        This function formats the DFD in the correct format for the data
-        editor. It takes the DFD in the format of a list of dictionaries and
-        returns a dictionary with keys "from", "typefrom", "to", "typeto" and
-        "trusted", indicating the columns of the data editor. Thus, it
-        transforms the DFD from a list of dictionaries to a dictionary of
-        lists, or essentially from a row-based to a column-based format.
-        
-        Args:
-            state (list): The DFD in the format of a list of dictionaries, with
-                keys "from", "typefrom", "to", "typeto" and "trusted".
-        Returns:
-            dict: The DFD in the format of a dictionary of lists, with keys
-                "from", "typefrom", "to", "typeto" and "trusted", where each
-                list represents a column of the data editor.
-        """
-        
-        # Create a new dictionary with the correct format
-        new_dict = {
-            "from": [],
-            "typefrom": [],
-            "to": [],
-            "typeto": [],
-            "trusted": [],
-        }
-        # For each row, append the values to the corresponding list
-        for object in state:
-            new_dict["from"].append(object.get("from"))
-            new_dict["typefrom"].append(object.get("typefrom"))
-            new_dict["to"].append(object.get("to"))
-            new_dict["typeto"].append(object.get("typeto"))
-            new_dict["trusted"].append(object.get("trusted"))
-
-        return new_dict
         
     # The data editor for the DFD
     edges = st.data_editor(
