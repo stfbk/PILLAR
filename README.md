@@ -43,7 +43,7 @@ more LLM providers supported, feel free to open an issue or a pull request.
 
 ## Tool Architecture
 
-<img src="static/ToolArchitecture.png" width="" height="" />
+<img src="static/ToolArchitectureV2.svg" width="" height="" />
 
 This is the tool architecture, highliting the different components of the tool
 and the expected usage flow.
