@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import streamlit as st
+import streamlit.components.v1 as components
+import base64
 import markdown 
 import pdfkit
 import urllib.parse
@@ -49,15 +51,35 @@ the required general information and you will be able to download the PDF report
         st.selectbox("Font face", options=font_options, key="font")
         st.slider("Font size", 8, 24, 16, key="font_size")
     
+    if st.button("Download report", disabled=not (st.session_state.app_name and st.session_state.author and st.session_state.app_version and st.session_state.date)):
+        download_file()
 
-    st.download_button(
-        "Download report",
-        data=generate_report(),
-        file_name="report.pdf",
-        mime="application/pdf",
-        disabled=not (st.session_state.app_name and st.session_state.author and st.session_state.app_version and st.session_state.date),
+    
+
+def download_file():
+    file=generate_report()
+    b64 = base64.b64encode(file).decode()
+
+    download_html = f"""
+    <html>
+    <head>
+    <title>Auto Download File</title>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {{
+        var link = document.createElement('a');
+        link.href = 'data:application/pdf;base64,{b64}';
+        link.download = 'report.pdf';
+        link.click();
+    }});
+    </script>
+    </head>
+    </html>
+    """
+
+    components.html(
+        download_html,
+        height=0,
     )
-
     
 def generate_report():
     """
