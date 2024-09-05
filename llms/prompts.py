@@ -691,12 +691,14 @@ PATTERNS: [
         "related_patterns": "some patterns related to this one, if applicable"
     }
 ]
+'''
 
-The "measures" array should contain ONLY and EXACTLY the names of the chosen privacy patterns to mitigate the threat. The names should be precise and match the ones in the "title" field of the privacy patterns provided.
 The JSON output MUST be structured as follows:
 {
     "measures": ["Title 1", "Title 2", // as many as needed ]
 }
+The "measures" array should contain ONLY and EXACTLY the names of the chosen privacy patterns to mitigate the threat. The names should be precise and match the ones in the "title" field of the privacy patterns provided.
+You should provide around 5 to 7 privacy patterns to mitigate the threat, based on the application description and the threat detected.
 """
 
 EXPLAIN_CONTROL_MEASURES_PROMPT = """
@@ -744,7 +746,7 @@ The threat is structured as follows, enclosed in triple quotes:
 THREAT: the threat detected in the application
 '''
 
-The chosen privacy patterns are provided as follows, enclosed in triple quotes:
+The 5 to 7 chosen privacy patterns are provided as follows, enclosed in triple quotes:
 '''
 PATTERNS: [
     {
@@ -771,4 +773,5 @@ The JSON output MUST be structured as follows:
     ]
 }
 The "explanation" and "implementation" fields should be detailed and tailored to the application and threat provided, and should be about 100 words long each.
+The "measures" array should contain only 3 or 4 objects, so you should choose the most relevant privacy patterns between the 5 to 7 provided.
 """

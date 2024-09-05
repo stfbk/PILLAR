@@ -70,13 +70,16 @@ def generate_report():
     text="""# Privacy Threat Modeling and Risk Assessment Report\n"""
     text += "## Report Details \n\n"
     
+    # Make this into a variable, because it is later used in the replace function to add CSS styles to the table
+    description_message = "High-level Description"
+
     # Add the general information to the report as a table
     text += f"| | | | |\n"
     text += f"|------|-------|-----|-----|\n"
     text += f"| **Application Name** | {st.session_state['app_name']} | **Application Version** | {st.session_state['app_version']} |\n"
     text += f"| **Report author** | {st.session_state['author']} | **Date** | {st.session_state['date']} |\n"
     if st.session_state["high_level_description"]: # the high-level description is optional
-        text += f"| **High-level Description** | {st.session_state['high_level_description']} | | |\n\n"
+        text += f"| **{description_message}** | {st.session_state['high_level_description']} | | |\n\n"
     else:
         text += f"\n\n"
 
@@ -137,6 +140,18 @@ def generate_report():
     
     # Convert the markdown text to HTML
     html = markdown.markdown(text, extensions=["markdown.extensions.tables"])
+    
+    
+    # General information table styling. NOTE: Replacing html text is not
+    # usually recommended, but in this case it is the only way to add the CSS
+    # styles to the table.
+    column_widths = [10, 40, 10, 40]
+    colgroup_html = "<colgroup>" + "".join([f"<col style='width: {width}%;'>" for width in column_widths]) + "</colgroup>"
+    html = html.replace("<table>", f"<table table-layout='fixed'>{colgroup_html}", 1)
+    html = html.replace(f"<td><strong>{description_message}</strong></td>\n<td>{st.session_state['high_level_description']}</td>\n<td></td>\n<td></td>", 
+                        f"<td><strong>{description_message}</strong></td>\n<td colspan='3'>{st.session_state["high_level_description"]}</td>\n", 1)
+
+
     # Add the CSS styles to the HTML
     html_with_style = f"""
 <html>
@@ -163,6 +178,7 @@ th {{
 </style>
 </head>
 <body>
+    {colgroup_html}
     {html}
 </body>
 </html>
