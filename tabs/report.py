@@ -51,12 +51,21 @@ the required general information and you will be able to download the PDF report
         st.selectbox("Font face", options=font_options, key="font")
         st.slider("Font size", 8, 24, 16, key="font_size")
     
+    # Download the report when the button is clicked, but only if the required
+    # information has been filled in
+    # I do not use st.download_button because it does not allow deferred generation of the file.
+    # This is a workaround to generate the file just before downloading it, without slowing down every single update in the app.
     if st.button("Download report", disabled=not (st.session_state.app_name and st.session_state.author and st.session_state.app_version and st.session_state.date)):
         download_file()
 
     
 
 def download_file():
+    """
+    This function triggers the download of the PDF report, generating it just
+    before. The download is done through a hidden HTML element that is
+    triggered when the function is called.
+    """
     file=generate_report()
     b64 = base64.b64encode(file).decode()
 
