@@ -28,6 +28,8 @@ from llms.prompts import (
     LINDDUN_GO_PREVIOUS_ANALYSIS_PROMPT,
     LINDDUN_GO_JUDGE_PROMPT,
 )
+    
+from pydantic import BaseModel
 
 def linddun_go_gen_markdown(threats):
     """
@@ -110,22 +112,37 @@ def get_linddun_go(api_key, model_name, inputs, threats_to_analyze, temperature)
         title = card["title"]
         description = card["description"]
         type = card["type"]
-        response = client.chat.completions.create(
-            model=model_name,
-            response_format={"type": "json_object"},
-            temperature=temperature,
-            messages=[
-                {
-                    "role": "system",
-                    "content": LINDDUN_GO_SPECIFIC_PROMPTS[0]+LINDDUN_GO_SYSTEM_PROMPT, # We use the first specific prompt for the system prompt, as it is the single agent simulation
-                }, 
-                {
-                    "role": "user", 
-                    "content": LINDDUN_GO_USER_PROMPT(inputs, question, title, description)
-                },
-            ],
-            max_tokens=4096,
-        )
+
+        messages=[
+            {
+                "role": "system",
+                "content": LINDDUN_GO_SPECIFIC_PROMPTS[0]+LINDDUN_GO_SYSTEM_PROMPT, # We use the first specific prompt for the system prompt, as it is the single agent simulation
+            }, 
+            {
+                "role": "user", 
+                "content": LINDDUN_GO_USER_PROMPT(inputs, question, title, description)
+            },
+        ]
+        
+        if model_name in ["gpt-4o", "gpt-4o-mini"]:
+            class Threat(BaseModel):
+                reply: bool
+                reason: str
+            response = client.beta.chat.completions.parse(
+                model=model_name,
+                messages=messages,
+                response_format=Threat,
+                temperature=temperature,
+                max_tokens=4096,
+            )
+        else:
+            response = client.chat.completions.create(
+                model=model_name,
+                messages=messages,
+                response_format={"type": "json_object"},
+                temperature=temperature,
+                max_tokens=4096,
+            )
         response_content = json.loads(response.choices[0].message.content)
         response_content["question"] = question
         response_content["threat_title"] = title
@@ -254,22 +271,35 @@ def get_response_openai(client, model, temperature, system_prompt, user_prompt):
             - reply: boolean. Whether the threat was deemed present or not in the application by the LLM.
             - reason: string. The reason for the detection or non-detection of the threat.
     """
-    response = client.chat.completions.create(
-        model=model,
-        response_format={"type": "json_object"},
-        messages=[
-            {
-                "role": "system",
-                "content": system_prompt,
-            },
-            {
-                "role": "user", 
-                "content": user_prompt,
-            },
-        ],
-        max_tokens=4096,
-        temperature=temperature,
-    )
+    messages=[
+        {
+            "role": "system",
+            "content": system_prompt,
+        },
+        {
+            "role": "user", 
+            "content": user_prompt,
+        },
+    ]
+    if model in ["gpt-4o", "gpt-4o-mini"]:
+        class Threat(BaseModel):
+            reply: bool
+            reason: str
+        response = client.beta.chat.completions.parse(
+            model=model,
+            response_format=Threat,
+            temperature=temperature,
+            messages=messages,
+            max_tokens=4096,
+        )
+    else:
+        response = client.chat.completions.create(
+            model=model,
+            messages=messages,
+            response_format={"type": "json_object"},
+            max_tokens=4096,
+            temperature=temperature,
+        )
     return json.loads(response.choices[0].message.content)
 
 def get_response_mistral(client, model, temperature, system_prompt, user_prompt):
@@ -353,21 +383,34 @@ def judge(keys, models, previous_analysis, temperature):
             - reason: string. The reason for the detection or non-detection of the threat.
     """
     client = OpenAI(api_key=keys["openai_api_key"])
-    response = client.chat.completions.create(
-        model=models["openai_model"],
-        response_format={"type": "json_object"},
-        temperature=temperature,
-        messages=[
-            {
-                "role": "system",
-                "content": LINDDUN_GO_JUDGE_PROMPT,
-            },
-            {
-                "role": "user", 
-                "content": LINDDUN_GO_PREVIOUS_ANALYSIS_PROMPT(previous_analysis)
-            },
-        ],
-        max_tokens=4096,
-    )
+    messages=[
+        {
+            "role": "system",
+            "content": LINDDUN_GO_JUDGE_PROMPT,
+        },
+        {
+            "role": "user", 
+            "content": LINDDUN_GO_PREVIOUS_ANALYSIS_PROMPT(previous_analysis)
+        },
+    ]
+    if models["openai_model"] in ["gpt-4o", "gpt-4o-mini"]:
+        class Threat(BaseModel):
+            reply: bool
+            reason: str
+        response = client.beta.chat.completions.parse(
+            model=models["openai_model"],
+            response_format=Threat,
+            temperature=temperature,
+            messages=messages,
+            max_tokens=4096,
+        )
+    else:
+        response = client.chat.completions.create(
+            model=models["openai_model"],
+            messages=messages,
+            response_format={"type": "json_object"},
+            temperature=temperature,
+            max_tokens=4096,
+        )
     response_content=json.loads(response.choices[0].message.content)
     return response_content

@@ -22,6 +22,7 @@ from llms.prompts import (
     LINDDUN_PRO_SYSTEM_PROMPT,
     LINDDUN_PRO_USER_PROMPT,
 )
+from pydantic import BaseModel
 
 def linddun_pro_gen_markdown(threats):
     """
@@ -111,27 +112,48 @@ def get_linddun_pro(api_key, model, dfd, edge, category, description, temperatur
             - category: string. The category of the threat, in the format "Linking", "Identifying", etc.
     """
     client = OpenAI(api_key=api_key)
-    
+
     source, data_flow, destination = mapping_table(edge, category)
     
     tree = threat_tree(category)
     
-    response = client.chat.completions.create(
-        model=model,
-        response_format={"type": "json_object"},
-        messages=[
-            {
-                "role": "system",
-                "content": LINDDUN_PRO_SYSTEM_PROMPT,
-            },
-            {
-                "role": "user", 
-                "content": LINDDUN_PRO_USER_PROMPT(dfd, edge, category, description, source, data_flow, destination, tree),
-            },
-        ],
-        max_tokens=4096,
-        temperature=temperature,
-    )
+    messages=[
+        {
+            "role": "system",
+            "content": LINDDUN_PRO_SYSTEM_PROMPT,
+        },
+        {
+            "role": "user", 
+            "content": LINDDUN_PRO_USER_PROMPT(dfd, edge, category, description, source, data_flow, destination, tree),
+        },
+    ]
+    
+    if model in ["gpt-4o", "gpt-4o-mini"]:
+        class Threat(BaseModel):
+            source_id: str
+            source_title: str
+            source: str
+            data_flow_id: str
+            data_flow_title: str
+            data_flow: str
+            destination_id: str
+            destination_title: str
+            destination: str
+        response = client.beta.chat.completions.parse(
+            model=model,
+            response_format=Threat,
+            temperature=temperature,
+            messages=messages,
+            max_tokens=4096,
+        )
+    else:
+        response = client.chat.completions.create(
+            model=model,
+            response_format={"type": "json_object"},
+            max_tokens=4096,
+            temperature=temperature,
+            messages=messages,
+        )
     threat = json.loads(response.choices[0].message.content)
     threat["category"] = category
     return threat

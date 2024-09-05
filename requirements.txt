@@ -6,3 +6,4 @@ graphviz
 csv
 markdown
 pdfkit
+pydantic

@@ -22,6 +22,8 @@ from misc.utils import (
 from llms.prompts import (
 	THREAT_MODEL_SYSTEM_PROMPT,
 )
+	
+from pydantic import BaseModel
 
 def threat_model_gen_markdown(threat_model):
 	"""
@@ -48,7 +50,6 @@ def threat_model_gen_markdown(threat_model):
 
 	return markdown_output
 
-
 def get_threat_model_openai(api_key, model_name, prompt, temperature):
 	"""
 	This function generates a simple LINDDUN threat model from the prompt.
@@ -60,7 +61,7 @@ def get_threat_model_openai(api_key, model_name, prompt, temperature):
 		temperature (float): The temperature to use for the model.
 	
 	Returns:
-		list: The list of threats in the threat model. Each threat is a dictionary with the following keys:
+		threat_model: The list of threats in the threat model. Each threat is a dictionary with the following keys:
 			- title: string. The title of the threat.
 			- threat_type: string. The type of the threat, in the format "L - Linking".
 			- Scenario: string. The scenario where the threat occurs.
@@ -68,21 +69,39 @@ def get_threat_model_openai(api_key, model_name, prompt, temperature):
 	"""
 
 	client = OpenAI(api_key=api_key)
+	messages=[
+			{
+					"role": "system",
+					"content": THREAT_MODEL_SYSTEM_PROMPT,
+			},
+			{"role": "user", "content": prompt},
+	]
 
-	response = client.chat.completions.create(
+	if model_name in ["gpt-4o", "gpt-4o-mini"]:
+		class Threat(BaseModel):
+			title: str
+			threat_type: str
+			Scenario: str
+			Reason: str
+		class ThreatModel(BaseModel):
+			threat_model: list[Threat]
+
+		response = client.beta.chat.completions.parse(
+			messages=messages,
 			model=model_name,
-			response_format={"type": "json_object"},
+			response_format=ThreatModel,
 			temperature=temperature,
-			messages=[
-					{
-							"role": "system",
-							"content": THREAT_MODEL_SYSTEM_PROMPT,
-					},
-					{"role": "user", "content": prompt},
-			],
 			max_tokens=4096,
-	)
-
+		)
+	else:
+		response = client.chat.completions.create(
+			model=model_name,
+			messages=messages,
+			max_tokens=4096,
+			temperature=temperature,
+			response_format={"type": "json_object"},
+		)
+		
 	response_content = json.loads(response.choices[0].message.content)
 
 	return response_content
@@ -98,7 +117,7 @@ def get_threat_model_google(google_api_key, google_model, prompt, temperature):
 		temperature (float): The temperature to use for the model.
 	
 	Returns:
-		list: The list of threats in the threat model. Each threat is a dictionary with the following keys
+		threat_model: The list of threats in the threat model. Each threat is a dictionary with the following keys
 			- title: string. The title of the threat.
 			- threat_type: string. The type of the threat, in the format "L - Linking".
 			- Scenario: string. The scenario where the threat occurs.
@@ -140,7 +159,7 @@ def get_threat_model_mistral(mistral_api_key, mistral_model, prompt, temperature
 		temperature (float): The temperature to use for the model.
 	
 	Returns:
-		list: The list of threats in the threat model. Each threat is a dictionary with the following keys
+		threat_model: The list of threats in the threat model. Each threat is a dictionary with the following keys
 			- title: string. The title of the threat.
 			- threat_type: string. The type of the threat, in the format "L - Linking".
 			- Scenario: string. The scenario where the threat occurs.

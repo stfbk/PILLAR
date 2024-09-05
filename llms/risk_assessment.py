@@ -18,6 +18,7 @@ from misc.utils import (
     match_number_color,
     match_category_number,
 )
+from pydantic import BaseModel
 
 def assessment_gen_markdown(assessment):
     """
@@ -75,6 +76,8 @@ def measures_gen_markdown(measures):
         markdown_output += f"| [{measure['title']}](https://privacypatterns.org/patterns/{measure["filename"]}) | {measure['explanation']} | {measure['implementation']} |\n"
     return markdown_output
     
+
+
 def get_assessment(api_key, model, threat, inputs, temperature):
     """
     This function generates an assessment for a threat.
@@ -92,27 +95,40 @@ def get_assessment(api_key, model, threat, inputs, temperature):
     """
     client = OpenAI(api_key=api_key)
     
-    response = client.chat.completions.create(
-        model=model,
-        response_format={"type": "json_object"},
-        messages=[
-            {
-                "role": "system",
-                "content": IMPACT_ASSESSMENT_PROMPT,
-            },
-            {
-                "role": "user", 
-                "content": THREAT_MODEL_USER_PROMPT(inputs) + f"""
-                
+    messages=[
+        {
+            "role": "system",
+            "content": IMPACT_ASSESSMENT_PROMPT,
+        },
+        {
+            "role": "user", 
+            "content": THREAT_MODEL_USER_PROMPT(inputs) + f"""
+            
 '''
 THREAT: {threat}
 '''
 """,
-            },
-        ],
-        max_tokens=4096,
-        temperature=temperature,
-    )
+        },
+    ]
+    
+    if model in ["gpt-4o", "gpt-4o-mini"]:
+        class Assessment(BaseModel):
+            impact: str
+        response = client.beta.chat.completions.parse(
+            model=model,
+            response_format=Assessment,
+            temperature=temperature,
+            messages=messages,
+            max_tokens=4096,
+        )
+    else:
+        response = client.chat.completions.create(
+            model=model,
+            messages=messages,
+            response_format={"type": "json_object"},
+            max_tokens=4096,
+            temperature=temperature,
+        )
     return json.loads(response.choices[0].message.content)
 
 
@@ -135,18 +151,14 @@ def choose_control_measures(api_key, model, threat, inputs, temperature):
         patterns = json.load(f)
         # for each pattern inside the "patterns" list, keep only "title", "excerpt" and "Related Patterns"
         patterns = [{"title": p["title"], "excerpt": p["excerpt"], "related_patterns": p["sections"]["Related Patterns"] if "Related Patterns" in p["sections"] else None} for p in patterns["patterns"]]
-    
-    response = client.chat.completions.create(
-        model=model,
-        response_format={"type": "json_object"},
-        messages=[
-            {
-                "role": "system",
-                "content": CHOOSE_CONTROL_MEASURES_PROMPT,
-            },
-            {
-                "role": "user", 
-                "content": THREAT_MODEL_USER_PROMPT(inputs) + f"""
+    messages=[
+        {
+            "role": "system",
+            "content": CHOOSE_CONTROL_MEASURES_PROMPT,
+        },
+        {
+            "role": "user", 
+            "content": THREAT_MODEL_USER_PROMPT(inputs) + f"""
 '''
 THREAT: {threat}
 '''
@@ -155,11 +167,27 @@ THREAT: {threat}
 PATTERNS: {json.dumps(patterns)}
 '''
 """,
-            },
-        ],
-        max_tokens=4096,
-        temperature=temperature,
-    )
+        },
+    ]
+    
+    if model in ["gpt-4o", "gpt-4o-mini"]:
+        class Measures(BaseModel):
+            measures: list[str]
+        response = client.beta.chat.completions.parse(
+            model=model,
+            response_format=Measures,
+            temperature=temperature,
+            messages=messages,
+            max_tokens=4096,
+        )
+    else:
+        response = client.chat.completions.create(
+            model=model,
+            messages=messages,
+            response_format={"type": "json_object"},
+            max_tokens=4096,
+            temperature=temperature,
+        )
     return json.loads(response.choices[0].message.content)["measures"]
 
 
@@ -192,17 +220,14 @@ def get_control_measures(api_key, model, threat, inputs, temperature):
     
 
     client = OpenAI(api_key=api_key)
-    response = client.chat.completions.create(
-        model=model,
-        response_format={"type": "json_object"},
-        messages=[
-            {
-                "role": "system",
-                "content": EXPLAIN_CONTROL_MEASURES_PROMPT,
-            },
-            {
-                "role": "user", 
-                "content": THREAT_MODEL_USER_PROMPT(inputs) + f"""
+    messages=[
+        {
+            "role": "system",
+            "content": EXPLAIN_CONTROL_MEASURES_PROMPT,
+        },
+        {
+            "role": "user", 
+            "content": THREAT_MODEL_USER_PROMPT(inputs) + f"""
 '''
 THREAT: {threat}
 '''
@@ -213,10 +238,32 @@ PATTERNS: {
 }
 '''
 """,
-            },
-        ],
-        max_tokens=4096,
-        temperature=temperature,
-    )
+        },
+    ]
+    
+    if model in ["gpt-4o", "gpt-4o-mini"]:
+        class Measure(BaseModel):
+            filename: str
+            title: str
+            explanation: str
+            implementation: str
+        class Measures(BaseModel):
+            measures: list[Measure]
+
+        response = client.beta.chat.completions.parse(
+            model=model,
+            response_format=Measures,
+            temperature=temperature,
+            messages=messages,
+            max_tokens=4096,
+        )
+    else:
+        response = client.chat.completions.create(
+            model=model,
+            messages=messages,
+            response_format={"type": "json_object"},
+            max_tokens=4096,
+            temperature=temperature,
+        )
     return json.loads(response.choices[0].message.content)["measures"]
 

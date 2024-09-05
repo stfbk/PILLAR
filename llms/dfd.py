@@ -19,6 +19,7 @@ from llms.prompts import (
     DFD_SYSTEM_PROMPT,
     DFD_IMAGE_SYSTEM_PROMPT,
 )
+from pydantic import BaseModel, Field
 
 def get_dfd(api_key, model, temperature, inputs):
     """
@@ -40,24 +41,44 @@ def get_dfd(api_key, model, temperature, inputs):
     """
     client = OpenAI(api_key=api_key)
     
-    response = client.chat.completions.create(
-        model=model,
-        response_format={"type": "json_object"},
-        messages=[
-            {
-                "role": "system",
-                "content": DFD_SYSTEM_PROMPT,
-            },
-            {
-                "role": "user", 
-                "content": THREAT_MODEL_USER_PROMPT(
-                    inputs
-                )
-            },
-        ],
-        max_tokens=4096,
-        temperature=temperature,
-    )
+    messages=[
+        {
+            "role": "system",
+            "content": DFD_SYSTEM_PROMPT,
+        },
+        {
+            "role": "user", 
+            "content": THREAT_MODEL_USER_PROMPT(
+                inputs
+            )
+        },
+    ]
+    if model in ["gpt-4o-mini", "gpt-4o"]:
+        class Edge(BaseModel):
+            # This is needed because "from" is a reserved keyword in Python
+            from_: str = Field(..., alias="from")
+            typefrom: str
+            to: str
+            typeto: str
+            trusted: bool
+        class DFD(BaseModel):
+            dfd: list[Edge]
+        response = client.beta.chat.completions.parse(
+            model=model,
+            response_format=DFD,
+            temperature=temperature,
+            messages=messages,
+            max_tokens=4096,
+        )
+    else:
+
+        response = client.chat.completions.create(
+            model=model,
+            messages=messages,
+            response_format={"type": "json_object"},
+            max_tokens=4096,
+            temperature=temperature,
+        )
     return json.loads(response.choices[0].message.content)
     
 
