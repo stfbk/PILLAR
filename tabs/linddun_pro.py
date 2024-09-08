@@ -81,12 +81,6 @@ Finally, click the button below to generate the LINDDUN Pro threat modeling.
         st.markdown(f"### Threats found for DF{st.session_state["edge_num"]}")
         markdown = linddun_pro_gen_markdown(st.session_state["linddun_pro_threats"][st.session_state["edge_num"]])
         st.markdown(markdown, unsafe_allow_html=True)
-        st.download_button(
-            label="Download Threat Model",
-            data=markdown,
-            file_name="linddun_pro_threat_model.md",
-            mime="text/markdown",
-        )
         st.session_state["linddun_pro_output"] = markdown
 
     else:
