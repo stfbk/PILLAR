@@ -42,7 +42,7 @@ Finally, click the button below to generate the LINDDUN Pro threat modeling.
     with col2:
         st.selectbox("Select the edge to consider", 
             [i for i in range(len(st.session_state["input"]["dfd"]))],
-            help="Select the edge of the DFD to find threats for.",
+            help="Select the Data Flow (edge of the DFD) to find threats for.",
             key="edge_num"
         )
         # Display the selected edge
