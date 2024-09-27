@@ -136,8 +136,8 @@ def sidebar():
             if llm_to_configure == "OpenAI API":
                 openai_model = st.selectbox(
                     "OpenAI model:",
-                    ["gpt-4o-mini", "gpt-3.5-turbo", "gpt-4-turbo", "gpt-4", "gpt-4o"],
-                    help="OpenAI have moved to continuous model upgrades so `gpt-3.5-turbo`, `gpt-4` and `gpt-4-turbo` point to the latest available version of each model.",
+                    ["gpt-4o-mini", "gpt-4-turbo", "gpt-4", "gpt-4o"],
+                    help="OpenAI have moved to continuous model upgrades so `gpt-4` and `gpt-4-turbo` point to the latest available version of each model.",
                 )
                 if openai_model != st.session_state["openai_model"]:
                     st.session_state["openai_model"] = openai_model
