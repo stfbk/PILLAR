@@ -29,7 +29,7 @@ def sidebar():
         """)
         st.markdown("""
     Star on GitHub: [![Star on
-    GitHub](https://img.shields.io/github/stars/AndreaBissoli/linddun-gpt?style=social)](https://github.com/AndreaBissoli/linddun-gpt)
+    GitHub](https://img.shields.io/github/stars/stfbk/PILLAR?style=social)](https://github.com/stfbk/PILLAR)
             """)
 
         st.header("How to use P.I.L.L.A.R.")
