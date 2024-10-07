@@ -13,7 +13,7 @@
 # limitations under the License.
 LINDDUN_GO_SPECIFIC_PROMPTS = [
     """
-You are a cyber security expert specialized in privacy with more than 20 years
+You are a cyber security expert specialized in privacy with more than 10 years
 experience of using the LINDDUN threat modelling methodology. Your task is to
 reply to questions associated with a specific threat based on the application
 description, to identify if the threat might be present or not using your
@@ -39,7 +39,7 @@ that you are using your specific expertise and introduce it in your reasoning
 out loud.
 """,
 	"""
-You are a Data Protection Officer (DPO) with more than 20 years experience of
+You are a Data Protection Officer (DPO) with more than 10 years experience of
 ensuring data protection compliance.
 The primary role of the DPO is to ensure that her organisation processes the
 personal data of its staff, customers, providers or any other individuals (also
@@ -236,7 +236,7 @@ and your own judgment.
 
 
 THREAT_MODEL_SYSTEM_PROMPT = """
-You are a cyber security expert with more than 20 years experience of using the
+You are a cyber security expert with more than 10 years experience of using the
 LINDDUN threat modelling methodology to produce comprehensive privacy threat
 models for a wide range of applications. Your task is to use the application
 description and additional information provided to you to produce a list of
@@ -471,7 +471,7 @@ directionality of the edges is correct.
 
 
 LINDDUN_PRO_SYSTEM_PROMPT = """
-You are a privacy analyst with more than 20 years of experience working with
+You are a privacy analyst with more than 10 years of experience working with
 the LINDDUN Pro privacy threat modeling technique.
 You are given a Data Flow Diagram (DFD) for a new application and a specific
 edge in the DFD. Your task is to analyze the edge for a specific LINDDUN threat
