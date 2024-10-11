@@ -71,6 +71,21 @@ patterns](https://privacypatterns.org/) website.
 - **Report Generation**: Download a comprehensive report of the privacy threat
 modeling of the application.
 
+## Citation
+
+If you use **PILLAR** in your research or project, please cite our paper as follows:
+
+```bash
+@article{pillar,
+title={PILLAR: an AI-Powered Privacy Threat Modeling Tool},
+author={Mollaeefar, Majid, Bissoli, Andrea and Ranise, Silvio},
+journal={arXiv preprint arXiv:2207.07385},
+year={2024},
+url={https://arxiv.org/abs/2402.xxxxx}
+}
+```
+
+
 ## License
 
 This project is licensed under the Apache License, Version 2.0 - see the [LICENSE](LICENSE.txt)
