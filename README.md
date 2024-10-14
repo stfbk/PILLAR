@@ -68,7 +68,7 @@ identify precise privacy threats in the LINDDUN Pro tab.
 - **Impact Assessment and Control Measures**: Assess the impact of identified
 privacy threats and suggest control measures based on the [privacy
 patterns](https://privacypatterns.org/) website.
-- **Report Generation**: Download a comprehensive report of the privacy threat
+- **Report Generation**: Download a comprehensive report on the privacy threat
 modeling of the application.
 
 ## Citation
@@ -79,9 +79,9 @@ If you use **PILLAR** in your research or project, please cite our paper as foll
 @article{pillar,
 title={PILLAR: an AI-Powered Privacy Threat Modeling Tool},
 author={Mollaeefar, Majid, Bissoli, Andrea and Ranise, Silvio},
-journal={arXiv preprint arXiv:2207.07385},
+journal={arXiv preprint arXiv:2410.08755},
 year={2024},
-url={https://arxiv.org/abs/2402.xxxxx}
+url={https://arxiv.org/abs/2410.08755}
 }
 ```
 
