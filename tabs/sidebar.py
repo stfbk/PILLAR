@@ -43,7 +43,7 @@ def sidebar():
             mistral_api_key = st.secrets["mistral_api_key"]
             st.session_state["keys"]["mistral_api_key"] = mistral_api_key
         except Exception as e:
-            st.warning("No secrets file found")
+            # st.warning("No secrets file found")
             # If the API keys are not in the secrets file, initialize them as
             # empty strings
             if "openai_api_key" not in st.session_state["keys"]:
