@@ -41,13 +41,6 @@ providers are [MistralAI](https://console.mistral.ai/api-keys) and [Google
 Gemini](https://makersuite.google.com/app/apikey). If you would like to see
 more LLM providers supported, feel free to open an issue or a pull request.
 
-## Tool Architecture
-
-<img src="static/Tool-Architecture.svg" width="" height="" />
-
-This is the tool architecture, highlighting the different components of the tool
-and the expected usage flow.
-
 
 ## Features
 
@@ -70,6 +63,20 @@ privacy threats and suggest control measures based on the [privacy
 patterns](https://privacypatterns.org/) website.
 - **Report Generation**: Download a comprehensive report on the privacy threat
 modeling of the application.
+
+
+## Roadmap
+
+Here’s an outline of our upcoming features and enhancements for **PILLAR**:
+
+- [ ] **Support for Open Threat Modeling (OTM) Format** by adding the ability to export threat modeling results in the widely-adopted OTM format to enhance compatibility with other tools.
+
+- [ ] **Locally Hosted Models** by implementing support for locally hosted models, such as **Ollama**, to give users more control over privacy and security when running AI models.
+
+- [ ] **Integration with OWASP DFD Generation Framework** by exploring integration with the **OWASP DFD generating framework (pytm)** to improve and extend PILLAR's DFD generation capabilities.
+
+---
+
 
 ## Citation
 
