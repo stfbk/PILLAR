@@ -80,15 +80,15 @@ Here’s an outline of our upcoming features and enhancements for **PILLAR**:
 
 ## Citation
 
-If you use **PILLAR** in your research or project, please cite our paper as follows:
+If you use **PILLAR** in your research or project, please cite our [paper](https://arxiv.org/abs/2410.08755) as follows:
 
 ```bash
 @article{pillar,
 title={PILLAR: an AI-Powered Privacy Threat Modeling Tool},
 author={Mollaeefar, Majid, Bissoli, Andrea and Ranise, Silvio},
 journal={arXiv preprint arXiv:2410.08755},
-year={2024},
-url={https://arxiv.org/abs/2410.08755}
+url={https://arxiv.org/abs/2410.08755},
+year={2024}
 }
 ```
 
