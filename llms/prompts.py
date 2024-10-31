@@ -245,7 +245,7 @@ LINDDUN threat types you should consider:
 1. L - Linking: Associating data items or user actions to learn more about an
    individual or group.
 2. I - Identifying: Learning the identity of an individual.
-3. Nr - Non-repudiation: Being able to attribute a claim to an individual.
+3. Nr - Non-repudiation: Being able to attribute a claim to an individual. This leads to loss of plausible deniability, e.g. a whistleblower who can be prosecuted. The system retains evidence regarding a particular action or fact, thus impacting deniability claims. E.g. log files, digital signatures, document metadata, watermarked data.
 4. D - Detecting: Deducing the involvement of an individual through
    observation.
 5. Dd - Data disclosure: Excessively collecting, storing, processing, or
