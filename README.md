@@ -24,7 +24,7 @@ To install the project, you need to clone the repository and install the
 dependencies. You can do this by running the following commands:
 
 ```bash 
-git clone https://github.com/AndreaBissoli/pillar.git 
+git clone https://github.com/stfbk/PILLAR.git 
 cd pillar 
 pip install -r requirements.txt 
 streamlit run main.py 
