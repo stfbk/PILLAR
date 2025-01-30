@@ -25,7 +25,7 @@ dependencies. You can do this by running the following commands:
 
 ```bash 
 git clone https://github.com/stfbk/PILLAR.git 
-cd pillar 
+cd PILLAR 
 pip install -r requirements.txt 
 streamlit run main.py 
 ```
