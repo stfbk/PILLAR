@@ -28,7 +28,7 @@ from llms.prompts import (
     LINDDUN_GO_JUDGE_PROMPT,
 )
     
-from pydantic import BaseModel
+from pydantic import BaseModel    
 
 def linddun_go_gen_markdown(threats):
     """
