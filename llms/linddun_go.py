@@ -15,8 +15,7 @@ import json
 import google.generativeai as genai
 import random
 from openai import OpenAI
-from mistralai.client import MistralClient
-from mistralai.models.chat_completion import ChatMessage
+from mistralai import Mistral
 from misc.utils import (
     match_number_color,
     match_letter,
@@ -180,7 +179,7 @@ def get_multiagent_linddun_go(keys, models, inputs, temperature, rounds, threats
 
     # Initialize the LLM clients
     openai_client = OpenAI(api_key=keys["openai_api_key"]) if "OpenAI API" in llms_to_use else None
-    mistral_client = MistralClient(api_key=keys["mistral_api_key"]) if "Mistral API" in llms_to_use else None
+    mistral_client = Mistral(api_key=keys["mistral_api_key"]) if "Mistral API" in llms_to_use else None
     if "Google AI API" in llms_to_use:
         genai.configure(api_key=keys["google_api_key"])
         google_client = genai.GenerativeModel(
@@ -322,8 +321,8 @@ def get_response_mistral(client, model, temperature, system_prompt, user_prompt)
 			model=model,
 			response_format={"type": "json_object"},
 			messages=[
-				ChatMessage(role="system", content=system_prompt),
-				ChatMessage(role="user", content=user_prompt),
+				{"role":"system", "content":system_prompt},
+				{"role":"user", "content":user_prompt},
 			],
 			max_tokens=4096,
             temperature=temperature,
