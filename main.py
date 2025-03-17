@@ -101,7 +101,7 @@ def init_session_state():
         st.session_state["input"]["data_policy"] = ""
         st.session_state["input"]["user_data_control"] = ""
         st.session_state["input"]["dfd"] = [ 
-            {"from": "User", "typefrom": "Entity", "to": "Application", "typeto": "Process", "trusted": True },
+            {"from": "User", "typefrom": "Entity", "to": "Application", "typeto": "Process", "trusted": True, "boundary": "boundary_1", "description": ""},
         ]
         st.session_state["input"]["graph"] = graphviz.Digraph()
         st.session_state["input"]["graph"].attr(

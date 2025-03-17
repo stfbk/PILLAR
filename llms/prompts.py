@@ -375,11 +375,6 @@ Keep in mind these guidelines for DFDs:
 6. Data memorized in a system has to go through a process
 7. All processes flow either to a data store or to another process
 
-You can also include a trusted boundary in the DFD to represent the system's
-security perimeter. The trusted boundary should encompass all the entities,
-processes, and data stores that are considered secure and trusted.
-To specify it, add a "trusted" attribute to the edges in the DFD, set to True
-if the edge is inside the trusted boundary, and False if it traverses it.
 
 The input is going to be structured as follows, enclosed in triple quotes:
 
@@ -414,23 +409,82 @@ DATA POLICY: the data policy of the application
 USER DATA CONTROL: the control the user has over their data
 '''
 
-You MUST reply with a json-formatted list of dictionaries under the "dfd"
-attribute, where each dictionary represents an edge in the DFD. The response
-MUST have the following structure:
+Analyze the application description to create a Data Flow Diagram (DFD) with security boundaries.
+
+You MUST reply with a json-formatted object with two keys, "boundaries"
+and "dfd", each containing a list of dictionaries where each dictionary
+represents a boundary or an edge in the DFD. The response MUST have the
+following structure:
+
+1. A 'dfd' key containing an array of edges:
+	Each edge should have:
+	- "from": The source component name
+	- "typefrom": The source component type ("Entity", "Process", or "Data store")
+	- "to": The destination component name
+	- "typeto": The destination component type ("Entity", "Process", or "Data store")
+	- "trusted": Boolean indicating if the flow stays within the same boundary
+	- "boundary": The boundary ID this component belongs to
+	- "description": A description of the data flow, around 2 sentences, used for LINDDUN Pro threat modelling. It should explain which data is flowing between the components and why.
+
+2. A 'boundaries' key containing an array of boundary definitions:
+	Each boundary should have:
+	- "id": A unique identifier (e.g., "boundary_1", "boundary_2", etc.)
+	- "name": A descriptive name (e.g., "Internet", "DMZ", "Internal Network", "Database Zone")
+	- "description": A brief description of the security context
+	- "color": A hex color code (e.g., "#00a6fb". Do not use the same color for different boundaries, and do not use red)
+
+
+Example response format (only the format is relevant, you can freely choose the data for the DFD and boundaries):
 {
-    "dfd": [
-        {
-            "from": "source_node",
-            "typefrom": "Entity/Process/Data store",
-            "to": "destination_node",
-            "typeto": "Entity/Process/Data store",
-			"trusted": True/False
-        },
-        //// other edges description....
-    ]
+	"dfd": [
+	{
+		"from": "User",
+		"typefrom": "Entity",
+		"to": "Web Application",
+		"typeto": "Process",
+		"trusted": false,
+		"boundary": "boundary_2",
+		"description": "User data is sent to the Web Application for processing."
+	},
+	{
+		"from": "Web Application",
+		"typefrom": "Process",
+		"to": "Database",
+		"typeto": "Data store",
+		"trusted": true,
+		"boundary": "boundary_1",
+		"description": "The Web Application stores the processed data in the Database."
+	},
+	......
+	]
+	"boundaries": [
+	{
+		"id": "boundary_1",
+		"name": "boundary_name",
+		"description": "boundary_description",
+		"color": "#boundary_color"
+	},
+	{
+		"id": "boundary_2",
+		"name": "boundary_name",
+		"description": "boundary_description",
+		"color": "#boundary_color"
+	},
+	.....
+	],
 }
+
+Follow these rules:
+- Create as many boundaries as needed to represent the security zones in the application
+- Every component must belong to exactly one boundary
+- Data stores must have at least one incoming and one outgoing flow
+- Processes must have at least one incoming and one outgoing flow
+- Entities should not connect directly to data stores
+- Use descriptive names for all components and boundaries
+- Do NOT include any boundaries which are not used in the DFD section
+
 Provide a comprehensive list, including as many nodes of the application as possible.
-                """
+"""
 
 
 DFD_IMAGE_SYSTEM_PROMPT = """
@@ -442,33 +496,77 @@ threat modelling can be executed upon it.
 The input is an image which already contains the architecture of the application as a DFD.
 You have to analyze the image and provide the Data Flow Diagram (DFD) for the application, as a JSON structure.
 
-You should also include a trusted boundary in the DFD to represent the system's
-security perimeter, which should be indicated in the image. To specify it, add
-a "trusted" attribute to the edges in the DFD, set to True if the edge is
-inside the trusted boundary, and False if it traverses it.
-
-You MUST reply with a json-formatted list of dictionaries under the "dfd"
-attribute, where each dictionary represents an edge in the DFD. The response
-MUST have the following structure:
-{
-    "dfd": [
-        {
-            "from": "source_node",
-            "typefrom": "Entity/Process/Data store",
-            "to": "destination_node",
-            "typeto": "Entity/Process/Data store",
-			"trusted": True/False
-        },
-        //// other edges description....
-    ]
-}
-
 Be very precise and detailed in your response, providing the DFD as accurately
 as possible, following exactly what is shown in the image.
 Avoid adding multiple edges between the same nodes, and ensure that the
 directionality of the edges is correct. 
-"""
 
+You MUST reply with a json-formatted object with two keys, "boundaries"
+and "dfd", each containing a list of dictionaries where each dictionary
+represents a boundary or an edge in the DFD. The response MUST have the
+following structure:
+    
+
+1. A 'dfd' key containing an array of edges:
+	Each edge should have:
+	- "from": The source component name
+	- "typefrom": The source component type ("Entity", "Process", or "Data store")
+	- "to": The destination component name
+	- "typeto": The destination component type ("Entity", "Process", or "Data store")
+	- "trusted": Boolean indicating if the flow stays within the same boundary
+	- "boundary": The boundary ID this component belongs to
+	- "description": A description of the data flow, around 2 sentences, used for LINDDUN Pro threat modelling. It should explain which data is flowing between the components and why.
+
+2. A 'boundaries' key containing an array of boundary definitions:
+	Each boundary should have:
+	- "id": A unique identifier (e.g., "boundary_1", "boundary_2", etc.)
+	- "name": A descriptive name (e.g., "Internet", "DMZ", "Internal Network", "Database Zone")
+	- "description": A brief description of the security context
+	- "color": A hex color code (e.g., "#00a6fb". Do not use the same color for different boundaries, and do not use red)
+
+Example response format (only the format is relevant, you can freely choose the data for the DFD and boundaries):
+{
+	"dfd": [
+	{
+		"from": "User",
+		"typefrom": "Entity",
+		"to": "Web Application",
+		"typeto": "Process",
+		"trusted": false,
+		"boundary": "boundary_2",
+		"description": "User data is sent to the Web Application for processing."
+	},
+	{
+		"from": "Web Application",
+		"typefrom": "Process",
+		"to": "Database",
+		"typeto": "Data store",
+		"trusted": true,
+		"boundary": "boundary_1",
+		"description": "The Web Application stores the processed data in the Database."
+	},
+	......
+	]
+	"boundaries": [
+	{
+		"id": "boundary_1",
+		"name": "boundary_name",
+		"description": "boundary_description",
+		"color": "#boundary_color"
+	},
+	{
+		"id": "boundary_2",
+		"name": "boundary_name",
+		"description": "boundary_description",
+		"color": "#boundary_color"
+	},
+	.....
+	],
+}
+
+Identify all boundaries visible in the image and assign components to the appropriate boundaries.
+Do NOT include any boundaries which are not used in the DFD section
+"""
 
 LINDDUN_PRO_SYSTEM_PROMPT = """
 You are a privacy analyst with more than 10 years of experience working with

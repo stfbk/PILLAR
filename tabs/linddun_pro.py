@@ -52,7 +52,15 @@ Finally, click the button below to generate the LINDDUN Pro threat modeling.
             help="Select the LINDDUN threat categories to look for in the threat model.",
             key="threat_categories"
         )
-        st.text_area("Data flow description", help="Describe in detail the data flow for the selected edge.", key="data_flow_description", placeholder="Explain what is transferred between source and destination and how it is processed.")
+        st.text_area(
+            "Data flow description",
+            help="Describe in detail the data flow for the selected edge.",
+            key="data_flow_description",
+            value=st.session_state["input"]["dfd"][st.session_state["edge_num"]]["description"],
+            placeholder="Explain what is transferred between source and destination and how it is processed.",
+            on_change=lambda: st.session_state["input"]["dfd"][st.session_state["edge_num"]].update({"description": st.session_state["data_flow_description"]})
+        )
+        print(st.session_state["data_flow_description"])
         if st.button("Analyze"):
             with st.spinner("Eliciting threats in the data flow..."):
                 # Get the LINDDUN Pro threats for the selected edge, for each selected category
