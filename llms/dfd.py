@@ -19,38 +19,8 @@ from llms.prompts import (
     DFD_SYSTEM_PROMPT,
     DFD_IMAGE_SYSTEM_PROMPT,
 )
-from pydantic import BaseModel
-from typing import Optional, Literal
 import streamlit as st
 import graphviz
-
-class Component(BaseModel):
-    """Represents a DFD component (Process, Entity, or Data Store)"""
-    name: str
-    type: Literal["Process", "Entity", "Data store"]
-    boundary_id: str
-    description: Optional[str]
-
-class Boundary(BaseModel):
-    """Represents a trust boundary in the DFD"""
-    id: str
-    name: str
-    description: str
-    color: str  # Remove default value
-
-class DataFlow(BaseModel):
-    """Represents a data flow between components"""
-    id: str
-    from_component: str
-    to_component: str
-    data_description: Optional[str]
-    classification: Optional[str]
-
-class DFDResponse(BaseModel):
-    """Complete DFD structure"""
-    boundaries: list[Boundary]
-    components: list[Component]
-    flows: list[DataFlow]
 
 def get_dfd(api_key, model, temperature, inputs):
     """

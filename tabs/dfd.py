@@ -22,7 +22,6 @@ from llms.dfd import (
     get_dfd,
     get_image_analysis,
     update_graph,
-    get_node_shape
 )
 
 # Default boundaries
@@ -93,6 +92,54 @@ def synchronize_boundaries_from_csv(dfd_list):
         st.error(f"Error synchronizing boundaries: {str(e)}")
         print(f"Error synchronizing boundaries: {str(e)}")
 
+def validate_dfd(dfd_data):
+    """
+    Validate the DFD data and return a list of issues.
+    """
+    issues = []
+    if not dfd_data:
+        return ["No DFD data available."]
+    components = set()
+    for edge in dfd_data:
+        components.add(edge["from"])
+        components.add(edge["to"])
+    incoming = {comp: 0 for comp in components}
+    outgoing = {comp: 0 for comp in components}
+    for edge in dfd_data:
+        outgoing[edge["from"]] += 1
+        incoming[edge["to"]] += 1
+    data_stores = set()
+    processes = set()
+    entities = set()
+    for edge in dfd_data:
+        if edge["typefrom"] == "Data store":
+            data_stores.add(edge["from"])
+        elif edge["typefrom"] == "Process":
+            processes.add(edge["from"])
+        elif edge["typefrom"] == "Entity":
+            entities.add(edge["from"])
+        if edge["typeto"] == "Data store":
+            data_stores.add(edge["to"])
+        elif edge["typeto"] == "Process":
+            processes.add(edge["to"])
+        elif edge["typeto"] == "Entity":
+            entities.add(edge["to"])
+    for ds in data_stores:
+        if incoming[ds] < 1:
+            issues.append(f"Data store '{ds}' has no incoming connections")
+        if outgoing[ds] < 1:
+            issues.append(f"Data store '{ds}' has no outgoing connections")
+    for proc in processes:
+        if incoming[proc] < 1:
+            issues.append(f"Process '{proc}' has no incoming connections")
+        if outgoing[proc] < 1:
+            issues.append(f"Process '{proc}' has no outgoing connections")
+    for edge in dfd_data:
+        if edge["typefrom"] == "Entity" and edge["typeto"] == "Data store":
+            issues.append(f"Invalid connection: Entity '{edge['from']}' directly connects to Data store '{edge['to']}'")
+        if edge["typefrom"] == "Data store" and edge["typeto"] == "Entity":
+            issues.append(f"Invalid connection: Data store '{edge['from']}' directly connects to Entity '{edge['to']}'")
+    return issues
 
 def dfd():
     st.markdown("""
@@ -417,52 +464,3 @@ def dfd():
                     st.markdown(f"- {issue}")
                 st.markdown("These issues may lead to an incomplete threat model. Consider addressing them for a more accurate analysis.")
 
-
-def validate_dfd(dfd_data):
-    """
-    Validate the DFD data and return a list of issues.
-    """
-    issues = []
-    if not dfd_data:
-        return ["No DFD data available."]
-    components = set()
-    for edge in dfd_data:
-        components.add(edge["from"])
-        components.add(edge["to"])
-    incoming = {comp: 0 for comp in components}
-    outgoing = {comp: 0 for comp in components}
-    for edge in dfd_data:
-        outgoing[edge["from"]] += 1
-        incoming[edge["to"]] += 1
-    data_stores = set()
-    processes = set()
-    entities = set()
-    for edge in dfd_data:
-        if edge["typefrom"] == "Data store":
-            data_stores.add(edge["from"])
-        elif edge["typefrom"] == "Process":
-            processes.add(edge["from"])
-        elif edge["typefrom"] == "Entity":
-            entities.add(edge["from"])
-        if edge["typeto"] == "Data store":
-            data_stores.add(edge["to"])
-        elif edge["typeto"] == "Process":
-            processes.add(edge["to"])
-        elif edge["typeto"] == "Entity":
-            entities.add(edge["to"])
-    for ds in data_stores:
-        if incoming[ds] < 1:
-            issues.append(f"Data store '{ds}' has no incoming connections")
-        if outgoing[ds] < 1:
-            issues.append(f"Data store '{ds}' has no outgoing connections")
-    for proc in processes:
-        if incoming[proc] < 1:
-            issues.append(f"Process '{proc}' has no incoming connections")
-        if outgoing[proc] < 1:
-            issues.append(f"Process '{proc}' has no outgoing connections")
-    for edge in dfd_data:
-        if edge["typefrom"] == "Entity" and edge["typeto"] == "Data store":
-            issues.append(f"Invalid connection: Entity '{edge['from']}' directly connects to Data store '{edge['to']}'")
-        if edge["typefrom"] == "Data store" and edge["typeto"] == "Entity":
-            issues.append(f"Invalid connection: Data store '{edge['from']}' directly connects to Entity '{edge['to']}'")
-    return issues
