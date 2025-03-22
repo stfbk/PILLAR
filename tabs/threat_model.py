@@ -49,6 +49,7 @@ list of potential threats to your application, classified by LINDDUN category.
     # model
     if threat_model_submit_button and (st.session_state["input"]["app_description"] or st.session_state["dfd_only"]):
         inputs = st.session_state["input"]
+        inputs["boundaries"] = st.session_state["boundaries"]
         threat_model_prompt = THREAT_MODEL_USER_PROMPT(
             inputs
         )

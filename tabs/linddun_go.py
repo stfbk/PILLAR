@@ -63,6 +63,7 @@ is made by a judge LLM, which evaluates the opinions proposed by the experts.
 
     if linddun_go_submit_button: 
         inputs = st.session_state["input"]
+        inputs["boundaries"] = st.session_state["boundaries"]
         threats = []
         # Show a spinner while generating the attack tree
         with st.spinner("Answering questions..."):

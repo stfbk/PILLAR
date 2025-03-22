@@ -114,9 +114,15 @@ APPLICATION DESCRIPTION: {inputs["app_description"]}
 The user has also provided a Data Flow Diagram to describe the application.
 The DFD is described as a list of edges, connecting the "from" node to the
 "to" node. "typefrom" and "typeto" describe the type of the node, which can be
-an Entity, Process, or Data store. "trusted" indicates whether the edge stays
-inside or outside the trusted boundary. This is the DFD provided:
+an Entity, Process, or Data store. "trusted" indicates whether the edge's data
+flow is trusted. "boundary" indicates the boundary id of the trust boundary the
+source belongs to. "description" describes the data flow. This is the DFD
+provided:
 {inputs["dfd"]}
+
+And this is the dictionary containing the trust boundaries:
+each boundary has "id", "name", "description", and "color" keys.
+{inputs["boundaries"]}
 """ if inputs["use_dfd"] else ""}
 DATABASE_SCHEMA: {inputs["database"]}
 DATA POLICY: {inputs["data_policy"]}
@@ -132,9 +138,15 @@ THREAT_DESCRIPTION: {description}
 The user has provided only a Data Flow Diagram to describe the application.
 The DFD is described as a list of edges, connecting the "from" node to the
 "to" node. "typefrom" and "typeto" describe the type of the node, which can be
-an Entity, Process, or Data store. "trusted" indicates whether the edge stays
-inside or outside the trusted boundary. This is the DFD provided:
+an Entity, Process, or Data store. "trusted" indicates whether the edge's data
+flow is trusted. "boundary" indicates the boundary id of the trust boundary the
+source belongs to. "description" describes the data flow. This is the DFD provided:
 {inputs["dfd"]}
+
+And this is the dictionary containing the trust boundaries:
+each boundary has "id", "name", "description", and "color" keys.
+{inputs["boundaries"]}
+
 QUESTIONS: {question}
 THREAT_TITLE: {title}
 THREAT_DESCRIPTION: {description}
@@ -159,7 +171,7 @@ Example input format:
 
 '''
 APPLICATION TYPE: Web | Mobile | Desktop | Cloud | IoT | Other application
-AUTHENTICATION METHODS: SSO | MFA | OAUTH2 | Basic | None
+TYPES OF DATA: PII, Financial, Health, User activity, Sensitive, Geolocation, Other
 APPLICATION DESCRIPTION: the general application description, sometimes with a Data Flow Diagram
 DATABASE SCHEMA: the database schema used by the application to contain the
 data, or none if no database is used, in this JSON format:
@@ -273,7 +285,7 @@ Example input format:
 
 '''
 APPLICATION TYPE: Web | Mobile | Desktop | Cloud | IoT | Other application
-AUTHENTICATION METHODS: SSO | MFA | OAUTH2 | Basic | None
+TYPES OF DATA: PII, Financial, Health, User activity, Sensitive, Geolocation, Other
 APPLICATION DESCRIPTION: the general application description, sometimes with a Data Flow Diagram
 DATABASE SCHEMA: the database schema used by the application to contain the
 data, or none if no database is used, in this JSON format:
@@ -338,9 +350,15 @@ APPLICATION DESCRIPTION: {inputs["app_description"]}
 The user has also provided a Data Flow Diagram to describe the application.
 The DFD is described as a list of edges, connecting the "from" node to the
 "to" node. "typefrom" and "typeto" describe the type of the node, which can be
-an Entity, Process, or Data store. "trusted" indicates whether the edge stays
-inside or outside the trusted boundary. This is the DFD provided:
+an Entity, Process, or Data store. "trusted" indicates whether the edge's data
+flow is trusted. "boundary" indicates the boundary id of the trust boundary the
+source belongs to. "description" describes the data flow. This is the DFD
+provided:
 {inputs["dfd"]}
+
+And this is the dictionary containing the trust boundaries:
+each boundary has "id", "name", "description", and "color" keys.
+{inputs["boundaries"]}
 """ if inputs["use_dfd"] else ""}
 DATABASE SCHEMA: {inputs["database"]}
 DATA POLICY: {inputs["data_policy"]}
@@ -353,9 +371,14 @@ USER DATA CONTROL: {inputs["user_data_control"]}
 The user has provided only a Data Flow Diagram to describe the application.
 The DFD is described as a list of edges, connecting the "from" node to the
 "to" node. "typefrom" and "typeto" describe the type of the node, which can be
-an Entity, Process, or Data store. "trusted" indicates whether the edge stays
-inside or outside the trusted boundary. This is the DFD provided:
+an Entity, Process, or Data store. "trusted" indicates whether the edge's data
+flow is trusted. "boundary" indicates the boundary id of the trust boundary the
+source belongs to. "description" describes the data flow. This is the DFD provided:
 {inputs["dfd"]}
+
+And this is the dictionary containing the trust boundaries:
+each boundary has "id", "name", "description", and "color" keys.
+{inputs["boundaries"]}
 '''
 """
 	return prompt
@@ -380,7 +403,7 @@ The input is going to be structured as follows, enclosed in triple quotes:
 
 '''
 APPLICATION TYPE: Web | Mobile | Desktop | Cloud | IoT | Other application
-AUTHENTICATION METHODS: SSO | MFA | OAUTH2 | Basic | None
+TYPES OF DATA: PII, Financial, Health, User activity, Sensitive, Geolocation, Other
 APPLICATION DESCRIPTION: the general application description, sometimes with a Data Flow Diagram
 DATABASE SCHEMA: the database schema used by the application to contain the
 data, or none if no database is used, in this JSON format:
@@ -486,6 +509,20 @@ Follow these rules:
 Provide a comprehensive list, including as many nodes of the application as possible.
 """
 
+def DFD_USER_PROMPT(
+		inputs
+):
+	prompt = f"""
+'''
+APPLICATION TYPE: {inputs["app_type"]}
+TYPES OF DATA: {inputs["types_of_data"]}
+APPLICATION DESCRIPTION: {inputs["app_description"]}
+DATABASE SCHEMA: {inputs["database"]}
+DATA POLICY: {inputs["data_policy"]}
+USER DATA CONTROL: {inputs["user_data_control"]}
+'''
+"""
+	return prompt
 
 DFD_IMAGE_SYSTEM_PROMPT = """
 You are a senior system architect with more than 20 years of
@@ -568,6 +605,7 @@ Identify all boundaries visible in the image and assign components to the approp
 Do NOT include any boundaries which are not used in the DFD section
 """
 
+
 LINDDUN_PRO_SYSTEM_PROMPT = """
 You are a privacy analyst with more than 10 years of experience working with
 the LINDDUN Pro privacy threat modeling technique.
@@ -610,13 +648,19 @@ recipient does with that data triggers the threat
 
 The input is structured as follows, enclosed in triple quotes:
 '''
-DFD: The Data Flow Diagram for the whole application, represented as a list of dictionaries with the keys "from", "typefrom", "to", "typeto" and "trusted", representing each edge.
-EDGE: {"from": "source_node", "typefrom": "source_type", "to": "destination_node", "typeto": "destination_type", "trusted": True/False}
+DFD: The Data Flow Diagram for the whole application, represented as a list of dictionaries with the keys "from", "typefrom", "to", "typeto", "trusted", "boundary" and "description", representing each edge.
+EDGE: {"from": "source_node", "typefrom": "source_type", "to": "destination_node", "typeto": "destination_type", "trusted": True/False, "boundary": "boundary_id", "description": "edge_description"}
 CATEGORY: The specific LINDDUN threat category you should analyze for the edge.
-DESCRIPTION: A detailed description of the data flow for the edge.
 SOURCE: A boolean, indicating whether you should analyze the source node for the edge.
 DATA FLOW: A boolean, indicating whether you should analyze the data flow for the edge.
 DESTINATION: A boolean, indicating whether you should analyze the destination node for the edge.
+BOUNDARIES: The boundaries of the DFD, in this JSON format:
+{
+	'id': 'boundary_1',
+	'name': 'Boundary 1',
+	'description': 'Description of the boundary',
+	'color': '#00a6fb'
+}
 THREAT TREE: The threat tree you should follow for the threat elicitation process, in this JSON format:
 {
 	"id": "The node id",
@@ -643,6 +687,8 @@ THREAT TREE: The threat tree you should follow for the threat elicitation proces
 }
 '''
 
+In your analysis, you should take into account the whole dfd and the specified trust boundaries, but focus on finding the threats for the specific edge provided.
+
 The output MUST be a JSON response with the following structure, with each explanation about 200 words long, and each path shall NOT jump over a node in the tree (i.e., after DD.1 there can only be DD.1.1, DD.1.2, etc. but not DD.1.2.3 right away):
 
 {
@@ -658,16 +704,16 @@ The output MUST be a JSON response with the following structure, with each expla
 }
                 """
 
-def LINDDUN_PRO_USER_PROMPT(dfd, edge, category, description, source, data_flow, destination, threat_tree):
+def LINDDUN_PRO_USER_PROMPT(dfd, edge, category, source, data_flow, destination, boundaries, threat_tree):
 	return f"""
 	'''
 	DFD: {dfd}
 	EDGE: {{ "from": {edge["from"]}, "typefrom": {edge["typefrom"]}, "to": {edge["to"]}, "typeto": {edge["typeto"]} }}
 	CATEGORY: {category}
-	DESCRIPTION: {description}
 	SOURCE: {source}
 	DATA FLOW: {data_flow}
 	DESTINATION: {destination}
+	BOUNDARIES: {boundaries}
 	THREAT TREE: {threat_tree}
 	'''
 	"""
@@ -685,7 +731,7 @@ threat.
 The input is structured as follows, enclosed in triple quotes:
 '''
 APPLICATION TYPE: Web | Mobile | Desktop | Cloud | IoT | Other application
-AUTHENTICATION METHODS: SSO | MFA | OAUTH2 | Basic | None
+TYPES OF DATA: PII, Financial, Health, User activity, Sensitive, Geolocation, Other
 APPLICATION DESCRIPTION: the general application description, sometimes with a Data Flow Diagram
 DATABASE SCHEMA: the database schema used by the application to contain the
 data, or none if no database is used, in this JSON format:
@@ -741,7 +787,7 @@ providing a clear understanding of the threat and the possible mitigation strate
 The input is structured as follows, enclosed in triple quotes:
 '''
 APPLICATION TYPE: Web | Mobile | Desktop | Cloud | IoT | Other application
-AUTHENTICATION METHODS: SSO | MFA | OAUTH2 | Basic | None
+TYPES OF DATA: PII, Financial, Health, User activity, Sensitive, Geolocation, Other
 APPLICATION DESCRIPTION: the general application description, sometimes with a Data Flow Diagram
 DATABASE SCHEMA: the database schema used by the application to contain the
 data, or none if no database is used, in this JSON format:
@@ -810,7 +856,7 @@ You should also suggest how to implement the chosen patterns in the application.
 The input is structured as follows, enclosed in triple quotes:
 '''
 APPLICATION TYPE: Web | Mobile | Desktop | Cloud | IoT | Other application
-AUTHENTICATION METHODS: SSO | MFA | OAUTH2 | Basic | None
+TYPES OF DATA: PII, Financial, Health, User activity, Sensitive, Geolocation, Other
 APPLICATION DESCRIPTION: the general application description, sometimes with a Data Flow Diagram
 DATABASE SCHEMA: the database schema used by the application to contain the
 data, or none if no database is used, in this JSON format:

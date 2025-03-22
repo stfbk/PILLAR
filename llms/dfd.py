@@ -15,7 +15,7 @@ import json
 import requests
 from openai import OpenAI
 from llms.prompts import (
-    THREAT_MODEL_USER_PROMPT,
+    DFD_USER_PROMPT,
     DFD_SYSTEM_PROMPT,
     DFD_IMAGE_SYSTEM_PROMPT,
 )
@@ -38,7 +38,7 @@ def get_dfd(api_key, model, temperature, inputs):
     
         messages=[
             {"role": "system", "content": DFD_SYSTEM_PROMPT},
-            {"role": "user", "content": THREAT_MODEL_USER_PROMPT(inputs)}
+            {"role": "user", "content": DFD_USER_PROMPT(inputs)}
         ]
 
         progress_placeholder.info("Generating DFD with AI model...")
@@ -172,7 +172,7 @@ def get_dfd(api_key, model, temperature, inputs):
             st.session_state["boundaries"] = default_boundaries
             
         return {
-            "dfd": [{"from": "User", "typefrom": "Entity", "to": "System", "typeto": "Process", "trusted": True, "boundary": "boundary_1"}],
+            "dfd": [{"from": "User", "typefrom": "Entity", "to": "System", "typeto": "Process", "trusted": True, "boundary": "boundary_1", "description": ""}],
             "boundaries": st.session_state["boundaries"]
         }
         
@@ -196,7 +196,7 @@ def get_dfd(api_key, model, temperature, inputs):
             st.session_state["boundaries"] = default_boundaries
             
         return {
-            "dfd": [{"from": "User", "typefrom": "Entity", "to": "System", "typeto": "Process", "trusted": True, "boundary": "boundary_1"}],
+            "dfd": [{"from": "User", "typefrom": "Entity", "to": "System", "typeto": "Process", "trusted": True, "boundary": "boundary_1", "description": ""}],
             "boundaries": st.session_state["boundaries"]
         }
 

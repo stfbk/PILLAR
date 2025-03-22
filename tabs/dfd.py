@@ -182,20 +182,23 @@ def dfd():
         # Flag to track whether a DFD has been generated
         st.session_state["dfd_generated"] = False
 
-    print("Current DFD data:", st.session_state["input"]["dfd"])
+    #print("Current DFD data:", st.session_state["input"]["dfd"])
 
     # ------------------------------------
     # Threat Modeling Options
     # ------------------------------------
     with st.expander("Threat Modeling Options", expanded=True):
-        st.checkbox("DFD only", value=False, key="dfd_only",
-                    help="Check this box if you only want to use a Data Flow Diagram for the threat modeling, without including the application description.")
-        st.session_state["input"]["dfd_only"] = st.session_state["dfd_only"]
-
         st.checkbox("Include DFD in threat modeling", key="use_dfd",
                     help="Include the DFD in the subsequent threat modeling process.",
-                    disabled=st.session_state["dfd_only"])
+        )
         st.session_state["input"]["use_dfd"] = st.session_state["use_dfd"]
+
+        st.checkbox("DFD only", value=False, key="dfd_only",
+                    help="Check this box if you only want to use a Data Flow Diagram for the threat modeling, without including the application description.",
+                    disabled=not st.session_state["input"]["use_dfd"],
+        )
+
+        st.session_state["input"]["dfd_only"] = st.session_state["dfd_only"]
 
     # ------------------------------------
     # DFD Generation Options 
@@ -203,8 +206,7 @@ def dfd():
     with st.expander("Generate Data Flow Diagram", expanded=True):
         # Generate DFD from Application Description
         if st.button("Generate DFD from Application Description", 
-                     help="Generate a DFD based on the application information provided.",
-                     disabled=st.session_state["dfd_only"]):
+                     help="Generate a DFD based on the application information provided."):
             with st.spinner("Generating DFD..."):
                 result = get_dfd(
                     st.session_state["keys"]["openai_api_key"],

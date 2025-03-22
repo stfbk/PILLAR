@@ -71,7 +71,7 @@ Finally, click the button below to generate the LINDDUN Pro threat modeling.
                             st.session_state["input"]["dfd"],
                             st.session_state["input"]["dfd"][st.session_state["edge_num"]],
                             category,
-                            st.session_state["data_flow_description"],
+                            st.session_state["boundaries"],
                             st.session_state["temperature"],
                         )
                     new_threat["edge"] = st.session_state["input"]["dfd"][st.session_state["edge_num"]]
