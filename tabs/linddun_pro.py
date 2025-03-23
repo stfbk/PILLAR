@@ -46,7 +46,7 @@ Finally, click the button below to generate the LINDDUN Pro threat modeling.
             key="edge_num"
         )
         # Display the selected edge
-        st.markdown(f"{st.session_state['input']['dfd'][st.session_state['edge_num']]["from"]} -> DF{st.session_state["edge_num"]} -> {st.session_state['input']['dfd'][st.session_state['edge_num']]["to"]}")
+        st.markdown(f"{st.session_state["input"]["dfd"][st.session_state["edge_num"]]["from"]} -> DF{st.session_state["edge_num"]} -> {st.session_state["input"]["dfd"][st.session_state['edge_num']]["to"]}")
         st.multiselect("Select the LINDDUN threat categories to look for",
             ["Linking", "Identifying", "Non-repudiation", "Detecting", "Data disclosure", "Unawareness and unintervenability", "Non-compliance"],
             help="Select the LINDDUN threat categories to look for in the threat model.",

@@ -297,7 +297,7 @@ def update_graph():
             bgcolor='transparent',
             overlap="false",
             splines="ortho",
-            rankdir="LR",
+            rankdir="TB",
             concentrate="false",  # Keep this false to prevent edge concentration
             fontname="Arial",
             pad="0.5"
@@ -426,8 +426,8 @@ def update_graph():
                 edge_style = "dashed"
                 edge_penwidth = "1.5"
             else:
-                # Black, solid arrows for trusted connections
-                edge_color = "#000000"  # Black
+                # White, solid arrows for trusted connections
+                edge_color = "#FFFFFF"  # White
                 edge_style = "solid"
                 edge_penwidth = "1.0"
             
@@ -443,8 +443,8 @@ def update_graph():
                 edge_counts[edge_key] = 0
                 pos_attr = ""
             
-            # Use a simple row number for the label (i+1 to start from 1)
-            df_label = f"DF_{i+1}"
+            df_label = f"DF_{i}"
+            
             
             # Add the edge with appropriate styling and a unique constraint
             graph.edge(
