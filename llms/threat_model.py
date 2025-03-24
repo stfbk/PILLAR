@@ -49,7 +49,7 @@ def threat_model_gen_markdown(threat_model):
 
 	return markdown_output
 
-def get_threat_model_openai(api_key, model_name, prompt, temperature):
+def get_threat_model_openai(api_key, model_name, prompt, temperature, lmstudio=False):
 	"""
 	This function generates a simple LINDDUN threat model from the prompt.
 	
@@ -67,7 +67,10 @@ def get_threat_model_openai(api_key, model_name, prompt, temperature):
 			- Reason: string. The reason for the threat.
 	"""
 
-	client = OpenAI(api_key=api_key)
+	if lmstudio:
+		client = OpenAI(base_url="http://localhost:1234/v1", api_key="lm-studio")
+	else:
+		client = OpenAI(api_key=api_key)
 	messages=[
 			{
 					"role": "system",

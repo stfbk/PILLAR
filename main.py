@@ -54,6 +54,12 @@ def init_session_state():
     if "mistral_model" not in st.session_state:
         # mistral_model is a string that will store the Mistral model to use
         st.session_state["mistral_model"] = "mistral-large-latest"
+    if "lmstudio_model" not in st.session_state:
+        # lmstudio_model is a string that will store the LM Studio model to use
+        st.session_state["lmstudio_model"] = ""
+    if "lmstudio_loaded" not in st.session_state:
+        # lmstudio_loaded is a boolean that will store whether an LM Studio model has been loaded in memory
+        st.session_state["lmstudio_loaded"] = False
     
     # Initialize the session state for the Application Info and DFD tabs
     if "input" not in st.session_state:
