@@ -57,7 +57,7 @@ def linddun_go_gen_markdown(threats):
 
     return markdown_output
 
-def get_deck(file="misc/deck.json"):
+def get_deck(shuffled=False, file="misc/deck.json"):
     """
     This function reads the deck of cards from a JSON file.
 
@@ -74,7 +74,11 @@ def get_deck(file="misc/deck.json"):
     """
     with open(file, 'r') as deck_file:
         deck = json.load(deck_file)
-    return deck["cards"]
+    
+    result = deck["cards"]
+    if shuffled:
+        random.shuffle(result)
+    return result
 
 
 def get_linddun_go(api_key, model_name, inputs, threats_to_analyze, temperature, lmstudio=False):
@@ -101,10 +105,8 @@ def get_linddun_go(api_key, model_name, inputs, threats_to_analyze, temperature,
         client = OpenAI(base_url="http://localhost:1234/v1", api_key="lm-studio")
     else:
         client = OpenAI(api_key=api_key)
-    deck = get_deck()
-    
-    # Shuffle the deck of cards, simulating the experience of drawing cards from the deck
-    random.shuffle(deck)
+
+    deck = get_deck(shuffled=True)
 
     threats = []
 
@@ -195,11 +197,8 @@ def get_multiagent_linddun_go(keys, models, inputs, temperature, rounds, threats
             google_client = None
 
     threats = []
-    deck = get_deck()
+    deck = get_deck(shuffled=True)
     
-    # Shuffle the deck of cards, simulating the experience of drawing cards from the deck
-    random.shuffle(deck)
-
 
     for card in deck[0:threats_to_analyze]:
         question = "\n".join(card["questions"])
