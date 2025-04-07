@@ -52,7 +52,7 @@ def linddun_pro_gen_individual_markdown(threat):
 
     color = match_number_color(match_category_number(threat["category"]))
     color_html = f"<p style='background-color:{color};color:#ffffff;'>"
-    markdown_output += f"| {color_html}{threat['category']}</p> | {threat["description"]} |\n"
+    markdown_output += f"| {color_html}{threat['category']}</p> | {threat['description']} |\n"
     return markdown_output
 
 def measures_gen_markdown(measures):
@@ -73,7 +73,7 @@ def measures_gen_markdown(measures):
     markdown_output += "|--------|-------|-----|\n"
 
     for measure in measures:
-        markdown_output += f"| [{measure['title']}](https://privacypatterns.org/patterns/{measure["filename"]}) | {measure['explanation']} | {measure['implementation']} |\n"
+        markdown_output += f"| [{measure['title']}](https://privacypatterns.org/patterns/{measure['filename']}) | {measure['explanation']} | {measure['implementation']} |\n"
     return markdown_output
     
 

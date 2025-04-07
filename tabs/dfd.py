@@ -218,14 +218,14 @@ def update_graph():
     # Set the graph attributes
     st.session_state["graph_seed"] = str(random.randint(0, 100))
     graph.attr(
-        bgcolor=f"{st.get_option("theme.backgroundColor")}",
+        bgcolor=f"{st.get_option('theme.backgroundColor')}",
         overlap="false",
         K="2.5",
         start=st.session_state["graph_seed"],
         splines="ortho",
     )
     graph.node_attr.update(
-        color=f"{st.get_option("theme.primaryColor")}",
+        color=f"{st.get_option('theme.primaryColor')}",
         fontcolor="white",
         padding="0.4",
     )
@@ -249,8 +249,8 @@ def update_graph():
                 c.node(edge["to"])
     # Add the edges to the graph
     for (i, object) in enumerate(st.session_state["input"]["dfd"]):
-        graph.node(object["from"], shape=f"{"box" if object["typefrom"] == "Entity" else "ellipse" if object["typefrom"] == "Process" else "cylinder"}")
-        graph.node(object["to"], shape=f"{"box" if object["typeto"] == "Entity" else "ellipse" if object["typeto"] == "Process" else "cylinder"}")
+        graph.node(object["from"], shape=f'{"box" if object["typefrom"] == "Entity" else "ellipse" if object["typefrom"] == "Process" else "cylinder"}')
+        graph.node(object["to"], shape=f'{"box" if object["typeto"] == "Entity" else "ellipse" if object["typeto"] == "Process" else "cylinder"}')
         graph.edge(object["from"], object["to"], taillabel=f"DF{i}", constraint="false")
         
         
