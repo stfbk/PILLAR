@@ -278,6 +278,23 @@ present in the application. It is very important that your responses are
 tailored to reflect the details you are given. You MUST include all threat
 categories at least three times, and as many times you can.
 
+The scenario and reason should be very detailed, referring VERY CLOSELY to the
+application described and the data types and flows. BE FOCUSED ON THE
+APPLICATION DESCRIBED TO YOU, EVEN REFERRING TO SPECIFIC FEATURES OF IT. THE
+THREAT MODEL SHOULD NOT BE GENERALLY APPLIABLE TO ANY SIMILAR APPLICATION, BUT
+TAILOR-MADE FOR THE SPECIFIC ONE. You can go into as much technical detail as
+you want, but make sure that the threats are credible and relevant to the
+application description, describing both what the threat is and why it is a
+threat.
+
+In the scenario, craft an actual example of what could happen in the
+application to realize the threat.
+In the reason, explain why the scenario is a threat to the application,
+referring to the application description and data types and flows and what
+consequence the threat could have.
+In both sections, you should write AT LEAST three to four sentences to provide a
+comprehensive threat model for the application.
+
 
 The input is enclosed in triple quotes.
 
