@@ -86,7 +86,7 @@ If you use **PILLAR** in your research or project, please cite our [paper](https
 @inproceedings{pillar,
 title={PILLAR: LINDDUN Privacy Threat Modeling using LLMs},
 author={Mollaeefar, Majid, Bissoli, Andrea, Van Landuyt, Dimitri and Ranise, Silvio},
-journal={International Workshop on Privacy Engineering (IWPE'25)},
+journal={International Workshop on Privacy Engineering (IWPE25)},
 year={2025}
 }
 ```
