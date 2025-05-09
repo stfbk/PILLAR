@@ -58,15 +58,18 @@ def sidebar():
             google_api_key = ""
             mistral_api_key = ""
 
-        # Add model selection input field to the sidebar
-        model_provider = st.selectbox(
-            "Select your preferred model provider:",
-            [
+        model_options =[
                 "OpenAI API",
                 "Google AI API",
                 "Mistral API",
-                "Local LM Studio",
-            ],
+            ]
+        if "disable_local_lm_studio" not in st.secrets:
+                model_options.append("Local LM Studio")
+
+        # Add model selection input field to the sidebar
+        model_provider = st.selectbox(
+            "Select your preferred model provider:",
+            model_options,
             key="model_provider",
             help="Select the model provider you would like to use. This will determine the models available for selection.",
         )
@@ -92,14 +95,11 @@ def sidebar():
         
         # LLM configuration section, for each available LLM provider you can choose the model and insert the API key
         st.header("""Configure here the API keys and models you would like to use for the privacy threat modelling:""")
+
+
         llm_to_configure = st.selectbox(
             "Select LLM to configure:",
-            [
-                "OpenAI API",
-                "Google AI API",
-                "Mistral API",
-                "Local LM Studio",
-            ],
+            model_options,
             help="Select the model provider you would like to insert the keys for. This will determine the models available for selection.",
         )
 
