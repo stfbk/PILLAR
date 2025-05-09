@@ -130,8 +130,8 @@ def get_linddun_go(api_key, model_name, inputs, threats_to_analyze, temperature,
         
         if model_name in ["gpt-4o", "gpt-4o-mini"] or lmstudio:
             class Threat(BaseModel):
-                reply: bool
                 reason: str
+                reply: bool
             response = client.beta.chat.completions.parse(
                 model=model_name,
                 messages=messages,
@@ -296,8 +296,8 @@ def get_response_openai(client, model, temperature, system_prompt, user_prompt, 
     ]
     if model in ["gpt-4o", "gpt-4o-mini"] or lmstudio:
         class Threat(BaseModel):
-            reply: bool
             reason: str
+            reply: bool
         response = client.beta.chat.completions.parse(
             model=model,
             response_format=Threat,
@@ -411,8 +411,8 @@ def judge(keys, models, previous_analysis, temperature, lmstudio=False):
     ]
     if models["openai_model"] in ["gpt-4o", "gpt-4o-mini"] or lmstudio:
         class Threat(BaseModel):
-            reply: bool
             reason: str
+            reply: bool
         response = client.beta.chat.completions.parse(
             model=models["openai_model"] if not lmstudio else models["lmstudio_model"],
             response_format=Threat,

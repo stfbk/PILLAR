@@ -157,12 +157,21 @@ THREAT_DESCRIPTION: {description}
 LINDDUN_GO_SYSTEM_PROMPT = """
 When providing the answer, you MUST reply with a JSON object with the following structure:
 {
-    "reply": <boolean>,
     "reason": <string>
+    "reply": <boolean>,
 }
 
-When the answer to the questions is positive or indicates the presence of the threat, set the "reply" field to true. If the answer is negative or indicates the absence of the threat, set the "reply" field to false. The "reason" field should contain a string explaining why the threat is present or not.
-Ensure that the reason is specific to the application description and the question asked, referring to both of them in your response.
+When the answer to the questions is positive or indicates the presence of the
+threat, set the "reply" field to true. If the answer is negative or indicates
+the absence of the threat, set the "reply" field to false. The "reason" field
+should contain a string explaining extensively why the threat is present or
+not, and some concrete examples of how it could be exploited.
+BE VERY CRITICAL AND THOROUGH IN YOUR ANALYSIS: do not assume the threat is
+always present. ONLY set the "reply" field to true if you are mostly sure the
+threat is applicable to the system.
+Ensure that the reason is VERY SPECIFIC to the application description and the
+question asked, referring to both of them in your response and tailoring it
+accordingly.
 
 
 The input is enclosed in triple quotes.
@@ -198,17 +207,11 @@ data, or none if no database is used, in this JSON format:
 ]}
 DATA POLICY: the data policy of the application
 USER DATA CONTROL: the control the user has over their data
-QUESTIONS: the questions associated with the threat, which you need to answer
+QUESTIONS: the questions associated with the threat, which you need to answer to understand if the threat is present or not
 THREAT_TITLE: the threat title
 THREAT_DESCRIPTION: the threat description
 '''
 
-Example of expected JSON response format:
-
-{
-    "reply": true,
-    "reason": "The threat is present because the application description mentions that the application is internet facing and uses a weak authentication method."
-}
 """
 
 LINDDUN_GO_JUDGE_PROMPT="""
