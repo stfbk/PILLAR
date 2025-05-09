@@ -83,12 +83,11 @@ Here’s an outline of our upcoming features and enhancements for **PILLAR**:
 If you use **PILLAR** in your research or project, please cite our [paper](https://arxiv.org/abs/2410.08755) as follows:
 
 ```bash
-@article{pillar,
-title={PILLAR: an AI-Powered Privacy Threat Modeling Tool},
-author={Mollaeefar, Majid, Bissoli, Andrea and Ranise, Silvio},
-journal={arXiv preprint arXiv:2410.08755},
-url={https://arxiv.org/abs/2410.08755},
-year={2024}
+@inproceedings{pillar,
+title={PILLAR: LINDDUN Privacy Threat Modeling using LLMs},
+author={Mollaeefar, Majid, Bissoli, Andrea, Van Landuyt, Dimitri and Ranise, Silvio},
+journal={International Workshop on Privacy Engineering (IWPE25)},
+year={2025}
 }
 ```
 

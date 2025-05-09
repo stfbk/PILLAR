@@ -1,11 +1,11 @@
 # Copyright 2024 Fondazione Bruno Kessler
-# 
+#
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
-# 
+#
 #   https://www.apache.org/licenses/LICENSE-2.0
-# 
+#
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -14,10 +14,10 @@
 def match_color(threat_type):
     """
     This function matches the letter of a LINDDUN category to a hex color value, based on the LINDDUN color scheme.
-    
+
     Args:
         threat_type (str): The LINDDUN category, in the form of the first letter: "L", "I", "Nr", "D ", "Dd", "U" or "Nc".
-    
+
     Returns:
         str: The color associated with the category, as a hex value.
     """
@@ -45,7 +45,7 @@ def match_letter(threat_type_number):
 
     Args:
         threat_type_number (int): The LINDDUN category, in the form of a number from 1 to 7.
-    
+
     Returns:
         str: The letter associated with the category, in the form of "L", "I", "Nr", "D ", "Dd", "U" or "Nc".
     """
@@ -64,18 +64,20 @@ def match_letter(threat_type_number):
     elif threat_type_number == 7:
         return "Nc"
 
+
 def match_number_color(threat_type_number):
     """
     This function matches the number of a LINDDUN category to the specific color, based on the LINDDUN color scheme.
 
     Args:
         threat_type_number (int): The LINDDUN category, in the form of a number from 1 to 7.
-    
+
     Returns:
         str: The color associated with the category, as a hex value.
     """
     letter = match_letter(threat_type_number)
     return match_color(letter)
+
 
 def match_category_number(category):
     """
@@ -83,7 +85,7 @@ def match_category_number(category):
 
     Args:
         category (str): The LINDDUN category, in the form of "Linking", "Identifying", etc.
-    
+
     Returns:
         int: The number associated with the category, in the form of a number from 1 to 7.
     """
@@ -102,13 +104,14 @@ def match_category_number(category):
     elif category == "Non-compliance":
         return 7
 
+
 def match_number_category(threat_type_number):
     """
     This function matches the number of a LINDDUN category to the specific category.
 
     Args:
         threat_type_number (int): The LINDDUN category, in the form of a number from 1 to 7.
-    
+
     Returns:
         str: The category associated with the number, in the form of "Linking", "Identifying", etc.
     """
@@ -128,7 +131,6 @@ def match_number_category(threat_type_number):
         return "Non-compliance"
 
 
-
 def format_correct(state):
     """
     This function formats the schema in the correct format for the data
@@ -137,7 +139,7 @@ def format_correct(state):
     columns of the data editor. Thus, it transforms the DFD from a list of
     dictionaries to a dictionary of lists, or essentially from a row-based
     to a column-based format.
-    
+
     Args:
         state (list): The DFD in the format of a list of dictionaries, with
             each dictionary representing a row of the data editor. Each dictionary
@@ -147,9 +149,9 @@ def format_correct(state):
             keys as the elements in the list of dictionaries, where each list
             represents a column of the data editor.
     """
-    
+
     # Extract keys directly from the first dictionary in the state list
     keys = state[0].keys()
-    
+
     # Use dictionary comprehension and zip to transpose the list of dictionaries
     return {key: [d[key] for d in state] for key in keys}

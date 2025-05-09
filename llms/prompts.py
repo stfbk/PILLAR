@@ -85,32 +85,36 @@ introduce it in your reasoning out loud.
 """,
 ]
 def LINDDUN_GO_PREVIOUS_ANALYSIS_PROMPT(previous_analysis):
-	return f"""
+    return f"""
 I will provide you the detailed opinions and reasoning steps from your team,
 which has already analyzed the threat based on the questions. Use these
 reasonings as additional advice critically, note that they may be wrong. Do not
-copy other’s entire answer, modify the part you believe is wrong if you think
+copy other's entire answer, modify the part you believe is wrong if you think
 it is necessary, otherwise elaborate on it and why you think it is correct.
 This is the previous analysis from your team:
-'''
-{f"The Domain Expert thinks the threat is {"" if previous_analysis[0]["reply"] else "not "} present because {previous_analysis[0]["reason"]}." if previous_analysis[0] else ""}
-{f"The System Architect thinks the threat is {"" if previous_analysis[1]["reply"] else "not "} present because {previous_analysis[1]["reason"]}." if previous_analysis[1] else ""}
-{f"The Software Developer thinks the threat is {"" if previous_analysis[2]["reply"] else "not "} present because {previous_analysis[2]["reason"]}." if previous_analysis[2] else ""}
-{f"The Data Protection Officer thinks the threat is {"" if previous_analysis[3]["reply"] else "not "} present because {previous_analysis[3]["reason"]}." if previous_analysis[3] else ""}
-{f"The Legal Expert thinks the threat is {"" if previous_analysis[4]["reply"] else "not "} present because {previous_analysis[4]["reason"]}." if previous_analysis[4] else ""}
-{f"The Chief Information Security Officer thinks the threat is {"" if previous_analysis[5]["reply"] else "not "} present because {previous_analysis[5]["reason"]}." if previous_analysis[5] else ""}
-'''
-	"""
+
+{f"The Domain Expert thinks the threat is {'present' if previous_analysis[0]['reply'] else 'not present'} because {previous_analysis[0]['reason']}." if previous_analysis[0] else ""}
+
+{f"The System Architect thinks the threat is {'present' if previous_analysis[1]['reply'] else 'not present'} because {previous_analysis[1]['reason']}." if previous_analysis[1] else ""}
+
+{f"The Software Developer thinks the threat is {'present' if previous_analysis[2]['reply'] else 'not present'} because {previous_analysis[2]['reason']}." if previous_analysis[2] else ""}
+
+{f"The Data Protection Officer thinks the threat is {'present' if previous_analysis[3]['reply'] else 'not present'} because {previous_analysis[3]['reason']}." if previous_analysis[3] else ""}
+
+{f"The Legal Expert thinks the threat is {'present' if previous_analysis[4]['reply'] else 'not present'} because {previous_analysis[4]['reason']}." if previous_analysis[4] else ""}
+
+{f"The Chief Information Security Officer thinks the threat is {'present' if previous_analysis[5]['reply'] else 'not present'} because {previous_analysis[5]['reason']}." if previous_analysis[5] else ""}
+"""
 
 def LINDDUN_GO_USER_PROMPT(inputs, question, title, description):
 	if not inputs["dfd_only"]:
 
 		prompt =  f"""
-'''
+
 APPLICATION TYPE: {inputs["app_type"]}
 TYPES OF DATA: {inputs["types_of_data"]}
 APPLICATION DESCRIPTION: {inputs["app_description"]}
-{f"""
+{f'''
 The user has also provided a Data Flow Diagram to describe the application.
 The DFD is described as a list of edges, connecting the "from" node to the
 "to" node. "typefrom" and "typeto" describe the type of the node, which can be
@@ -123,7 +127,8 @@ provided:
 And this is the dictionary containing the trust boundaries:
 each boundary has "id", "name", "description", and "color" keys.
 {inputs["boundaries"]}
-""" if inputs["use_dfd"] else ""}
+''' if inputs["use_dfd"] else ""}
+
 DATABASE_SCHEMA: {inputs["database"]}
 DATA POLICY: {inputs["data_policy"]}
 USER DATA CONTROL: {inputs["user_data_control"]}
@@ -366,7 +371,7 @@ def THREAT_MODEL_USER_PROMPT(
 APPLICATION TYPE: {inputs["app_type"]}
 TYPES OF DATA: {inputs["types_of_data"]}
 APPLICATION DESCRIPTION: {inputs["app_description"]}
-{f"""
+{f'''
 The user has also provided a Data Flow Diagram to describe the application.
 The DFD is described as a list of edges, connecting the "from" node to the
 "to" node. "typefrom" and "typeto" describe the type of the node, which can be
@@ -379,7 +384,9 @@ provided:
 And this is the dictionary containing the trust boundaries:
 each boundary has "id", "name", "description", and "color" keys.
 {inputs["boundaries"]}
-""" if inputs["use_dfd"] else ""}
+
+''' if inputs["use_dfd"] else ""}
+
 DATABASE SCHEMA: {inputs["database"]}
 DATA POLICY: {inputs["data_policy"]}
 USER DATA CONTROL: {inputs["user_data_control"]}
