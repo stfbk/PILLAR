@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import streamlit as st
+import lmstudio as lms
+from lmstudio import DownloadedLlm
 
 def sidebar():
         
@@ -56,14 +58,18 @@ def sidebar():
             google_api_key = ""
             mistral_api_key = ""
 
-        # Add model selection input field to the sidebar
-        model_provider = st.selectbox(
-            "Select your preferred model provider:",
-            [
+        model_options =[
                 "OpenAI API",
                 "Google AI API",
                 "Mistral API",
-            ],
+            ]
+        if "disable_local_lm_studio" not in st.secrets:
+                model_options.append("Local LM Studio")
+
+        # Add model selection input field to the sidebar
+        model_provider = st.selectbox(
+            "Select your preferred model provider:",
+            model_options,
             key="model_provider",
             help="Select the model provider you would like to use. This will determine the models available for selection.",
         )
@@ -89,13 +95,11 @@ def sidebar():
         
         # LLM configuration section, for each available LLM provider you can choose the model and insert the API key
         st.header("""Configure here the API keys and models you would like to use for the privacy threat modelling:""")
+
+
         llm_to_configure = st.selectbox(
             "Select LLM to configure:",
-            [
-                "OpenAI API",
-                "Google AI API",
-                "Mistral API",
-            ],
+            model_options,
             help="Select the model provider you would like to insert the keys for. This will determine the models available for selection.",
         )
 
@@ -131,6 +135,23 @@ def sidebar():
                 if mistral_api_key_input:
                     mistral_api_key = mistral_api_key_input
                 st.session_state["keys"]["mistral_api_key"] = mistral_api_key
+                
+                
+            if llm_to_configure == "Local LM Studio":
+                st.markdown(
+                    """
+                Local LM Studio is a feature that allows you to run the models on your own machine. 
+                To use this feature, you need to have the models installed on your machine and running PILLAR locally.
+                """)
+                available_models = lms.list_downloaded_models()
+                
+                lmstudio_model = st.selectbox(
+                    "LM Studio model:",
+                    [model.model_key for model in filter(lambda x: isinstance(x, DownloadedLlm), available_models)],
+                )
+                if lmstudio_model != st.session_state["lmstudio_model"]:
+                    st.session_state["lmstudio_model"] = lmstudio_model
+
 
         with c2:
             if llm_to_configure == "OpenAI API":
@@ -155,6 +176,15 @@ def sidebar():
                 )
                 if mistral_model != st.session_state["mistral_model"]:
                     st.session_state["mistral_model"] = mistral_model
+            if llm_to_configure == "Local LM Studio":
+                if st.button("Load"):
+                    lms.llm(lmstudio_model)
+                    st.session_state["lmstudio_loaded"] = True
+                if st.button("Unload"):
+                    model = lms.llm(lmstudio_model)
+                    model.unload()
+                    st.session_state["lmstudio_loaded"] = False
+            
 
         st.markdown("""---""")
         

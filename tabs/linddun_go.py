@@ -50,23 +50,29 @@ is made by a judge LLM, which evaluates the opinions proposed by the experts.
         if st.session_state["keys"]["google_api_key"] and st.session_state["google_model"]:
             available_llms.append("Google AI API")
         
-        llms_to_use = st.multiselect(
-            "Select the LLMs to use",
-            available_llms,
-            default=[available_llms[0]] if available_llms else [],
-            help="Select the LLM providers to use for the multi-agent simulation, if you want to have multiple ones.",
-            disabled=not multiagent_linddun_go,
-        )
+        if st.session_state["model_provider"] == "Local LM Studio":
+            llms_to_use = ["Local LM Studio"]
+        else: 
+            llms_to_use = st.multiselect(
+                "Select the LLMs to use",
+                available_llms,
+                default=[available_llms[0]] if available_llms else [],
+                help="Select the LLM providers to use for the multi-agent simulation, if you want to have multiple ones.",
+                disabled=not multiagent_linddun_go,
+            )
     with c2:
         linddun_go_submit_button = st.button(label="Simulate LINDDUN Go", help="Simulate the LINDDUN Go process to identify privacy threats.", disabled=not st.session_state["input"]["app_description"] and not st.session_state["dfd_only"])
     
 
     if linddun_go_submit_button: 
         inputs = st.session_state["input"]
+        inputs["boundaries"] = st.session_state["boundaries"]
         threats = []
         # Show a spinner while generating the attack tree
         with st.spinner("Answering questions..."):
             try:
+                if st.session_state["model_provider"] == "Local LM Studio" and not st.session_state["lmstudio_loaded"]:
+                    raise Exception("No model loaded from LMStudio, use the sidebar to load one.")
                 if multiagent_linddun_go:
                     if not llms_to_use:
                         raise ValueError("Please select at least one LLM to use.")
@@ -76,12 +82,14 @@ is made by a judge LLM, which evaluates the opinions proposed by the experts.
                             "openai_model": st.session_state["openai_model"],
                             "mistral_model": st.session_state["mistral_model"],
                             "google_model": None,
+                            "lmstudio_model": st.session_state["lmstudio_model"],
                         },
                         inputs, 
                         st.session_state["temperature"],
                         rounds, 
                         threats_to_analyze,
                         llms_to_use,
+                        lmstudio=st.session_state["model_provider"] == "Local LM Studio",
                     )
                 elif st.session_state["model_provider"] == "OpenAI API":
                     threats = get_linddun_go(
@@ -90,6 +98,15 @@ is made by a judge LLM, which evaluates the opinions proposed by the experts.
                         inputs,
                         threats_to_analyze,
                         st.session_state["temperature"],
+                    )
+                elif st.session_state["model_provider"] == "Local LM Studio":
+                    threats = get_linddun_go(
+                        st.session_state["keys"]["openai_api_key"], 
+                        st.session_state["lmstudio_model"], 
+                        inputs,
+                        threats_to_analyze,
+                        st.session_state["temperature"],
+                        lmstudio=True,
                     )
             except Exception as e:
                 st.error(f"Error generating simulation: {e}")

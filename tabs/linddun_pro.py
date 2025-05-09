@@ -46,14 +46,22 @@ Finally, click the button below to generate the LINDDUN Pro threat modeling.
             key="edge_num"
         )
         # Display the selected edge
-        st.markdown(f"{st.session_state['input']['dfd'][st.session_state['edge_num']]['from']} -> DF{st.session_state['edge_num']} -> {st.session_state['input']['dfd'][st.session_state['edge_num']]['to']}")
+        st.markdown(f"{st.session_state["input"]["dfd"][st.session_state["edge_num"]]["from"]} -> DF{st.session_state["edge_num"]} -> {st.session_state["input"]["dfd"][st.session_state['edge_num']]["to"]}")
         st.multiselect("Select the LINDDUN threat categories to look for",
             ["Linking", "Identifying", "Non-repudiation", "Detecting", "Data disclosure", "Unawareness and unintervenability", "Non-compliance"],
             help="Select the LINDDUN threat categories to look for in the threat model.",
             key="threat_categories"
         )
-        st.text_area("Data flow description", help="Describe in detail the data flow for the selected edge.", key="data_flow_description", placeholder="Explain what is transferred between source and destination and how it is processed.")
-        if st.button("Analyze"):
+        st.text_area(
+            "Data flow description",
+            help="Describe in detail the data flow for the selected edge.",
+            key="data_flow_description",
+            value=st.session_state["input"]["dfd"][st.session_state["edge_num"]]["description"],
+            placeholder="Explain what is transferred between source and destination and how it is processed.",
+            on_change=lambda: st.session_state["input"]["dfd"][st.session_state["edge_num"]].update({"description": st.session_state["data_flow_description"]})
+        )
+        print(st.session_state["data_flow_description"])
+        if st.button("Analyze", disabled=not st.session_state["dfd_generated"] or not st.session_state["threat_categories"]):
             with st.spinner("Eliciting threats in the data flow..."):
                 # Get the LINDDUN Pro threats for the selected edge, for each selected category
                 for category in st.session_state["threat_categories"]:
@@ -63,7 +71,7 @@ Finally, click the button below to generate the LINDDUN Pro threat modeling.
                             st.session_state["input"]["dfd"],
                             st.session_state["input"]["dfd"][st.session_state["edge_num"]],
                             category,
-                            st.session_state["data_flow_description"],
+                            st.session_state["boundaries"],
                             st.session_state["temperature"],
                         )
                     new_threat["edge"] = st.session_state["input"]["dfd"][st.session_state["edge_num"]]
