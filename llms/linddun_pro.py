@@ -79,7 +79,7 @@ def mapping_table(edge, category):
     return (True, True, True)
 
 
-def get_linddun_pro(api_key, model, dfd, edge, category, description, temperature):
+def get_linddun_pro(api_key, model, dfd, edge, category, boundaries, temperature):
     """
     This function generates a LINDDUN Pro threat model from the information provided.
     
@@ -92,9 +92,15 @@ def get_linddun_pro(api_key, model, dfd, edge, category, description, temperatur
             - to: string. The entity where the data flow ends
             - typeto: string. The type of the entity where the data flow ends
             - trusted: bool. Whether the data flow is trusted
+            - boundary: string. The trust boundary id of the data flow
+            - description: string. The description of the data flow
         - edge (dict): The specific edge of the DFD to find threats for. The dictionary has the same keys as the DFD.
         - category (str): The LINDDUN category to look for in the threat model, in the format "Linking", "Identifying", etc.
-        - description (str): A brief description of the data flow.
+        - boundaries (dict): The trust boundaries of the application. The dictionary has the following keys:
+            - id: string. The ID of the trust boundary.
+            - title: string. The title of the trust boundary.
+            - description: string. The description of the trust
+            - color: string. The color of the trust boundary.
         - temperature (float): The temperature to use for the model.
     
     Returns:
@@ -124,7 +130,7 @@ def get_linddun_pro(api_key, model, dfd, edge, category, description, temperatur
         },
         {
             "role": "user", 
-            "content": LINDDUN_PRO_USER_PROMPT(dfd, edge, category, description, source, data_flow, destination, tree),
+            "content": LINDDUN_PRO_USER_PROMPT(dfd, edge, category, source, data_flow, destination, boundaries, tree),
         },
     ]
     

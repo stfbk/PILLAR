@@ -13,8 +13,7 @@
 # limitations under the License.
 import json
 import google.generativeai as genai
-from mistralai.client import MistralClient
-from mistralai.models.chat_completion import ChatMessage
+from mistralai import Mistral
 from openai import OpenAI
 from misc.utils import (
 		match_color,
@@ -50,7 +49,7 @@ def threat_model_gen_markdown(threat_model):
 
 	return markdown_output
 
-def get_threat_model_openai(api_key, model_name, prompt, temperature):
+def get_threat_model_openai(api_key, model_name, prompt, temperature, lmstudio=False):
 	"""
 	This function generates a simple LINDDUN threat model from the prompt.
 	
@@ -68,7 +67,10 @@ def get_threat_model_openai(api_key, model_name, prompt, temperature):
 			- Reason: string. The reason for the threat.
 	"""
 
-	client = OpenAI(api_key=api_key)
+	if lmstudio:
+		client = OpenAI(base_url="http://localhost:1234/v1", api_key="lm-studio")
+	else:
+		client = OpenAI(api_key=api_key)
 	messages=[
 			{
 					"role": "system",
@@ -165,14 +167,14 @@ def get_threat_model_mistral(mistral_api_key, mistral_model, prompt, temperature
 			- Scenario: string. The scenario where the threat occurs.
 			- Reason: string. The reason for the threat.
 	"""
-	client = MistralClient(api_key=mistral_api_key)
+	client = Mistral(api_key=mistral_api_key)
 
-	response = client.chat(
+	response = client.chat.complete(
 		model=mistral_model,
 		response_format={"type": "json_object"},
 		messages=[
-			ChatMessage(role="system", content=THREAT_MODEL_SYSTEM_PROMPT),
-			ChatMessage(role="user", content=prompt),
+			{ "role": "system", "content": THREAT_MODEL_SYSTEM_PROMPT},
+			{"role":"user", "content":prompt},
 		],
 		max_tokens=4096,
 		temperature=temperature,

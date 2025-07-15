@@ -118,10 +118,17 @@ APPLICATION DESCRIPTION: {inputs["app_description"]}
 The user has also provided a Data Flow Diagram to describe the application.
 The DFD is described as a list of edges, connecting the "from" node to the
 "to" node. "typefrom" and "typeto" describe the type of the node, which can be
-an Entity, Process, or Data store. "trusted" indicates whether the edge stays
-inside or outside the trusted boundary. This is the DFD provided:
+an Entity, Process, or Data store. "trusted" indicates whether the edge's data
+flow is trusted. "boundary" indicates the boundary id of the trust boundary the
+source belongs to. "description" describes the data flow. This is the DFD
+provided:
 {inputs["dfd"]}
+
+And this is the dictionary containing the trust boundaries:
+each boundary has "id", "name", "description", and "color" keys.
+{inputs["boundaries"]}
 ''' if inputs["use_dfd"] else ""}
+
 DATABASE_SCHEMA: {inputs["database"]}
 DATA POLICY: {inputs["data_policy"]}
 USER DATA CONTROL: {inputs["user_data_control"]}
@@ -136,9 +143,15 @@ THREAT_DESCRIPTION: {description}
 The user has provided only a Data Flow Diagram to describe the application.
 The DFD is described as a list of edges, connecting the "from" node to the
 "to" node. "typefrom" and "typeto" describe the type of the node, which can be
-an Entity, Process, or Data store. "trusted" indicates whether the edge stays
-inside or outside the trusted boundary. This is the DFD provided:
+an Entity, Process, or Data store. "trusted" indicates whether the edge's data
+flow is trusted. "boundary" indicates the boundary id of the trust boundary the
+source belongs to. "description" describes the data flow. This is the DFD provided:
 {inputs["dfd"]}
+
+And this is the dictionary containing the trust boundaries:
+each boundary has "id", "name", "description", and "color" keys.
+{inputs["boundaries"]}
+
 QUESTIONS: {question}
 THREAT_TITLE: {title}
 THREAT_DESCRIPTION: {description}
@@ -149,12 +162,21 @@ THREAT_DESCRIPTION: {description}
 LINDDUN_GO_SYSTEM_PROMPT = """
 When providing the answer, you MUST reply with a JSON object with the following structure:
 {
-    "reply": <boolean>,
     "reason": <string>
+    "reply": <boolean>,
 }
 
-When the answer to the questions is positive or indicates the presence of the threat, set the "reply" field to true. If the answer is negative or indicates the absence of the threat, set the "reply" field to false. The "reason" field should contain a string explaining why the threat is present or not.
-Ensure that the reason is specific to the application description and the question asked, referring to both of them in your response.
+When the answer to the questions is positive or indicates the presence of the
+threat, set the "reply" field to true. If the answer is negative or indicates
+the absence of the threat, set the "reply" field to false. The "reason" field
+should contain a string explaining extensively why the threat is present or
+not, and some concrete examples of how it could be exploited.
+BE VERY CRITICAL AND THOROUGH IN YOUR ANALYSIS: do not assume the threat is
+always present. ONLY set the "reply" field to true if you are mostly sure the
+threat is applicable to the system.
+Ensure that the reason is VERY SPECIFIC to the application description and the
+question asked, referring to both of them in your response and tailoring it
+accordingly.
 
 
 The input is enclosed in triple quotes.
@@ -163,7 +185,7 @@ Example input format:
 
 '''
 APPLICATION TYPE: Web | Mobile | Desktop | Cloud | IoT | Other application
-AUTHENTICATION METHODS: SSO | MFA | OAUTH2 | Basic | None
+TYPES OF DATA: PII, Financial, Health, User activity, Sensitive, Geolocation, Other
 APPLICATION DESCRIPTION: the general application description, sometimes with a Data Flow Diagram
 DATABASE SCHEMA: the database schema used by the application to contain the
 data, or none if no database is used, in this JSON format:
@@ -190,17 +212,11 @@ data, or none if no database is used, in this JSON format:
 ]}
 DATA POLICY: the data policy of the application
 USER DATA CONTROL: the control the user has over their data
-QUESTIONS: the questions associated with the threat, which you need to answer
+QUESTIONS: the questions associated with the threat, which you need to answer to understand if the threat is present or not
 THREAT_TITLE: the threat title
 THREAT_DESCRIPTION: the threat description
 '''
 
-Example of expected JSON response format:
-
-{
-    "reply": true,
-    "reason": "The threat is present because the application description mentions that the application is internet facing and uses a weak authentication method."
-}
 """
 
 LINDDUN_GO_JUDGE_PROMPT="""
@@ -270,6 +286,23 @@ present in the application. It is very important that your responses are
 tailored to reflect the details you are given. You MUST include all threat
 categories at least three times, and as many times you can.
 
+The scenario and reason should be very detailed, referring VERY CLOSELY to the
+application described and the data types and flows. BE FOCUSED ON THE
+APPLICATION DESCRIBED TO YOU, EVEN REFERRING TO SPECIFIC FEATURES OF IT. THE
+THREAT MODEL SHOULD NOT BE GENERALLY APPLIABLE TO ANY SIMILAR APPLICATION, BUT
+TAILOR-MADE FOR THE SPECIFIC ONE. You can go into as much technical detail as
+you want, but make sure that the threats are credible and relevant to the
+application description, describing both what the threat is and why it is a
+threat.
+
+In the scenario, craft an actual example of what could happen in the
+application to realize the threat.
+In the reason, explain why the scenario is a threat to the application,
+referring to the application description and data types and flows and what
+consequence the threat could have.
+In both sections, you should write AT LEAST three to four sentences to provide a
+comprehensive threat model for the application.
+
 
 The input is enclosed in triple quotes.
 
@@ -277,7 +310,7 @@ Example input format:
 
 '''
 APPLICATION TYPE: Web | Mobile | Desktop | Cloud | IoT | Other application
-AUTHENTICATION METHODS: SSO | MFA | OAUTH2 | Basic | None
+TYPES OF DATA: PII, Financial, Health, User activity, Sensitive, Geolocation, Other
 APPLICATION DESCRIPTION: the general application description, sometimes with a Data Flow Diagram
 DATABASE SCHEMA: the database schema used by the application to contain the
 data, or none if no database is used, in this JSON format:
@@ -342,10 +375,18 @@ APPLICATION DESCRIPTION: {inputs["app_description"]}
 The user has also provided a Data Flow Diagram to describe the application.
 The DFD is described as a list of edges, connecting the "from" node to the
 "to" node. "typefrom" and "typeto" describe the type of the node, which can be
-an Entity, Process, or Data store. "trusted" indicates whether the edge stays
-inside or outside the trusted boundary. This is the DFD provided:
+an Entity, Process, or Data store. "trusted" indicates whether the edge's data
+flow is trusted. "boundary" indicates the boundary id of the trust boundary the
+source belongs to. "description" describes the data flow. This is the DFD
+provided:
 {inputs["dfd"]}
+
+And this is the dictionary containing the trust boundaries:
+each boundary has "id", "name", "description", and "color" keys.
+{inputs["boundaries"]}
+
 ''' if inputs["use_dfd"] else ""}
+
 DATABASE SCHEMA: {inputs["database"]}
 DATA POLICY: {inputs["data_policy"]}
 USER DATA CONTROL: {inputs["user_data_control"]}
@@ -357,9 +398,14 @@ USER DATA CONTROL: {inputs["user_data_control"]}
 The user has provided only a Data Flow Diagram to describe the application.
 The DFD is described as a list of edges, connecting the "from" node to the
 "to" node. "typefrom" and "typeto" describe the type of the node, which can be
-an Entity, Process, or Data store. "trusted" indicates whether the edge stays
-inside or outside the trusted boundary. This is the DFD provided:
+an Entity, Process, or Data store. "trusted" indicates whether the edge's data
+flow is trusted. "boundary" indicates the boundary id of the trust boundary the
+source belongs to. "description" describes the data flow. This is the DFD provided:
 {inputs["dfd"]}
+
+And this is the dictionary containing the trust boundaries:
+each boundary has "id", "name", "description", and "color" keys.
+{inputs["boundaries"]}
 '''
 """
 	return prompt
@@ -379,17 +425,12 @@ Keep in mind these guidelines for DFDs:
 6. Data memorized in a system has to go through a process
 7. All processes flow either to a data store or to another process
 
-You can also include a trusted boundary in the DFD to represent the system's
-security perimeter. The trusted boundary should encompass all the entities,
-processes, and data stores that are considered secure and trusted.
-To specify it, add a "trusted" attribute to the edges in the DFD, set to True
-if the edge is inside the trusted boundary, and False if it traverses it.
 
 The input is going to be structured as follows, enclosed in triple quotes:
 
 '''
 APPLICATION TYPE: Web | Mobile | Desktop | Cloud | IoT | Other application
-AUTHENTICATION METHODS: SSO | MFA | OAUTH2 | Basic | None
+TYPES OF DATA: PII, Financial, Health, User activity, Sensitive, Geolocation, Other
 APPLICATION DESCRIPTION: the general application description, sometimes with a Data Flow Diagram
 DATABASE SCHEMA: the database schema used by the application to contain the
 data, or none if no database is used, in this JSON format:
@@ -418,24 +459,97 @@ DATA POLICY: the data policy of the application
 USER DATA CONTROL: the control the user has over their data
 '''
 
-You MUST reply with a json-formatted list of dictionaries under the "dfd"
-attribute, where each dictionary represents an edge in the DFD. The response
-MUST have the following structure:
-{
-    "dfd": [
-        {
-            "from": "source_node",
-            "typefrom": "Entity/Process/Data store",
-            "to": "destination_node",
-            "typeto": "Entity/Process/Data store",
-			"trusted": True/False
-        },
-        //// other edges description....
-    ]
-}
-Provide a comprehensive list, including as many nodes of the application as possible.
-                """
+Analyze the application description to create a Data Flow Diagram (DFD) with security boundaries.
 
+You MUST reply with a json-formatted object with two keys, "boundaries"
+and "dfd", each containing a list of dictionaries where each dictionary
+represents a boundary or an edge in the DFD. The response MUST have the
+following structure:
+
+1. A 'dfd' key containing an array of edges:
+	Each edge should have:
+	- "from": The source component name
+	- "typefrom": The source component type ("Entity", "Process", or "Data store")
+	- "to": The destination component name
+	- "typeto": The destination component type ("Entity", "Process", or "Data store")
+	- "trusted": Boolean indicating if the flow stays within the same boundary
+	- "boundary": The boundary ID this component belongs to
+	- "description": A description of the data flow, around 2 sentences, used for LINDDUN Pro threat modelling. It should explain which data is flowing between the components and why.
+
+2. A 'boundaries' key containing an array of boundary definitions:
+	Each boundary should have:
+	- "id": A unique identifier (e.g., "boundary_1", "boundary_2", etc.)
+	- "name": A descriptive name (e.g., "Internet", "DMZ", "Internal Network", "Database Zone")
+	- "description": A brief description of the security context
+	- "color": A hex color code (e.g., "#00a6fb". Do not use the same color for different boundaries, and do not use red)
+
+
+Example response format (only the format is relevant, you can freely choose the data for the DFD and boundaries):
+{
+	"dfd": [
+	{
+		"from": "User",
+		"typefrom": "Entity",
+		"to": "Web Application",
+		"typeto": "Process",
+		"trusted": false,
+		"boundary": "boundary_2",
+		"description": "User data is sent to the Web Application for processing."
+	},
+	{
+		"from": "Web Application",
+		"typefrom": "Process",
+		"to": "Database",
+		"typeto": "Data store",
+		"trusted": true,
+		"boundary": "boundary_1",
+		"description": "The Web Application stores the processed data in the Database."
+	},
+	......
+	]
+	"boundaries": [
+	{
+		"id": "boundary_1",
+		"name": "boundary_name",
+		"description": "boundary_description",
+		"color": "#boundary_color"
+	},
+	{
+		"id": "boundary_2",
+		"name": "boundary_name",
+		"description": "boundary_description",
+		"color": "#boundary_color"
+	},
+	.....
+	],
+}
+
+Follow these rules:
+- Create as many boundaries as needed to represent the security zones in the application
+- Every component must belong to exactly one boundary
+- Data stores must have at least one incoming and one outgoing flow
+- Processes must have at least one incoming and one outgoing flow
+- Entities should not connect directly to data stores
+- Use descriptive names for all components and boundaries
+- Do NOT include any boundaries which are not used in the DFD section
+
+Provide a comprehensive list, including as many nodes of the application as possible.
+"""
+
+def DFD_USER_PROMPT(
+		inputs
+):
+	prompt = f"""
+'''
+APPLICATION TYPE: {inputs["app_type"]}
+TYPES OF DATA: {inputs["types_of_data"]}
+APPLICATION DESCRIPTION: {inputs["app_description"]}
+DATABASE SCHEMA: {inputs["database"]}
+DATA POLICY: {inputs["data_policy"]}
+USER DATA CONTROL: {inputs["user_data_control"]}
+'''
+"""
+	return prompt
 
 DFD_IMAGE_SYSTEM_PROMPT = """
 You are a senior system architect with more than 20 years of
@@ -446,31 +560,76 @@ threat modelling can be executed upon it.
 The input is an image which already contains the architecture of the application as a DFD.
 You have to analyze the image and provide the Data Flow Diagram (DFD) for the application, as a JSON structure.
 
-You should also include a trusted boundary in the DFD to represent the system's
-security perimeter, which should be indicated in the image. To specify it, add
-a "trusted" attribute to the edges in the DFD, set to True if the edge is
-inside the trusted boundary, and False if it traverses it.
-
-You MUST reply with a json-formatted list of dictionaries under the "dfd"
-attribute, where each dictionary represents an edge in the DFD. The response
-MUST have the following structure:
-{
-    "dfd": [
-        {
-            "from": "source_node",
-            "typefrom": "Entity/Process/Data store",
-            "to": "destination_node",
-            "typeto": "Entity/Process/Data store",
-			"trusted": True/False
-        },
-        //// other edges description....
-    ]
-}
-
 Be very precise and detailed in your response, providing the DFD as accurately
 as possible, following exactly what is shown in the image.
 Avoid adding multiple edges between the same nodes, and ensure that the
 directionality of the edges is correct. 
+
+You MUST reply with a json-formatted object with two keys, "boundaries"
+and "dfd", each containing a list of dictionaries where each dictionary
+represents a boundary or an edge in the DFD. The response MUST have the
+following structure:
+    
+
+1. A 'dfd' key containing an array of edges:
+	Each edge should have:
+	- "from": The source component name
+	- "typefrom": The source component type ("Entity", "Process", or "Data store")
+	- "to": The destination component name
+	- "typeto": The destination component type ("Entity", "Process", or "Data store")
+	- "trusted": Boolean indicating if the flow stays within the same boundary
+	- "boundary": The boundary ID this component belongs to
+	- "description": A description of the data flow, around 2 sentences, used for LINDDUN Pro threat modelling. It should explain which data is flowing between the components and why.
+
+2. A 'boundaries' key containing an array of boundary definitions:
+	Each boundary should have:
+	- "id": A unique identifier (e.g., "boundary_1", "boundary_2", etc.)
+	- "name": A descriptive name (e.g., "Internet", "DMZ", "Internal Network", "Database Zone")
+	- "description": A brief description of the security context
+	- "color": A hex color code (e.g., "#00a6fb". Do not use the same color for different boundaries, and do not use red)
+
+Example response format (only the format is relevant, you can freely choose the data for the DFD and boundaries):
+{
+	"dfd": [
+	{
+		"from": "User",
+		"typefrom": "Entity",
+		"to": "Web Application",
+		"typeto": "Process",
+		"trusted": false,
+		"boundary": "boundary_2",
+		"description": "User data is sent to the Web Application for processing."
+	},
+	{
+		"from": "Web Application",
+		"typefrom": "Process",
+		"to": "Database",
+		"typeto": "Data store",
+		"trusted": true,
+		"boundary": "boundary_1",
+		"description": "The Web Application stores the processed data in the Database."
+	},
+	......
+	]
+	"boundaries": [
+	{
+		"id": "boundary_1",
+		"name": "boundary_name",
+		"description": "boundary_description",
+		"color": "#boundary_color"
+	},
+	{
+		"id": "boundary_2",
+		"name": "boundary_name",
+		"description": "boundary_description",
+		"color": "#boundary_color"
+	},
+	.....
+	],
+}
+
+Identify all boundaries visible in the image and assign components to the appropriate boundaries.
+Do NOT include any boundaries which are not used in the DFD section
 """
 
 
@@ -516,13 +675,19 @@ recipient does with that data triggers the threat
 
 The input is structured as follows, enclosed in triple quotes:
 '''
-DFD: The Data Flow Diagram for the whole application, represented as a list of dictionaries with the keys "from", "typefrom", "to", "typeto" and "trusted", representing each edge.
-EDGE: {"from": "source_node", "typefrom": "source_type", "to": "destination_node", "typeto": "destination_type", "trusted": True/False}
+DFD: The Data Flow Diagram for the whole application, represented as a list of dictionaries with the keys "from", "typefrom", "to", "typeto", "trusted", "boundary" and "description", representing each edge.
+EDGE: {"from": "source_node", "typefrom": "source_type", "to": "destination_node", "typeto": "destination_type", "trusted": True/False, "boundary": "boundary_id", "description": "edge_description"}
 CATEGORY: The specific LINDDUN threat category you should analyze for the edge.
-DESCRIPTION: A detailed description of the data flow for the edge.
 SOURCE: A boolean, indicating whether you should analyze the source node for the edge.
 DATA FLOW: A boolean, indicating whether you should analyze the data flow for the edge.
 DESTINATION: A boolean, indicating whether you should analyze the destination node for the edge.
+BOUNDARIES: The boundaries of the DFD, in this JSON format:
+{
+	'id': 'boundary_1',
+	'name': 'Boundary 1',
+	'description': 'Description of the boundary',
+	'color': '#00a6fb'
+}
 THREAT TREE: The threat tree you should follow for the threat elicitation process, in this JSON format:
 {
 	"id": "The node id",
@@ -549,6 +714,8 @@ THREAT TREE: The threat tree you should follow for the threat elicitation proces
 }
 '''
 
+In your analysis, you should take into account the whole dfd and the specified trust boundaries, but focus on finding the threats for the specific edge provided.
+
 The output MUST be a JSON response with the following structure, with each explanation about 200 words long, and each path shall NOT jump over a node in the tree (i.e., after DD.1 there can only be DD.1.1, DD.1.2, etc. but not DD.1.2.3 right away):
 
 {
@@ -564,16 +731,16 @@ The output MUST be a JSON response with the following structure, with each expla
 }
                 """
 
-def LINDDUN_PRO_USER_PROMPT(dfd, edge, category, description, source, data_flow, destination, threat_tree):
+def LINDDUN_PRO_USER_PROMPT(dfd, edge, category, source, data_flow, destination, boundaries, threat_tree):
 	return f"""
 	'''
 	DFD: {dfd}
 	EDGE: {{ "from": {edge["from"]}, "typefrom": {edge["typefrom"]}, "to": {edge["to"]}, "typeto": {edge["typeto"]} }}
 	CATEGORY: {category}
-	DESCRIPTION: {description}
 	SOURCE: {source}
 	DATA FLOW: {data_flow}
 	DESTINATION: {destination}
+	BOUNDARIES: {boundaries}
 	THREAT TREE: {threat_tree}
 	'''
 	"""
@@ -591,7 +758,7 @@ threat.
 The input is structured as follows, enclosed in triple quotes:
 '''
 APPLICATION TYPE: Web | Mobile | Desktop | Cloud | IoT | Other application
-AUTHENTICATION METHODS: SSO | MFA | OAUTH2 | Basic | None
+TYPES OF DATA: PII, Financial, Health, User activity, Sensitive, Geolocation, Other
 APPLICATION DESCRIPTION: the general application description, sometimes with a Data Flow Diagram
 DATABASE SCHEMA: the database schema used by the application to contain the
 data, or none if no database is used, in this JSON format:
@@ -647,7 +814,7 @@ providing a clear understanding of the threat and the possible mitigation strate
 The input is structured as follows, enclosed in triple quotes:
 '''
 APPLICATION TYPE: Web | Mobile | Desktop | Cloud | IoT | Other application
-AUTHENTICATION METHODS: SSO | MFA | OAUTH2 | Basic | None
+TYPES OF DATA: PII, Financial, Health, User activity, Sensitive, Geolocation, Other
 APPLICATION DESCRIPTION: the general application description, sometimes with a Data Flow Diagram
 DATABASE SCHEMA: the database schema used by the application to contain the
 data, or none if no database is used, in this JSON format:
@@ -716,7 +883,7 @@ You should also suggest how to implement the chosen patterns in the application.
 The input is structured as follows, enclosed in triple quotes:
 '''
 APPLICATION TYPE: Web | Mobile | Desktop | Cloud | IoT | Other application
-AUTHENTICATION METHODS: SSO | MFA | OAUTH2 | Basic | None
+TYPES OF DATA: PII, Financial, Health, User activity, Sensitive, Geolocation, Other
 APPLICATION DESCRIPTION: the general application description, sometimes with a Data Flow Diagram
 DATABASE SCHEMA: the database schema used by the application to contain the
 data, or none if no database is used, in this JSON format:

@@ -49,6 +49,7 @@ list of potential threats to your application, classified by LINDDUN category.
     # model
     if threat_model_submit_button and (st.session_state["input"]["app_description"] or st.session_state["dfd_only"]):
         inputs = st.session_state["input"]
+        inputs["boundaries"] = st.session_state["boundaries"]
         threat_model_prompt = THREAT_MODEL_USER_PROMPT(
             inputs
         )
@@ -81,6 +82,17 @@ list of potential threats to your application, classified by LINDDUN category.
                             threat_model_prompt,
                             st.session_state["temperature"],
                         )
+                    elif model_provider == "Local LM Studio":
+                        if st.session_state["lmstudio_loaded"]:
+                            model_output = get_threat_model_openai(
+                                st.session_state["keys"]["openai_api_key"],
+                                st.session_state["openai_model"], 
+                                threat_model_prompt,
+                                st.session_state["temperature"],
+                                lmstudio=True,
+                            )
+                        else:
+                            raise Exception("No model loaded from LMStudio, use the sidebar to load one.")
 
                     # Access the threat model from the parsed content, or set it to an empty list if not found
                     threat_model = model_output.get("threat_model", [])
