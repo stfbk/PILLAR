@@ -1,1 +1,2 @@
 wkhtmltopdf
+graphviz
