@@ -320,7 +320,7 @@ def sidebar():
         downloading a complete report of the privacy threat modeling and risk
         assessment, which allows for a subsequent improvement of the application's
         privacy protection. For a detailed description of PILLAR, its methodology, and evaluation, 
-        see our [paper](https://github.com/stfbk/PILLAR/blob/master/papers/PILLAR_paper.pdf) 
+        see our [paper](https://github.com/stfbk/PILLAR/blob/master/papers/PILLAR-IWPE25.pdf) 
         presented at the IWPE25.
 
         ---
