@@ -39,12 +39,26 @@ def report():
     ---
     """)
 
+    # Show warning for cloud environments about DFD limitations
+    if is_cloud_environment() and not check_graphviz_available():
+        st.warning("""
+        **Cloud Environment Detected**: Graphical DFD rendering may not be available. 
+        If PDF generation fails, try unchecking "Include DFD graph in the report" below 
+        to generate a report with tabular DFD representation instead.
+        """)
+
     col1, col2 = st.columns([1, 1])
     with col1:
         st.text_input("Application name", help="Enter the name of the application.", key="app_name")
         st.text_input("Author", help="Enter the name of the author.", key="author")
         st.text_area("High-level description (optional)", help="Enter a high-level description of the application, if you want to include it in the report.", key="high_level_description")
-        st.checkbox("Include DFD graph in the report", help="Include the Data Flow Diagram in the report.", key="include_graph")
+        
+        # Add additional help text for cloud environments
+        dfd_help = "Include the Data Flow Diagram in the report."
+        if is_cloud_environment():
+            dfd_help += " Note: In cloud environments, this will show a tabular representation if graphical rendering is unavailable."
+        
+        st.checkbox("Include DFD graph in the report", help=dfd_help, key="include_graph")
     with col2:
         st.text_input("Application version", help="Enter the version of the application.", key="app_version")
         st.date_input("Date", key="date", help="Enter the date of the report.", format="YYYY/MM/DD")
@@ -117,10 +131,36 @@ def download_file():
             
             For detailed installation instructions, visit: https://github.com/JazzCore/python-pdfkit/wiki/Installing-wkhtmltopdf
             """)
+        elif "graphviz" in str(e).lower() or "dot" in str(e):
+            st.error("""
+            **PDF Generation Failed: Graphviz not available**
+            
+            This deployment environment doesn't have Graphviz installed, which is needed for DFD diagrams.
+            
+            **Solutions:**
+            1. **Disable DFD diagrams**: Uncheck "Include DFD graph in the report" to generate a report with tabular DFD representation
+            2. **For local deployment**: Install Graphviz from https://graphviz.org/download/
+            3. **For cloud deployment**: Add Graphviz to your system requirements or use the tabular format
+            """)
         else:
             st.error(f"Error generating PDF: {str(e)}")
     except Exception as e:
-        st.error(f"Unexpected error generating report: {str(e)}")
+        if "failed to execute" in str(e) and ("dot" in str(e) or "PosixPath" in str(e)):
+            st.error("""
+            **PDF Generation Failed: Graphviz not available in deployment environment**
+            
+            This appears to be a cloud deployment where Graphviz is not installed.
+            
+            **Quick Fix:** Uncheck "Include DFD graph in the report" above and try again. 
+            This will generate a PDF report with a tabular representation of your DFD instead of a graphical one.
+            
+            **For developers:** To enable graphical DFDs in cloud deployments, you'll need to:
+            1. Add Graphviz to your system dependencies
+            2. For Streamlit Cloud: Add `graphviz` to your `packages.txt` file
+            3. For other platforms: Install Graphviz through your platform's package manager
+            """)
+        else:
+            st.error(f"Unexpected error generating report: {str(e)}")
     
 def generate_report():
     """
@@ -159,42 +199,53 @@ def generate_report():
             text+="## Data Flow Diagram\n\n"
             text+="The Data Flow Diagram (DFD) is a graphical representation of the data flow within the application. To reduce ambiguity, the labels are close to the **tail** of the arrow they refer to.\n\n"
             
-            graph = graphviz.Digraph(engine='fdp', format='svg')
-            graph.attr(
-                bgcolor="white",
-                overlap="false",
-                K="5",
-                start=st.session_state["graph_seed"],
-                splines="ortho",
-            )
-            graph.node_attr.update(
-                color="black",
-                fontcolor="black",
-            )
-            graph.edge_attr.update(
-                color="grey",
-                fontcolor="fuchsia",
-                arrowsize="0.5",
-            )
-            with graph.subgraph(name='cluster_0') as c:
-                c.attr(
-                    color="#00a6fb",
-                    label="Trusted",
-                    fontcolor="#00a6fb",
-                    style="dashed"
+            try:
+                graph = graphviz.Digraph(engine='fdp', format='svg')
+                graph.attr(
+                    bgcolor="white",
+                    overlap="false",
+                    K="5",
+                    start=st.session_state["graph_seed"],
+                    splines="ortho",
                 )
-                for object in st.session_state["input"]["dfd"]:
-                    if object["trusted"]:
-                        c.node(object["from"])
-                    if object["trusted"]:
-                        c.node(object["to"])
-            for (i, object) in enumerate(st.session_state["input"]["dfd"]):
-                graph.node(object["from"], shape=f"{'box' if object['typefrom'] == 'Entity' else 'ellipse' if object['typefrom'] == 'Process' else 'cylinder'}")
-                graph.node(object["to"], shape=f"{{'box' if object['typeto'] == 'Entity' else 'ellipse' if object['typeto'] == 'Process' else 'cylinder'}}")
-                graph.edge(object["from"], object["to"], taillabel=f"DF{i}", constraint="false")
+                graph.node_attr.update(
+                    color="black",
+                    fontcolor="black",
+                )
+                graph.edge_attr.update(
+                    color="grey",
+                    fontcolor="fuchsia",
+                    arrowsize="0.5",
+                )
+                with graph.subgraph(name='cluster_0') as c:
+                    c.attr(
+                        color="#00a6fb",
+                        label="Trusted",
+                        fontcolor="#00a6fb",
+                        style="dashed"
+                    )
+                    for object in st.session_state["input"]["dfd"]:
+                        if object["trusted"]:
+                            c.node(object["from"])
+                        if object["trusted"]:
+                            c.node(object["to"])
+                for (i, object) in enumerate(st.session_state["input"]["dfd"]):
+                    graph.node(object["from"], shape=f"{'box' if object['typefrom'] == 'Entity' else 'ellipse' if object['typefrom'] == 'Process' else 'cylinder'}")
+                    graph.node(object["to"], shape=f"{{'box' if object['typeto'] == 'Entity' else 'ellipse' if object['typeto'] == 'Process' else 'cylinder'}}")
+                    graph.edge(object["from"], object["to"], taillabel=f"DF{i}", constraint="false")
 
-            # Add the graph to the report as an SVG image
-            text += f"![Data Flow Diagram](data:image/svg+xml,{urllib.parse.quote(graph.pipe(encoding='utf-8'))})\n"
+                # Add the graph to the report as an SVG image
+                text += f"![Data Flow Diagram](data:image/svg+xml,{urllib.parse.quote(graph.pipe(encoding='utf-8'))})\n"
+            except Exception as e:
+                # If Graphviz fails (common in cloud deployments), provide a textual representation instead
+                text += "**Note**: Graphical DFD rendering is not available in this deployment environment. Showing textual representation instead:\n\n"
+                text += "| Data Flow | From | Type | To | Type | Trusted | Boundary |\n"
+                text += "|-----------|------|------|----|----- |---------|----------|\n"
+                for (i, object) in enumerate(st.session_state["input"]["dfd"]):
+                    trusted_text = "Yes" if object.get("trusted", False) else "No"
+                    boundary = object.get("boundary", "N/A")
+                    text += f"| DF{i} | {object['from']} | {object['typefrom']} | {object['to']} | {object['typeto']} | {trusted_text} | {boundary} |\n"
+                text += "\n"
         
         # Add the threats found with the selected methodology to the report
         if st.session_state["threat_source"] == "threat_model":
@@ -386,4 +437,29 @@ def find_wkhtmltopdf():
                 return path
     
     return None
+
+def is_cloud_environment():
+    """
+    Detect if running in a cloud environment like Streamlit Cloud
+    """
+    # Check for common cloud environment indicators
+    cloud_indicators = [
+        os.getenv('STREAMLIT_SHARING_MODE'),  # Streamlit Cloud
+        os.getenv('HEROKU_APP_NAME'),         # Heroku
+        os.getenv('VERCEL'),                  # Vercel
+        os.getenv('NETLIFY'),                 # Netlify
+        os.getenv('AWS_LAMBDA_FUNCTION_NAME') # AWS Lambda
+    ]
+    return any(indicator for indicator in cloud_indicators)
+
+def check_graphviz_available():
+    """
+    Check if Graphviz is available on the system
+    """
+    try:
+        import subprocess
+        subprocess.run(['dot', '-V'], capture_output=True, check=True)
+        return True
+    except (subprocess.CalledProcessError, FileNotFoundError):
+        return False
 
