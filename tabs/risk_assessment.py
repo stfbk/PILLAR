@@ -13,7 +13,7 @@
 # limitations under the License.
 import streamlit as st
 from llms.linddun_go import linddun_go_gen_markdown
-from llms.threat_model import threat_model_gen_markdown
+from llms.simple import threat_model_gen_markdown
 from llms.risk_assessment import (
     get_assessment,
     get_control_measures,
@@ -28,7 +28,7 @@ def risk_assessment():
     st.markdown("""
 This tab allows you to carry out impact assessment associated the threats found
 within your application. First, you have to execute privacy threat modeling in
-either the Threat Model, LINDDUN Go or LINDDUN Pro tabs, to generate the
+either the SIMPLE, LINDDUN GO or LINDDUN PRO tabs, to generate the
 potential threats. Then, import the threats using the buttons below. You can
 then navigate through the threats, and generate an impact assessment and
 control measures for each one.
@@ -37,10 +37,10 @@ control measures for each one.
 """
     )
 
-    # Import the threats from the Threat Model, LINDDUN Go, or LINDDUN Pro tabs
+    # Import the threats from the SIMPLE, LINDDUN GO, or LINDDUN PRO tabs
     col1, col2, col3 = st.columns([1, 1, 1])
     with col1:
-        if st.button("Import Threat Model", help="Import the output of the Threat Model to assess the risks.", disabled=not st.session_state["threat_model_threats"]):
+        if st.button("Import SIMPLE", help="Import the output of the SIMPLE to assess the risks.", disabled=not st.session_state["threat_model_threats"]):
             st.session_state["to_assess"] = st.session_state["threat_model_threats"]
             st.session_state["threat_source"] = "threat_model"
             st.session_state["assessments"] = [{"impact": ""} for _ in st.session_state["to_assess"]]
@@ -48,7 +48,7 @@ control measures for each one.
             st.session_state["to_report"] = [False for _ in st.session_state["to_assess"]]
             st.session_state["current_threat"] = 0
     with col2:
-        if st.button("Import LINDDUN Go", help="Import the output of the LINDDUN Go simulation to assess the risks.", disabled=not st.session_state["linddun_go_threats"]):
+        if st.button("Import LINDDUN GO", help="Import the output of the LINDDUN GO simulation to assess the risks.", disabled=not st.session_state["linddun_go_threats"]):
             st.session_state["to_assess"] = st.session_state["linddun_go_threats"]
             st.session_state["threat_source"] = "linddun_go"
             st.session_state["assessments"] = [{"impact": ""} for _ in st.session_state["to_assess"]]
@@ -56,7 +56,7 @@ control measures for each one.
             st.session_state["to_report"] = [False for _ in st.session_state["to_assess"]]
             st.session_state["current_threat"] = 0
     with col3:
-        # The LINDDUN Pro initialization is a bit more complex, as it requires some transformation of the data
+        # The LINDDUN PRO initialization is a bit more complex, as it requires some transformation of the data
     
         # This variable is used to check if the list of threats is empty, to disable the import button
         empty = True
@@ -65,11 +65,11 @@ control measures for each one.
                 empty = False
                 break
         
-        if st.button("Import LINDDUN Pro", help="Import the output of the LINDDUN Pro threat modeling to assess the risks.", disabled=empty):
+        if st.button("Import LINDDUN PRO", help="Import the output of the LINDDUN PRO (Single Analyze) threat modeling to assess the risks.", disabled=empty):
             analyzed_edges = st.session_state["linddun_pro_threats"]
             to_assess = []
             
-            # For each edge in the DFD, the LINDDUN Pro tab finds a threat at the source, data flow, and destination.
+            # For each edge in the DFD, the LINDDUN PRO tab finds a threat at the source, data flow, and destination.
             # For the risk assessment, we want to assess each of these threats separately.
             # Thus, we create three separate threats for each edge, one for each location.
             for (i, edge) in enumerate(analyzed_edges):
@@ -146,14 +146,36 @@ control measures for each one.
     with col1:
         if st.button("Impact assessment", help="Generate an assessment of the impact of the current threat, which can then be modified.", disabled=not st.session_state["to_assess"]):
             with st.spinner("Assessing impact..."):
-                assessment = get_assessment(
-                    st.session_state["keys"]["openai_api_key"],
-                    st.session_state["openai_model"],
-                    st.session_state["to_assess"][st.session_state["current_threat"]],
-                    st.session_state["input"],
-                    st.session_state["temperature"],
-                )
-                st.session_state["assessments"][st.session_state["current_threat"]] = assessment
+                provider = st.session_state.get("model_provider", "OpenAI API")
+                
+                if provider == "Ollama":
+                    api_key = None  
+                    model = st.session_state.get("ollama_model")
+                elif provider == "Local LM Studio":
+                    api_key = None  
+                    model = st.session_state.get("lmstudio_model")
+                elif provider == "Google AI API":
+                    api_key = st.session_state["keys"].get("google_api_key")
+                    model = st.session_state.get("google_model")
+                elif provider == "Mistral API":
+                    api_key = st.session_state["keys"].get("mistral_api_key")
+                    model = st.session_state.get("mistral_model")
+                else: 
+                    api_key = st.session_state["keys"].get("openai_api_key")
+                    model = st.session_state.get("openai_model")
+                
+                try:
+                    assessment = get_assessment(
+                        api_key, 
+                        model, 
+                        st.session_state["to_assess"][st.session_state["current_threat"]],
+                        st.session_state["input"],
+                        st.session_state["temperature"],
+                        provider
+                    )
+                    st.session_state["assessments"][st.session_state["current_threat"]] = assessment
+                except Exception as e:
+                    st.error(f"Error generating impact assessment: {str(e)}")
     with col2:
         if st.session_state["assessments"]:
             st.text_area(
@@ -168,19 +190,41 @@ control measures for each one.
     
     col1, col2 = st.columns([0.2, 0.8])
     with col1:
-        if st.button("Control suggestions", help="Get control measures for the current threat, based on [privacy patterns](https://privacypatterns.org/).", disabled=not st.session_state["to_assess"]):
+        # Get the current provider to determine if Control suggestions should be enabled
+        provider = st.session_state.get("model_provider", "OpenAI API")
+        control_suggestions_disabled = (not st.session_state["to_assess"]) or (provider != "OpenAI API")
+        
+        if st.button("Control suggestions", 
+                    help="Get control measures for the current threat, based on [privacy patterns](https://privacypatterns.org/). This feature only works with OpenAI API - please select OpenAI API to use Control Suggestions.", 
+                    disabled=control_suggestions_disabled):
             with st.spinner("Generating control measures..."):
-                control_measures = get_control_measures(
-                    st.session_state["keys"]["openai_api_key"],
-                    st.session_state["openai_model"],
-                    st.session_state["to_assess"][st.session_state["current_threat"]],
-                    st.session_state["input"],
-                    st.session_state["temperature"],
-                )
-                st.session_state["control_measures"][st.session_state["current_threat"]] = control_measures
+                provider = st.session_state.get("model_provider", "OpenAI API")
+                
+                if provider == "OpenAI API":
+                    api_key = st.session_state["keys"].get("openai_api_key")
+                    model = st.session_state.get("openai_model")
+                    
+                    try:
+                        control_measures = get_control_measures(
+                            api_key,
+                            model,
+                            st.session_state["to_assess"][st.session_state["current_threat"]],
+                            st.session_state["input"],
+                            st.session_state["temperature"],
+                            provider
+                        )
+                        st.session_state["control_measures"][st.session_state["current_threat"]] = control_measures
+                    except Exception as e:
+                        st.error(f"Error generating control measures: {str(e)}")
+                else:
+                    st.error("Control suggestions are only available with OpenAI API. Please select OpenAI API as your model provider.")
     with col2:
-        if st.session_state["control_measures"] and st.session_state["control_measures"][st.session_state["current_threat"]] != []:
-            st.markdown(measures_gen_markdown(st.session_state["control_measures"][st.session_state["current_threat"]]), unsafe_allow_html=True)
+        control_measures = st.session_state.get("control_measures")
+        if (control_measures and 
+            st.session_state.get("current_threat", 0) < len(control_measures) and
+            control_measures[st.session_state["current_threat"]] is not None and 
+            control_measures[st.session_state["current_threat"]] != []):
+            st.markdown(measures_gen_markdown(control_measures[st.session_state["current_threat"]]), unsafe_allow_html=True)
 
 
 

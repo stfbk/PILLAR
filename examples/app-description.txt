@@ -1,0 +1,12 @@
+Application Background:
+
+Face authentication is the process of verifying the claimed identity of an individual using their face with the goal of unlocking a system (such as your smartphone or computer) or gaining access to online services or physical settings. The process consists of two phases:
+1. the enrollment phase,
+2. the authentication phase
+
+
+Application Scenarios:
+
+Face unlock scenario: Many smartphones nowadays have a ‘face unlock’ capability as a convenient alternative to PIN codes, swipe patterns or fingerprints. In this scenario, the front camera on your smartphone acts as the sensor. For the sake of simplicity, we make abstraction of the technical capabilities of the camera (e.g., support for infrared or 3D photos). Once the photograph is taken, it is analyzed for the presence of a face. If so, a first algorithm computes a bounding box around the face, and then pre-processes the photo to align and scale the bounding box to a fixed resolution (e.g., 256x256 pixels). Next, a pre-trained deep learning model extracts features from this normalized fixed size face image. During the enrollment phase, the feature vector is stored in the biometric database. During the authentication phase, the same feature extraction process is followed, but now the feature vector is compared to the enrolled one using a distance function (e.g., Euclidean distance, Cosine distance). Depending on the threshold set by the authentication system, the distance between the enrolled and test feature vectors will decide whether face authentication succeeds. For this application scenario, all computations take place on the smartphone.
+
+Physical security scenario: Consider the same ML pipeline but now for a scenario where access to various rooms in a building is restricted by a face authentication system that manages the lock of the door. Individuals are granted access to a room after passing the building’s face authentication system. The sensor is now the camera next to each door. The way feature vectors are computed remains the same. However, the software solution that computes, stores, and compares the biometric feature vectors now runs as a service in the cloud, and all the cameras in the building are connected to this cloud service. As such, this is inherently a distributed application.

@@ -135,7 +135,7 @@ details you include, the more accurate the subsequent analysis.
     st.text("")
     st.text("")
 
-    has_database = st.checkbox("Describe collected data", value=True, disabled=st.session_state["dfd_only"])
+    has_database = st.checkbox("Describe collected data", value=False, disabled=st.session_state["dfd_only"])
     has_database_toggled = False
     if has_database != st.session_state["input"]["has_database"]:
         has_database_toggled = True # The user has toggled the checkbox

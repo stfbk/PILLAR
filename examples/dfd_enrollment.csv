@@ -1,0 +1,7 @@
+﻿from,typefrom,to,typeto,trusted,boundary,description
+user,Entity,face authentication enrollment system,Process,FALSE,boundary_1,enrollment request (identity)
+face authentication enrollment system,Process,camera,Entity,FALSE,boundary_3,reequest picture: image
+face authentication enrollment system,Process,appropriateness check + preprocessing,Process,TRUE,boundary_2,pre-process(image):normalized_image
+face authentication enrollment system,Process,ML-based feature extraction,Process,TRUE,boundary_2,extract(normalized_image)
+ML-based feature extraction,Process,ML Moldel,Data store,TRUE,boundary_2,read (ML Model)
+face authentication enrollment system,Process,biometric database,Data store,FALSE,boundary_4,"store (feature_vectore, identity)"

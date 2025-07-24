@@ -12,14 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import json
-from openai import OpenAI
+from pydantic import BaseModel
 from llms.prompts import CHOOSE_CONTROL_MEASURES_PROMPT, EXPLAIN_CONTROL_MEASURES_PROMPT, IMPACT_ASSESSMENT_PROMPT, THREAT_MODEL_USER_PROMPT
 from misc.utils import (
     match_number_color,
     match_category_number,
 )
-from pydantic import BaseModel
-
+from openai import OpenAI
+import google.generativeai as genai
+from mistralai import Mistral, UserMessage
+import requests
 def assessment_gen_markdown(assessment):
     """
     This function generates a markdown table from the assessment data.
@@ -58,43 +60,47 @@ def linddun_pro_gen_individual_markdown(threat):
 def measures_gen_markdown(measures):
     """
     This function generates a markdown table from the control measures data.
-
     Args:
         measures (list): The list of control measures. Each measure is a dictionary with the following
             keys:
             - title: string. The title of the measure.
             - explanation: string. The explanation of the measure.
             - implementation: string. The implementation of the measure.
-    
     Returns:
         str: The markdown table with the control measures data.
     """
-    markdown_output = "| Title | Explanation | Implementation |\n"
-    markdown_output += "|--------|-------|-----|\n"
+    if measures is None or not isinstance(measures, (list, tuple)):
+        measures = []
 
+    markdown_output = "| Title | Explanation | Implementation |\n|--------|-------|-----|\n"
     for measure in measures:
-        markdown_output += f"| [{measure['title']}](https://privacypatterns.org/patterns/{measure['filename']}) | {measure['explanation']} | {measure['implementation']} |\n"
+        if measure is None or not isinstance(measure, dict):
+            continue
+        title = measure.get("title", "No Title")
+        filename = measure.get("filename", "")
+        explanation = measure.get("explanation", "")
+        implementation = measure.get("implementation", "")
+        markdown_output += f"| [{title}](https://privacypatterns.org/patterns/{filename}) | {explanation} | {implementation} |\n"
     return markdown_output
+
     
 
-
-def get_assessment(api_key, model, threat, inputs, temperature):
+def get_assessment(api_key, model, threat, inputs, temperature, provider):
     """
     This function generates an assessment for a threat.
     
     Args:
-        api_key (str): The OpenAI API key.
-        model (str): The OpenAI model to use.
+        api_key (str): The API key for the selected provider.
+        model (str): The model to use.
         threat (dict): The threat to assess. Any dictionary is accepted, since it will be converted to a string and passed to the model.
         inputs (dict): The dictionary of inputs to the application, with the same keys as the "input" session state in the Application Info tab.
         temperature (float): The temperature to use for the model.
+        provider (str): The provider to use. One of "OpenAI API", "Google AI API", "Mistral API", "Ollama", or "Local LM Studio".
 
     Returns:
         dict: The assessment data. The dictionary has the following keys:
             - impact: string. The impact of the threat.
     """
-    client = OpenAI(api_key=api_key)
-    
     messages=[
         {
             "role": "system",
@@ -111,17 +117,8 @@ THREAT: {threat}
         },
     ]
     
-    if model in ["gpt-4o", "gpt-4o-mini"]:
-        class Assessment(BaseModel):
-            impact: str
-        response = client.beta.chat.completions.parse(
-            model=model,
-            response_format=Assessment,
-            temperature=temperature,
-            messages=messages,
-            max_tokens=4096,
-        )
-    else:
+    if provider == "OpenAI API":
+        client = OpenAI(api_key=api_key)
         response = client.chat.completions.create(
             model=model,
             messages=messages,
@@ -129,87 +126,263 @@ THREAT: {threat}
             max_tokens=4096,
             temperature=temperature,
         )
-    return json.loads(response.choices[0].message.content)
+        return json.loads(response.choices[0].message.content)
+    
+    elif provider == "Google AI API":
+     
+        
+        genai.configure(api_key=api_key)
+        model_obj = genai.GenerativeModel(model)
+        
+        response = model_obj.generate_content(
+            [
+                {"role": "system", "parts": [messages[0]["content"]]},
+                {"role": "user", "parts": [messages[1]["content"]]},
+            ],
+            generation_config={"temperature": temperature}
+        )
+        
+        content = response.text
+        
+        # Clean up the content if it contains markdown JSON formatting
+        if "```json" in content:
+            content = content.split("```json")[1]
+            if "```" in content:
+                content = content.split("```")[0]
+        elif "```" in content:
+            content = content.split("```")[1].split("```")[0]
+            
+        content = content.strip()
+        
+        try:
+            result = json.loads(content)
+            if "impact" in result:
+                return {"impact": result["impact"]}
+            else:
+                return {"impact": content}
+        except Exception as e:
+            if "impact" in content.lower() and ":" in content:
+                try:
+                    impact_text = content.lower().split("impact")[1].split("\n")[0]
+                    impact_text = impact_text.replace(":", "").replace('"', "").replace(",", "").strip()
+                    return {"impact": f"Extracted from response: {impact_text}"}
+                except:
+                    pass
+            
+            return {"impact": response.text}
+    
+    elif provider == "Mistral API": 
+        client = Mistral(api_key=api_key)
+        
+        combined_prompt = f"{messages[0]['content']}\n\nUser request: {messages[1]['content']}"
+        
+        response = client.chat.complete(
+            model=model,
+            response_format={"type": "json_object"},
+            messages=[
+                UserMessage(content=combined_prompt)
+            ],
+            max_tokens=4096,
+            temperature=temperature,
+        )
+        
+        content = response.choices[0].message.content
+        
+        try:
+            start_idx = content.find('{')
+            end_idx = content.rfind('}') + 1
+            
+            if start_idx != -1 and end_idx > start_idx:
+                json_text = content[start_idx:end_idx]
+                result = json.loads(json_text)
+            else:
+                result = json.loads(content)
+            
+            if "impact" in result:
+                return {"impact": result["impact"]}
+            else:
+                return {"impact": content}
+        except json.JSONDecodeError as e:
+            if "impact" in content.lower() and ":" in content:
+                try:
+                    impact_text = content.lower().split("impact")[1].split("\n")[0]
+                    impact_text = impact_text.replace(":", "").replace('"', "").replace(",", "").strip()
+                    return {"impact": f"Extracted from response: {impact_text}"}
+                except:
+                    pass
+            
+            return {"impact": content}
+    
+    elif provider == "Ollama":   
+        response = requests.post(
+            "http://localhost:11434/api/chat",
+            json={
+                "model": model,
+                "messages": [
+                    {"role": "system", "content": messages[0]["content"]},
+                    {"role": "user", "content": messages[1]["content"]},
+                ],
+                "stream": False,
+                "options": {"temperature": temperature}
+            }
+        )
+        
+        if response.status_code == 200:
+            content = response.json()["message"]["content"]
+            
+            if "```json" in content:
+                content = content.split("```json")[1]
+                if "```" in content:
+                    content = content.split("```")[0]
+            elif "```" in content:
+                content = content.split("```")[1].split("```")[0]
+                
+            content = content.strip()
+            
+            try:
+                result = json.loads(content)
+                if "impact" in result:
+                    return {"impact": result["impact"]}
+                else:
+                    return {"impact": content}
+            except Exception as e:
+                if "impact" in content.lower() and ":" in content:
+                    try:
+                        impact_text = content.lower().split("impact")[1].split("\n")[0]
+                        impact_text = impact_text.replace(":", "").replace('"', "").replace(",", "").strip()
+                        return {"impact": f"Extracted from response: {impact_text}"}
+                    except:
+                        pass
+                
+                return {"impact": response.json()["message"]["content"]}
+        else:
+            raise Exception(f"Error from Ollama: {response.text}")
+    
+    elif provider == "Local LM Studio":
+        
+        response = requests.post(
+            "http://localhost:1234/v1/chat/completions",
+            json={
+                "model": model,
+                "messages": messages,
+                "temperature": temperature,
+                "max_tokens": 4096,
+            },
+            headers={"Content-Type": "application/json"}
+        )
+        
+        if response.status_code == 200:
+            content = response.json()["choices"][0]["message"]["content"]
+            
+            if "```json" in content:
+                content = content.split("```json")[1]
+                if "```" in content:
+                    content = content.split("```")[0]
+            elif "```" in content:
+                content = content.split("```")[1].split("```")[0]
+                
+            content = content.strip()
+            
+            try:
+                result = json.loads(content)
+                if "impact" in result:
+                    return {"impact": result["impact"]}
+                else:
+                    return {"impact": content}
+            except Exception as e:
+                if "impact" in content.lower() and ":" in content:
+                    try:
+                        impact_text = content.lower().split("impact")[1].split("\n")[0]
+                        impact_text = impact_text.replace(":", "").replace('"', "").replace(",", "").strip()
+                        return {"impact": f"Extracted from response: {impact_text}"}
+                    except:
+                        pass
+                
+                return {"impact": response.json()["choices"][0]["message"]["content"]}
+        else:
+            raise Exception(f"Error from LM Studio: {response.text}")
+    
+    else:
+        raise ValueError(f"Unknown provider: {provider}")
 
 
-def choose_control_measures(api_key, model, threat, inputs, temperature):
+def choose_control_measures(api_key, model, threat, inputs, temperature, provider="OpenAI API"):
     """
     This function generates a list of control measures which could be useful for a threat, out of the full list of [privacy patterns](https://privacypatterns.org/).
     
+    Note: This function only supports OpenAI API provider for reliable JSON parsing and response formatting.
+
     Args:
-        api_key (str): The OpenAI API key.
+        api_key (str): The API key for OpenAI.
         model (str): The OpenAI model to use.
-        threat (dict): The threat to assess. Any dictionary is accepted, since it will be converted to a string and passed to the model.
-        inputs (dict): The dictionary of inputs to the application, with the same keys as the "input" session state in the Application Info tab.
+        threat (dict): The threat to assess.
+        inputs (dict): The dictionary of inputs to the application.
         temperature (float): The temperature to use for the model.
-    
+        provider (str): The provider to use. Only "OpenAI API" is supported.
+
     Returns:
-        list: The list of control measures. Each measure is a string, the title of the chosen privacy pattern.
+        list: The list of control measures.
     """
-    client = OpenAI(api_key=api_key)
+    if provider != "OpenAI API":
+        raise ValueError("Control measures selection is only supported with OpenAI API provider.")
+        
     with open("misc/privacypatterns.json", "r") as f:
         patterns = json.load(f)
-        # for each pattern inside the "patterns" list, keep only "title", "excerpt" and "Related Patterns"
         patterns = [{"title": p["title"], "excerpt": p["excerpt"], "related_patterns": p["sections"]["Related Patterns"] if "Related Patterns" in p["sections"] else None} for p in patterns["patterns"]]
-    messages=[
+
+    messages = [
         {
             "role": "system",
             "content": CHOOSE_CONTROL_MEASURES_PROMPT,
         },
         {
-            "role": "user", 
+            "role": "user",
             "content": THREAT_MODEL_USER_PROMPT(inputs) + f"""
 '''
 THREAT: {threat}
 '''
-
 '''
 PATTERNS: {json.dumps(patterns)}
 '''
 """,
         },
     ]
-    
-    if model in ["gpt-4o", "gpt-4o-mini"]:
-        class Measures(BaseModel):
-            measures: list[str]
-        response = client.beta.chat.completions.parse(
-            model=model,
-            response_format=Measures,
-            temperature=temperature,
-            messages=messages,
-            max_tokens=4096,
-        )
-    else:
-        response = client.chat.completions.create(
-            model=model,
-            messages=messages,
-            response_format={"type": "json_object"},
-            max_tokens=4096,
-            temperature=temperature,
-        )
+
+    client = OpenAI(api_key=api_key)
+    response = client.chat.completions.create(
+        model=model,
+        messages=messages,
+        response_format={"type": "json_object"},
+        max_tokens=4096,
+        temperature=temperature,
+    )
     return json.loads(response.choices[0].message.content)["measures"]
 
-
-def get_control_measures(api_key, model, threat, inputs, temperature):
+def get_control_measures(api_key, model, threat, inputs, temperature, provider="OpenAI API"):
     """
     This function generates a list of control measures which could be useful for a threat and explains why they are useful and how to implement them.
     
+    Note: This function only supports OpenAI API provider for reliable JSON parsing and response formatting.
+
     Args:
-        api_key (str): The OpenAI API key.
+        api_key (str): The API key for OpenAI.
         model (str): The OpenAI model to use.
-        threat (dict): The threat to assess. Any dictionary is accepted, since it will be converted to a string and passed to the model.
-        inputs (dict): The dictionary of inputs to the application, with the same keys as the "input" session state in the Application Info tab.
+        threat (dict): The threat to assess.
+        inputs (dict): The dictionary of inputs to the application.
         temperature (float): The temperature to use for the model.
-    
+        provider (str): The provider to use. Only "OpenAI API" is supported.
+
     Returns:
-        list: The list of control measures. Each measure is a dictionary with the following keys:
-            - filename: string. The filename of the measure.
-            - title: string. The title of the measure.
-            - explanation: string. The explanation of the measure.
-            - implementation: string. The implementation of the measure.
+        list: The list of control measures.
     """
-    measures = choose_control_measures(api_key, model, threat, inputs, temperature)
+    if provider != "OpenAI API":
+        raise ValueError("Control measures generation is only supported with OpenAI API provider.")
+    
+    measures = choose_control_measures(api_key, model, threat, inputs, temperature, provider)
+    
+    if not isinstance(measures, list):
+        measures = [measures] if measures is not None else []
+    
     chosen = []
     with open("misc/privacypatterns.json", "r") as f:
         patterns = json.load(f)["patterns"]
@@ -217,53 +390,31 @@ def get_control_measures(api_key, model, threat, inputs, temperature):
     for pattern in patterns:
         if pattern["title"] in measures:
             chosen.append(pattern)
-    
 
-    client = OpenAI(api_key=api_key)
-    messages=[
+    messages = [
         {
             "role": "system",
             "content": EXPLAIN_CONTROL_MEASURES_PROMPT,
         },
         {
-            "role": "user", 
+            "role": "user",
             "content": THREAT_MODEL_USER_PROMPT(inputs) + f"""
 '''
 THREAT: {threat}
 '''
-
 '''
-PATTERNS: {
-    json.dumps(chosen)
-}
+PATTERNS: {json.dumps(chosen)}
 '''
 """,
         },
     ]
-    
-    if model in ["gpt-4o", "gpt-4o-mini"]:
-        class Measure(BaseModel):
-            filename: str
-            title: str
-            explanation: str
-            implementation: str
-        class Measures(BaseModel):
-            measures: list[Measure]
 
-        response = client.beta.chat.completions.parse(
-            model=model,
-            response_format=Measures,
-            temperature=temperature,
-            messages=messages,
-            max_tokens=4096,
-        )
-    else:
-        response = client.chat.completions.create(
-            model=model,
-            messages=messages,
-            response_format={"type": "json_object"},
-            max_tokens=4096,
-            temperature=temperature,
-        )
+    client = OpenAI(api_key=api_key)
+    response = client.chat.completions.create(
+        model=model,
+        messages=messages,
+        response_format={"type": "json_object"},
+        max_tokens=4096,
+        temperature=temperature,
+    )
     return json.loads(response.choices[0].message.content)["measures"]
-

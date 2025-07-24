@@ -1,6 +1,6 @@
 venv/
 __pycache__/
 test_functions.py
-.streamlit/secrets.toml
 .devcontainer
 benchmarks/
+.archive/

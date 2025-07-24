@@ -19,7 +19,7 @@ import json
 from tabs.sidebar import sidebar
 from tabs.application_info import application_info
 from tabs.dfd import dfd
-from tabs.threat_model import threat_model
+from tabs.simple import threat_model
 from tabs.linddun_go import linddun_go
 from tabs.linddun_pro import linddun_pro
 from tabs.risk_assessment import risk_assessment
@@ -57,9 +57,21 @@ def init_session_state():
     if "lmstudio_model" not in st.session_state:
         # lmstudio_model is a string that will store the LM Studio model to use
         st.session_state["lmstudio_model"] = ""
+    if "lmstudio_model_select" not in st.session_state:
+        # lmstudio_model_select is used by the selectbox in the sidebar
+        st.session_state["lmstudio_model_select"] = ""
     if "lmstudio_loaded" not in st.session_state:
         # lmstudio_loaded is a boolean that will store whether an LM Studio model has been loaded in memory
         st.session_state["lmstudio_loaded"] = False
+    if "ollama_model" not in st.session_state:
+        # ollama_model is a string that will store the OLlama model to use
+        st.session_state["ollama_model"] = ""
+    if "ollama_model_select" not in st.session_state:
+        # ollama_model_select is used by the selectbox in the sidebar
+        st.session_state["ollama_model_select"] = ""
+    if "ollama_loaded" not in st.session_state:
+        # lmstudio_loaded is a boolean that will store whether an Ollama model has been loaded in memory
+        st.session_state["ollama_loaded"] = False
     
     # Initialize the session state for the Application Info and DFD tabs
     if "input" not in st.session_state:
@@ -116,6 +128,12 @@ def init_session_state():
     if "backup_database" not in st.session_state:
         # "backup_database" is a list of dictionaries that stores the backup of the database information, to be able to restore it if needed
         st.session_state["backup_database"] = st.session_state["input"]["database"].copy()
+    if "dfd_manually_edited" not in st.session_state:
+        # Flag to track whether the DFD has been manually edited
+        st.session_state["dfd_manually_edited"] = False
+    if "last_uploaded_csv_hash" not in st.session_state:
+        # Store the hash of the last uploaded CSV to prevent reprocessing
+        st.session_state["last_uploaded_csv_hash"] = None
     if "dfd_only" not in st.session_state:
         # "dfd_only" is a boolean that indicates whether only the DFD is
         # needed, in order to disable the application description
@@ -243,17 +261,17 @@ st.set_page_config(
     menu_items={
             'Report a bug': "https://github.com/AndreaBissoli/PILLAR/issues",
             'About': """
-**PILLAR** (**P**rivacy risk **I**dentification with **L**INDDUN and **L**LM
-**A**nalysis **R**eport) is a tool developed by [Andrea Bissoli](https://www.linkedin.com/in/andrea-bissoli/) 
-under the supervision of
-[Dr. Majid Mollaeefar](https://www.linkedin.com/in/majid-mollaeefar/) as an
-internship project for [Fondazione Bruno Kessler](https://www.fbk.eu/). The
-tool is designed to help developers and security professionals to assess the
-privacy and information leakage risks of their applications. It provides a
-user-friendly interface to create Data Flow Diagrams, generate threat models,
-and perform risk assessments based on the LINDDUN methodology. The tool is
-open-source and can be found on
-[GitHub](https://github.com/AndreaBissoli/PILLAR).""",
+            **PILLAR** (**P**rivacy risk **I**dentification with **L**INDDUN and **L**LM
+            **A**nalysis **R**eport) is a tool developed by [Andrea Bissoli](https://www.linkedin.com/in/andrea-bissoli/) 
+            under the supervision of
+            [Dr. Majid Mollaeefar](https://www.linkedin.com/in/majid-mollaeefar/) as an
+            internship project for [Fondazione Bruno Kessler](https://www.fbk.eu/). The
+            tool is designed to help developers and security professionals to assess the
+            privacy and information leakage risks of their applications. It provides a
+            user-friendly interface to create Data Flow Diagrams, generate threat models,
+            and perform risk assessments based on the LINDDUN methodology. The tool is
+            open-source and can be found on
+            [GitHub](https://github.com/AndreaBissoli/PILLAR).""",
     }
 )
 
@@ -264,7 +282,7 @@ init_session_state()
 sidebar()
 
 tab1, tab2, tab3, tab4, tab5, tab6, tab7 = st.tabs(
-    ["Application Info", "DFD", "Threat Model", "LINDDUN Go", "LINDDUN Pro", "Risk Assessment", "Report"],
+    ["Application Info", "DFD", "SIMPLE", "LINDDUN GO", "LINDDUN PRO", "Risk Assessment", "Report"],
 )
 
 with tab1:

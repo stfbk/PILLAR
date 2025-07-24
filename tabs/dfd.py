@@ -280,20 +280,44 @@ def dfd():
             help="Upload a CSV file containing the DFD data.",
             key="dfd_file"
         )
+        
+        # Check if manual edits have been made - if so, show a warning
+        if "dfd_manually_edited" in st.session_state and st.session_state["dfd_manually_edited"] and uploaded_file is not None:
+            st.warning("You have manually edited the DFD. Uploading a new CSV will overwrite your changes.")
+            
+            # Add a confirmation button for loading the new CSV
+            if st.button("Load New CSV and Overwrite Changes"):
+                # Reset the flag and allow CSV processing
+                st.session_state["dfd_manually_edited"] = False
+                st.session_state.pop("last_uploaded_csv_hash", None)
+            else:
+                # If user hasn't confirmed, don't process the uploaded file
+                uploaded_file = None
         if uploaded_file is not None:
             try:
-                reader = csv.DictReader(StringIO(uploaded_file.getvalue().decode("utf-8-sig")), delimiter=",")
-                dfd_list = list(reader)
-                for edge in dfd_list:
-                    if "trusted" in edge:
-                        edge["trusted"] = edge["trusted"].lower() == "true"
-                # Synchronize boundaries from CSV data before updating the graph
-                synchronize_boundaries_from_csv(dfd_list)
-                st.session_state["input"]["dfd"] = dfd_list
-                update_graph()
-                st.session_state["dfd_generated"] = True
-                st.success(f"DFD loaded from CSV with {len(dfd_list)} connections!")
-                # st.rerun()
+                # Only process the file if we haven't already or if it's a new file
+                file_contents = uploaded_file.getvalue().decode("utf-8-sig")
+                
+                # Create a hash of the file to detect changes
+                current_file_hash = hash(file_contents)
+                
+                # Check if we've already processed this exact file
+                if "last_uploaded_csv_hash" not in st.session_state or st.session_state["last_uploaded_csv_hash"] != current_file_hash:
+                    reader = csv.DictReader(StringIO(file_contents), delimiter=",")
+                    dfd_list = list(reader)
+                    for edge in dfd_list:
+                        if "trusted" in edge:
+                            edge["trusted"] = edge["trusted"].lower() == "true"
+                    # Synchronize boundaries from CSV data before updating the graph
+                    synchronize_boundaries_from_csv(dfd_list)
+                    st.session_state["input"]["dfd"] = dfd_list
+                    update_graph()
+                    st.session_state["dfd_generated"] = True
+                    
+                    # Store the hash to prevent reprocessing on reruns
+                    st.session_state["last_uploaded_csv_hash"] = current_file_hash
+                    
+                    st.success(f"DFD loaded from CSV with {len(dfd_list)} connections!")
             except Exception as e:
                 st.error(f"Error reading the uploaded file: {e}")
 
@@ -375,8 +399,9 @@ def dfd():
             graph_placeholder = st.empty()  # Create a placeholder for the graph
             graph_placeholder.graphviz_chart(st.session_state["input"]["graph"])
         
+        # -----------------------------------------------------------------
         # Graph Functions 
-        # ------------------------------------
+        # -----------------------------------------------------------------
         with st.expander("Graph Functions", expanded=False):
             if st.button("Save Changes and Update Graph"):
                 # Save the edited table to session state
@@ -384,6 +409,16 @@ def dfd():
                 # Update the graph (make sure update_graph() returns the new graph if needed)
                 new_graph = update_graph()
                 st.session_state["input"]["graph"] = new_graph
+                
+                # Set a flag to indicate that manual changes have been made
+                # This flag will prevent the CSV loader from overriding our changes
+                st.session_state["dfd_manually_edited"] = True
+                
+                # If we had a CSV file loaded, clear its hash to prevent reprocessing
+                if "last_uploaded_csv_hash" in st.session_state:
+                    # By setting to None, we ensure the original CSV won't be reprocessed
+                    st.session_state["last_uploaded_csv_hash"] = None
+                
                 st.success("Changes saved and graph updated!")
                 # Update the graph placeholder with the new graph so it refreshes
                 graph_placeholder.empty()  # Clear previous content
@@ -407,8 +442,9 @@ def dfd():
                     help="Download the Graphviz source code for the current DFD."
                 )
         
+        # -----------------------------------------------------------------
         # Manage Trust Boundaries
-        # ------------------------------------
+        # -----------------------------------------------------------------
         with st.expander("Manage Trust Boundaries", expanded=False):
             st.write("Define trust boundaries for your DFD:")
             boundaries_df = pd.DataFrame(st.session_state["boundaries"])
@@ -456,8 +492,9 @@ def dfd():
                 except Exception as e:
                     st.error(f"Error updating boundaries: {str(e)}")
         
-        # DFD Validation Issues  
-        # ------------------------------------
+        # -----------------------------------------------------------------
+        # DFD Validation Issues
+        # -----------------------------------------------------------------
         issues = validate_dfd(st.session_state["input"]["dfd"])
         if issues:
             with st.expander("DFD Validation Issues", expanded=True):

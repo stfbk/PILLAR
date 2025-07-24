@@ -18,6 +18,8 @@ import markdown
 import pdfkit
 import urllib.parse
 import graphviz
+import os
+import platform
 from misc.utils import (
     match_color,
     match_number_color,
@@ -30,11 +32,11 @@ from tabs.risk_assessment import measures_gen_markdown
 def report():
 
     st.markdown("""
-In this tab you can download the complete report of the privacy threat modeling
-and risk assessment, after the previous steps have been completed. Just fill in
-the required general information and you will be able to download the PDF report.
+    In this tab you can download the complete report of the privacy threat modeling
+    and risk assessment, after the previous steps have been completed. Just fill in
+    the required general information and you will be able to download the PDF report.
 
----
+    ---
     """)
 
     col1, col2 = st.columns([1, 1])
@@ -51,10 +53,6 @@ the required general information and you will be able to download the PDF report
         st.selectbox("Font face", options=font_options, key="font")
         st.slider("Font size", 8, 24, 16, key="font_size")
     
-    # Download the report when the button is clicked, but only if the required
-    # information has been filled in
-    # I do not use st.download_button because it does not allow deferred generation of the file.
-    # This is a workaround to generate the file just before downloading it, without slowing down every single update in the app.
     if st.button("Download report", disabled=not (st.session_state.app_name and st.session_state.author and st.session_state.app_version and st.session_state.date)):
         download_file()
 
@@ -66,29 +64,63 @@ def download_file():
     before. The download is done through a hidden HTML element that is
     triggered when the function is called.
     """
-    file=generate_report()
-    b64 = base64.b64encode(file).decode()
+    try:
+        file = generate_report()
+        b64 = base64.b64encode(file).decode()
 
-    download_html = f"""
-    <html>
-    <head>
-    <title>Auto Download File</title>
-    <script>
-    document.addEventListener('DOMContentLoaded', function() {{
-        var link = document.createElement('a');
-        link.href = 'data:application/pdf;base64,{b64}';
-        link.download = 'report.pdf';
-        link.click();
-    }});
-    </script>
-    </head>
-    </html>
-    """
+        download_html = f"""
+        <html>
+        <head>
+        <title>Auto Download File</title>
+        <script>
+        document.addEventListener('DOMContentLoaded', function() {{
+            var link = document.createElement('a');
+            link.href = 'data:application/pdf;base64,{b64}';
+            link.download = 'report.pdf';
+            link.click();
+        }});
+        </script>
+        </head>
+        </html>
+        """
 
-    components.html(
-        download_html,
-        height=0,
-    )
+        components.html(
+            download_html,
+            height=0,
+        )
+    except OSError as e:
+        if "wkhtmltopdf" in str(e):
+            st.error("""
+            **PDF Generation Failed: wkhtmltopdf not installed**
+            
+            To generate PDF reports, you need to install wkhtmltopdf on your system:
+            
+            **Windows:**
+            1. Download the installer from: https://wkhtmltopdf.org/downloads.html
+            2. Run the installer and follow the setup wizard
+            3. Restart this application
+            
+            **macOS:**
+            ```bash
+            brew install wkhtmltopdf
+            ```
+            
+            **Linux (Ubuntu/Debian):**
+            ```bash
+            sudo apt-get install wkhtmltopdf
+            ```
+            
+            **Linux (CentOS/RHEL):**
+            ```bash
+            sudo yum install wkhtmltopdf
+            ```
+            
+            For detailed installation instructions, visit: https://github.com/JazzCore/python-pdfkit/wiki/Installing-wkhtmltopdf
+            """)
+        else:
+            st.error(f"Error generating PDF: {str(e)}")
+    except Exception as e:
+        st.error(f"Unexpected error generating report: {str(e)}")
     
 def generate_report():
     """
@@ -96,137 +128,155 @@ def generate_report():
     Returns:
         PDF file: The PDF file with the report.
     """
-
-    # Start the markdown text with the general information
-    text="""# Privacy Threat Modeling and Risk Assessment Report\n"""
-    text += "## Report Details \n\n"
-    
-    # Make this into a variable, because it is later used in the replace function to add CSS styles to the table
-    description_message = "High-level Description"
-
-    # Add the general information to the report as a table
-    text += f"| | | | |\n"
-    text += f"|------|-------|-----|-----|\n"
-    text += f"| **Application Name** | {st.session_state['app_name']} | **Application Version** | {st.session_state['app_version']} |\n"
-    text += f"| **Report author** | {st.session_state['author']} | **Date** | {st.session_state['date']} |\n"
-    if st.session_state["high_level_description"]: # the high-level description is optional
-        text += f"| **{description_message}** | {st.session_state['high_level_description']} | | |\n\n"
-    else:
-        text += f"\n\n"
-
+    try:
+        # Try to find wkhtmltopdf automatically
+        wkhtmltopdf_path = find_wkhtmltopdf()
         
+        # Start the markdown text with the general information
+        text="""# Privacy Threat Modeling and Risk Assessment Report\n"""
+        text += "## Report Details \n\n"
         
-    # Add the DFD graph to the report. If the user has not generated the graph, it will not be included (because the graph is not available).
-    if st.session_state["include_graph"] and st.session_state["is_graph_generated"]:
-        text+="## Data Flow Diagram\n\n"
-        text+="The Data Flow Diagram (DFD) is a graphical representation of the data flow within the application. To reduce ambiguity, the labels are close to the **tail** of the arrow they refer to.\n\n"
-        
-        # Generate the graph using Graphviz. The configuration is different,
-        # for some aspects, from the one used in the DFD tab, thus some code is
-        # repeated here.
-        graph = graphviz.Digraph(engine='fdp', format='svg')
-        graph.attr(
-            bgcolor="white",
-            overlap="false",
-            K="5",
-            start=st.session_state["graph_seed"],
-            splines="ortho",
-        )
-        graph.node_attr.update(
-            color="black",
-            fontcolor="black",
-        )
-        graph.edge_attr.update(
-            color="grey",
-            fontcolor="fuchsia",
-            arrowsize="0.5",
-        )
-        with graph.subgraph(name='cluster_0') as c:
-            c.attr(
-                color="#00a6fb",
-                label="Trusted",
-                fontcolor="#00a6fb",
-                style="dashed"
+        # Make this into a variable, because it is later used in the replace function to add CSS styles to the table
+        description_message = "High-level Description"
+
+        # Add the general information to the report as a table
+        text += f"| | | | |\n"
+        text += f"|------|-------|-----|-----|\n"
+        text += f"| **Application Name** | {st.session_state['app_name']} | **Application Version** | {st.session_state['app_version']} |\n"
+        text += f"| **Report author** | {st.session_state['author']} | **Date** | {st.session_state['date']} |\n"
+        if st.session_state["high_level_description"]: # the high-level description is optional
+            text += f"| **{description_message}** | {st.session_state['high_level_description']} | | |\n\n"
+        else:
+            text += f"\n\n"
+
+            
+            
+        # if st.session_state["include_graph"] and st.session_state["is_graph_generated"]:
+        if (st.session_state["include_graph"] and 
+            st.session_state.get("input") and 
+            st.session_state["input"].get("dfd") and 
+            len(st.session_state["input"]["dfd"]) > 0):
+            text+="## Data Flow Diagram\n\n"
+            text+="The Data Flow Diagram (DFD) is a graphical representation of the data flow within the application. To reduce ambiguity, the labels are close to the **tail** of the arrow they refer to.\n\n"
+            
+            graph = graphviz.Digraph(engine='fdp', format='svg')
+            graph.attr(
+                bgcolor="white",
+                overlap="false",
+                K="5",
+                start=st.session_state["graph_seed"],
+                splines="ortho",
             )
-            for object in st.session_state["input"]["dfd"]:
-                if object["trusted"]:
-                    c.node(object["from"])
-                if object["trusted"]:
-                    c.node(object["to"])
-        for (i, object) in enumerate(st.session_state["input"]["dfd"]):
-            graph.node(object["from"], shape=f"{'box' if object['typefrom'] == 'Entity' else 'ellipse' if object['typefrom'] == 'Process' else 'cylinder'}")
-            graph.node(object["to"], shape=f"{{'box' if object['typeto'] == 'Entity' else 'ellipse' if object['typeto'] == 'Process' else 'cylinder'}}")
-            graph.edge(object["from"], object["to"], taillabel=f"DF{i}", constraint="false")
+            graph.node_attr.update(
+                color="black",
+                fontcolor="black",
+            )
+            graph.edge_attr.update(
+                color="grey",
+                fontcolor="fuchsia",
+                arrowsize="0.5",
+            )
+            with graph.subgraph(name='cluster_0') as c:
+                c.attr(
+                    color="#00a6fb",
+                    label="Trusted",
+                    fontcolor="#00a6fb",
+                    style="dashed"
+                )
+                for object in st.session_state["input"]["dfd"]:
+                    if object["trusted"]:
+                        c.node(object["from"])
+                    if object["trusted"]:
+                        c.node(object["to"])
+            for (i, object) in enumerate(st.session_state["input"]["dfd"]):
+                graph.node(object["from"], shape=f"{'box' if object['typefrom'] == 'Entity' else 'ellipse' if object['typefrom'] == 'Process' else 'cylinder'}")
+                graph.node(object["to"], shape=f"{{'box' if object['typeto'] == 'Entity' else 'ellipse' if object['typeto'] == 'Process' else 'cylinder'}}")
+                graph.edge(object["from"], object["to"], taillabel=f"DF{i}", constraint="false")
 
-        # Add the graph to the report as an SVG image
-        text += f"![Data Flow Diagram](data:image/svg+xml,{urllib.parse.quote(graph.pipe(encoding='utf-8'))})\n"
-    
-    # Add the threats found with the selected methodology to the report
-    if st.session_state["threat_source"] == "threat_model":
-        text = from_threat_model(text)
-    elif st.session_state["threat_source"] == "linddun_go":
-        text = from_linddun_go(text)
-    elif st.session_state["threat_source"] == "linddun_pro":
-        text = from_linddun_pro(text)
-    
-    # Convert the markdown text to HTML
-    html = markdown.markdown(text, extensions=["markdown.extensions.tables"])
-    
-    
-    # General information table styling. NOTE: Replacing html text is not
-    # usually recommended, but in this case it is the only way to add the CSS
-    # styles to the table.
-    column_widths = [10, 40, 10, 40]
-    colgroup_html = "<colgroup>" + "".join([f"<col style='width: {width}%;'>" for width in column_widths]) + "</colgroup>"
-    html = html.replace("<table>", f"<table table-layout='fixed'>{colgroup_html}", 1)
-    html = html.replace(f"<td><strong>{description_message}</strong></td>\n<td>{st.session_state['high_level_description']}</td>\n<td></td>\n<td></td>", 
-                        f"<td><strong>{description_message}</strong></td>\n<td colspan='3'>{st.session_state['high_level_description']}</td>\n", 1)
+            # Add the graph to the report as an SVG image
+            text += f"![Data Flow Diagram](data:image/svg+xml,{urllib.parse.quote(graph.pipe(encoding='utf-8'))})\n"
+        
+        # Add the threats found with the selected methodology to the report
+        if st.session_state["threat_source"] == "threat_model":
+            text = from_threat_model(text)
+        elif st.session_state["threat_source"] == "linddun_go":
+            text = from_linddun_go(text)
+        elif st.session_state["threat_source"] == "linddun_pro":
+            text = from_linddun_pro(text)
+        
+        # Convert the markdown text to HTML
+        html = markdown.markdown(text, extensions=["markdown.extensions.tables"])
+        
+        
+        
+        column_widths = [10, 40, 10, 40]
+        colgroup_html = "<colgroup>" + "".join([f"<col style='width: {width}%;'>" for width in column_widths]) + "</colgroup>"
+        html = html.replace("<table>", f"<table table-layout='fixed'>{colgroup_html}", 1)
+        html = html.replace(f"<td><strong>{description_message}</strong></td>\n<td>{st.session_state['high_level_description']}</td>\n<td></td>\n<td></td>", 
+                            f"<td><strong>{description_message}</strong></td>\n<td colspan='3'>{st.session_state['high_level_description']}</td>\n", 1)
 
 
-    # Add the CSS styles to the HTML
-    html_with_style = f"""
-<html>
-<head>
-<style type="text/css">
-body {{
-    font-family: {st.session_state["font"]};
-    font-size: {st.session_state["font_size"]}px;
-}}
-table {{
-    width: 100%;
-}}
-table, th, td {{
-    border: 1px solid black;
-    border-collapse: collapse;
-}}
-th, td {{
-    padding: 10px;
-    text-align: left;
-}}
-th {{
-    background-color: #f2f2f2;
-}}
-</style>
-</head>
-<body>
-    {colgroup_html}
-    {html}
-</body>
-</html>
-    """
-    
-    options = {
-        'page-size': 'Letter',
-        'margin-top': '0.75in',
-        'margin-right': '0.75in',
-        'margin-bottom': '0.75in',
-        'margin-left': '0.75in',
-        'encoding': "UTF-8",
-        'no-outline': None,
-    }
+        # Add the CSS styles to the HTML
+        html_with_style = f"""
+    <html>
+    <head>
+    <style type="text/css">
+    body {{
+        font-family: {st.session_state["font"]};
+        font-size: {st.session_state["font_size"]}px;
+    }}
+    table {{
+        width: 100%;
+    }}
+    table, th, td {{
+        border: 1px solid black;
+        border-collapse: collapse;
+    }}
+    th, td {{
+        padding: 10px;
+        text-align: left;
+    }}
+    th {{
+        background-color: #f2f2f2;
+    }}
+    </style>
+    </head>
+    <body>
+        {colgroup_html}
+        {html}
+    </body>
+    </html>
+        """
+        
+        options = {
+            'page-size': 'Letter',
+            'margin-top': '0.75in',
+            'margin-right': '0.75in',
+            'margin-bottom': '0.75in',
+            'margin-left': '0.75in',
+            'encoding': "UTF-8",
+            'no-outline': None,
+        }
 
-    # Generate the PDF report with the styled HTML content and the specified options
-    return pdfkit.from_string(html_with_style, False, options=options)
+        # Configure pdfkit with the found path if available
+        config = None
+        if wkhtmltopdf_path:
+            import pdfkit
+            config = pdfkit.configuration(wkhtmltopdf=wkhtmltopdf_path)
+
+        # Generate the PDF report with the styled HTML content and the specified options
+        if config:
+            return pdfkit.from_string(html_with_style, False, options=options, configuration=config)
+        else:
+            return pdfkit.from_string(html_with_style, False, options=options)
+        
+    except OSError as e:
+        if "wkhtmltopdf" in str(e):
+            raise OSError("wkhtmltopdf executable not found. Please install wkhtmltopdf to generate PDF reports.")
+        else:
+            raise e
+    except Exception as e:
+        raise Exception(f"Error generating PDF report: {str(e)}")
 
 
 def from_threat_model(text):
@@ -296,3 +346,44 @@ def from_linddun_pro(text):
                 text += f"**Suggested control measures**: \n\n{measures_gen_markdown(st.session_state['control_measures'][i])}\n\n"
 
     return text
+
+def find_wkhtmltopdf():
+    """
+    Try to find wkhtmltopdf executable in common installation paths
+    """
+    system = platform.system().lower()
+    
+    if system == "windows":
+        # Common Windows installation paths
+        common_paths = [
+            r"C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe",
+            r"C:\Program Files (x86)\wkhtmltopdf\bin\wkhtmltopdf.exe",
+            r"C:\wkhtmltopdf\bin\wkhtmltopdf.exe",
+        ]
+        
+        for path in common_paths:
+            if os.path.exists(path):
+                return path
+                
+    elif system == "darwin":  # macOS
+        common_paths = [
+            "/usr/local/bin/wkhtmltopdf",
+            "/opt/homebrew/bin/wkhtmltopdf",
+        ]
+        
+        for path in common_paths:
+            if os.path.exists(path):
+                return path
+                
+    elif system == "linux":
+        common_paths = [
+            "/usr/bin/wkhtmltopdf",
+            "/usr/local/bin/wkhtmltopdf",
+        ]
+        
+        for path in common_paths:
+            if os.path.exists(path):
+                return path
+    
+    return None
+

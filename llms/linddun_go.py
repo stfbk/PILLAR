@@ -12,10 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import json
-import google.generativeai as genai
 import random
+import streamlit as st
 from openai import OpenAI
-from mistralai import Mistral
+import google.generativeai as genai
+# from mistralai import Mistral
 from misc.utils import (
     match_number_color,
     match_letter,
@@ -27,7 +28,7 @@ from llms.prompts import (
     LINDDUN_GO_PREVIOUS_ANALYSIS_PROMPT,
     LINDDUN_GO_JUDGE_PROMPT,
 )
-    
+ 
 from pydantic import BaseModel    
 
 def linddun_go_gen_markdown(threats):
@@ -81,7 +82,89 @@ def get_deck(shuffled=False, file="misc/deck.json"):
     return result
 
 
-def get_linddun_go(api_key, model_name, inputs, threats_to_analyze, temperature, lmstudio=False):
+def get_linddun_go_google(client, model_name, inputs, threats_to_analyze, temperature):
+    """
+    This function generates a single-agent LINDDUN threat model from the prompt using Google Gemini.
+
+    Args:
+        client (GenerativeModel): The Google Gemini client.
+        model_name (str): The Google model to use.
+        inputs (dict): The inputs to the model, a dictionary with the same keys as the one in the Application Info tab.
+        threats_to_analyze (int): The number of threats to analyze.
+        temperature (float): The temperature to use for the model.
+    
+    Returns:
+        list: The list of threats in the threat model. Each threat is a dictionary with the following keys:
+            - question: string. The questions on the card, asked to the LLM to elicit the threat.
+            - threat_title: string. The title of the threat.
+            - threat_description: string. The description of the threat.
+            - threat_type: int. The LINDDUN category of the threat, from 1 to 7.
+            - reply: boolean. Whether the threat was deemed present or not in the application by the LLM.
+            - reason: string. The reason for the detection or non-detection of the threat.
+    """
+    print(f"Starting Google Gemini analysis with model: {model_name}")
+    deck = get_deck(shuffled=True)
+    threats = []
+
+    # For each card, ask the associated questions to the LLM
+    for card in deck[0:threats_to_analyze]:
+        question = "\n".join(card["questions"])
+        title = card["title"]
+        description = card["description"]
+        type = card["type"]
+        
+        print(f"Processing card: {title}")
+
+        system_prompt = LINDDUN_GO_SPECIFIC_PROMPTS[0] + LINDDUN_GO_SYSTEM_PROMPT
+        user_prompt = LINDDUN_GO_USER_PROMPT(inputs, question, title, description)
+        
+        messages = [
+            {
+                'role': 'user',
+                'parts': [{'text': system_prompt}],
+            },
+            {
+                'role': 'user',
+                'parts': [{'text': user_prompt}],
+            }
+        ]
+        
+        try:
+            print(f"Sending request to Google Gemini API")
+            response = client.generate_content(
+                messages,
+                generation_config=genai.types.GenerationConfig(
+                    response_mime_type="application/json",
+                    max_output_tokens=4096,
+                    temperature=temperature,
+                ),
+            )
+            
+            print(f"Received response from Google Gemini API")
+            if response and response.candidates and response.candidates[0].content and response.candidates[0].content.parts:
+                response_text = response.candidates[0].content.parts[0].text
+                print(f"Response text: {response_text[:100]}...")  # Print first 100 chars
+                response_content = json.loads(response_text)
+            else:
+                print("Empty or invalid response from Google Gemini API")
+                response_content = {"reply": False, "reason": "Google API response was empty or invalid."}
+        except Exception as e:
+            print(f"Error with Google Gemini API: {str(e)}")
+            response_content = {"reply": False, "reason": f"Error processing with Google API: {str(e)}"}
+        
+        response_content["question"] = question
+        response_content["threat_title"] = title
+        response_content["threat_description"] = description
+        response_content["threat_type"] = type
+
+        threats.append(response_content)
+        print(f"Completed card: {title}")
+
+    print(f"Completed Google Gemini analysis, processed {len(threats)} threats")
+    return threats
+
+
+def get_linddun_go(api_key, model_name, inputs, threats_to_analyze, temperature, provider=None):
     """
     This function generates a single-agent LINDDUN threat model from the prompt.
 
@@ -101,11 +184,29 @@ def get_linddun_go(api_key, model_name, inputs, threats_to_analyze, temperature,
             - reply: boolean. Whether the threat was deemed present or not in the application by the LLM.
             - reason: string. The reason for the detection or non-detection of the threat.
     """
-    if lmstudio:
-        client = OpenAI(base_url="http://localhost:1234/v1", api_key="lm-studio")
+    if provider == "Ollama":
+        client = OpenAI(base_url="http://localhost:11434/v1", api_key="ollama")
+    elif provider == "Local LM Studio":
+        client = OpenAI(
+            base_url="http://localhost:1234/v1",
+            api_key="lmstudio"
+        )
+    elif provider == "Google AI API":
+        try:
+            import google.generativeai as genai
+            genai.configure(api_key=api_key)
+            google_client = genai.GenerativeModel(
+                model_name,
+                generation_config={"response_mime_type": "application/json"}
+            )
+            return get_linddun_go_google(google_client, model_name, inputs, threats_to_analyze, temperature)
+        except Exception as e:
+            print(f"Error initializing Google AI client: {str(e)}")
+            raise Exception(f"Error initializing Google AI client: {str(e)}")
+    elif provider == "Mistral API":
+        client = OpenAI(api_key=api_key)
     else:
         client = OpenAI(api_key=api_key)
-
     deck = get_deck(shuffled=True)
 
     threats = []
@@ -128,7 +229,7 @@ def get_linddun_go(api_key, model_name, inputs, threats_to_analyze, temperature,
             },
         ]
         
-        if model_name in ["gpt-4o", "gpt-4o-mini"] or lmstudio:
+        if model_name in ["gpt-4o", "gpt-4o-mini"]:
             class Threat(BaseModel):
                 reason: str
                 reply: bool
@@ -159,7 +260,7 @@ def get_linddun_go(api_key, model_name, inputs, threats_to_analyze, temperature,
 
 
 
-def get_multiagent_linddun_go(keys, models, inputs, temperature, rounds, threats_to_analyze, llms_to_use, lmstudio=False):
+def get_multiagent_linddun_go(keys, models, inputs, temperature, rounds, threats_to_analyze, llms_to_use, lmstudio=False, ollama=False):
     """
     This function generates a multi-agent LINDDUN threat model from the prompt.
     
@@ -182,23 +283,53 @@ def get_multiagent_linddun_go(keys, models, inputs, temperature, rounds, threats
             - reason: string. The reason for the detection or non-detection of the threat.
     """
 
-    if lmstudio:
-        lmstudio_client = OpenAI(base_url="http://localhost:1234/v1", api_key="lm-studio")
-    else:
-        # Initialize the LLM clients
-        openai_client = OpenAI(api_key=keys["openai_api_key"]) if "OpenAI API" in llms_to_use else None
-        mistral_client = Mistral(api_key=keys["mistral_api_key"]) if "Mistral API" in llms_to_use else None
-        if "Google AI API" in llms_to_use:
-            genai.configure(api_key=keys["google_api_key"])
-            google_client = genai.GenerativeModel(
-                    models["google_model"], generation_config={"response_mime_type": "application/json"}
-            )
-        else:
-            google_client = None
+    # Initialize clients based on selected providers
+    clients = {}
+    if "OpenAI API" in llms_to_use:
+        clients["OpenAI API"] = OpenAI(api_key=keys["openai_api_key"])
+    if "Local LM Studio" in llms_to_use:
+        clients["Local LM Studio"] = OpenAI(base_url="http://127.0.0.1:7860/v1", api_key="lm-studio")
+    if "Ollama" in llms_to_use:
+        clients["Ollama"] = OpenAI(base_url="http://localhost:11434/v1", api_key="ollama")
+    if "Mistral API" in llms_to_use:
+        clients["Mistral API"] = OpenAI(api_key=keys["mistral_api_key"])
+    if "Google AI API" in llms_to_use:
+        genai.configure(api_key=keys["google_api_key"])
+        clients["Google AI API"] = genai.GenerativeModel(
+            models["google_model"],
+            generation_config={"response_mime_type": "application/json"}
+        )
 
     threats = []
     deck = get_deck(shuffled=True)
-    
+
+    # Separate judge provider/model from agent pool
+    if ollama:
+        judge_model = models.get("ollama_models")[0]  # First model is judge
+        agent_models = models.get("ollama_models")[1:] if len(models.get("ollama_models", [])) > 1 else [judge_model]
+    elif lmstudio:
+        judge_model = models.get("lmstudio_models")[0]
+        agent_models = models.get("lmstudio_models")[1:] if len(models.get("lmstudio_models", [])) > 1 else [judge_model]
+    else:
+        # For cloud providers
+        judge_provider = llms_to_use[0]  # First provider is judge
+        agent_providers = llms_to_use[1:] if len(llms_to_use) > 1 else [judge_provider]
+        
+        # Map providers to their models
+        judge_model = {
+            "OpenAI API": models.get("openai_model"),
+            "Mistral API": models.get("mistral_model"),
+            "Google AI API": models.get("google_model")
+        }.get(judge_provider)
+        
+        agent_models = []
+        for provider in agent_providers:
+            if provider == "OpenAI API":
+                agent_models.append(models.get("openai_model"))
+            elif provider == "Mistral API":
+                agent_models.append(models.get("mistral_model"))
+            elif provider == "Google AI API":
+                agent_models.append(models.get("google_model"))
 
     for card in deck[0:threats_to_analyze]:
         question = "\n".join(card["questions"])
@@ -207,84 +338,119 @@ def get_multiagent_linddun_go(keys, models, inputs, temperature, rounds, threats
         type = card["type"]
         previous_analysis = [{} for _ in range(6)]
         
-        # Run the simulation for the specified number of rounds
-        # In the first round, we ask the questions to all agents.
-        # In the following rounds, we only ask the questions to the competent agents, but we keep track of the previous analysis for all agents.
         for round in range(rounds):
-            for i in range(6):
-                if round == 2 and i not in card["competent_agents"]:
-                    previous_analysis[i] = {} # At the third round, we only have to consider the analysis of the competent agents in the second round, not the others, so we reset the previous analysis for the non-competent agents
-                if i not in card["competent_agents"] and round != 0:
+            # First round: all agents participate
+            # Subsequent rounds: only competent agents
+            agents_this_round = range(6) if round == 0 else card["competent_agents"]
+            
+            for i in agents_this_round:
+                if round > 0 and i not in card["competent_agents"]:
                     continue
-                llm = random.randrange(0, len(llms_to_use))
-                system_prompt = LINDDUN_GO_SPECIFIC_PROMPTS[i]+LINDDUN_GO_SYSTEM_PROMPT+(LINDDUN_GO_PREVIOUS_ANALYSIS_PROMPT(previous_analysis) if previous_analysis[i] else "")  
+
+                # Select model for current agent from pool (excluding judge model)
+                model_index = (i % len(agent_models))
+                current_model = agent_models[model_index]
+                
+                system_prompt = LINDDUN_GO_SPECIFIC_PROMPTS[i] + LINDDUN_GO_SYSTEM_PROMPT
                 user_prompt = LINDDUN_GO_USER_PROMPT(inputs, question, title, description)
-                if llms_to_use[llm] == "OpenAI API":
+
+                if ollama:
                     response_content = get_response_openai(
-                        openai_client, 
-                        models["openai_model"], 
-                        temperature,
-                        system_prompt,
-                        user_prompt
-                    )
-                elif llms_to_use[llm] == "Mistral API":
-                    response_content = get_response_mistral(
-                        mistral_client,
-                        models["mistral_model"],
-                        temperature,
-                        system_prompt,
-                        user_prompt
-                    )
-                elif llms_to_use[llm] == "Google AI API":
-                    response_content = get_response_google(
-                        google_client,
-                        temperature,
-                        system_prompt,
-                        user_prompt
-                    )
-                elif llms_to_use[llm] == "Local LM Studio":
-                    response_content = get_response_openai(
-                        lmstudio_client,
-                        models["lmstudio_model"],
+                        clients["Ollama"],
+                        current_model,
                         temperature,
                         system_prompt,
                         user_prompt,
-                        lmstudio=lmstudio
+                        ollama=True
+                    )
+                elif lmstudio:
+                    response_content = get_response_openai(
+                        clients["Local LM Studio"],
+                        current_model,
+                        temperature,
+                        system_prompt,
+                        user_prompt,
+                        lmstudio=True
                     )
                 else:
-                    raise Exception("Invalid LLM provider")
+                    # Get current provider for the model
+                    current_provider = llms_to_use[model_index % len(llms_to_use)]
+                    if current_provider == "OpenAI API":
+                        response_content = get_response_openai(
+                            clients["OpenAI API"],
+                            current_model,
+                            temperature,
+                            system_prompt,
+                            user_prompt
+                        )
+                    elif current_provider == "Mistral API":
+                        response_content = get_response_mistral(
+                            clients["Mistral API"],
+                            current_model,
+                            temperature,
+                            system_prompt,
+                            user_prompt
+                        )
+                    elif current_provider == "Google AI API":
+                        response_content = get_response_google(
+                            clients["Google AI API"],
+                            temperature,
+                            system_prompt,
+                            user_prompt
+                        )
 
-                
                 previous_analysis[i] = response_content
 
-        # Judge the final verdict based on the previous analysis
-        final_verdict = judge(keys, models, previous_analysis, temperature, lmstudio=lmstudio)
-        final_verdict["question"] = question
-        final_verdict["threat_title"] = title
-        final_verdict["threat_description"] = description
-        final_verdict["threat_type"] = type
+        # Judge phase - use dedicated judge model
+        if ollama:
+            final_verdict = judge(
+                keys,
+                {"ollama_model": judge_model},
+                previous_analysis,
+                temperature,
+                ollama=True
+            )
+        elif lmstudio:
+            final_verdict = judge(
+                keys,
+                {"lmstudio_model": judge_model},
+                previous_analysis,
+                temperature,
+                lmstudio=True
+            )
+        else:
+            final_verdict = judge(keys, models, previous_analysis, temperature)
+
+        final_verdict.update({
+            "question": question,
+            "threat_title": title,
+            "threat_description": description,
+            "threat_type": type
+        })
 
         threats.append(final_verdict)
 
     return threats
 
-def get_response_openai(client, model, temperature, system_prompt, user_prompt, lmstudio=False):
+def get_response_openai(client, model, temperature, system_prompt, user_prompt, lmstudio=False, ollama=False):
     """
-    This function generates a response from the OpenAI API.
+    This function generates a response from the OpenAI API, LM Studio, or Ollama.
 
     Args:
-        client (OpenAI): The OpenAI client.
-        model (str): The OpenAI model to use.
+        client (OpenAI): The OpenAI/LM Studio/Ollama client.
+        model (str): The model to use.
         temperature (float): The temperature to use for the model.
         system_prompt (str): The system prompt to use.
         user_prompt (str): The user prompt to use.
+        lmstudio (bool): Whether to use LM Studio format.
+        ollama (bool): Whether to use Ollama format.
     
     Returns:
-        dict: The response from the OpenAI API, with the following keys:
-            - reply: boolean. Whether the threat was deemed present or not in the application by the LLM.
-            - reason: string. The reason for the detection or non-detection of the threat.
+        dict: The response with the following keys:
+            - reply: boolean. Whether the threat was deemed present or not.
+            - reason: string. The reason for the detection or non-detection.
     """
-    messages=[
+    messages = [
         {
             "role": "system",
             "content": system_prompt,
@@ -294,7 +460,9 @@ def get_response_openai(client, model, temperature, system_prompt, user_prompt, 
             "content": user_prompt,
         },
     ]
+
     if model in ["gpt-4o", "gpt-4o-mini"] or lmstudio:
+        # Use parse format for GPT4-organic and LM Studio
         class Threat(BaseModel):
             reason: str
             reply: bool
@@ -305,14 +473,25 @@ def get_response_openai(client, model, temperature, system_prompt, user_prompt, 
             messages=messages,
             max_tokens=4096,
         )
-    else:
+    elif ollama:
+        # Use regular completion for Ollama
         response = client.chat.completions.create(
             model=model,
             messages=messages,
             response_format={"type": "json_object"},
-            max_tokens=4096,
             temperature=temperature,
+            max_tokens=4096,
         )
+    else:
+        # Standard OpenAI format
+        response = client.chat.completions.create(
+            model=model,
+            messages=messages,
+            response_format={"type": "json_object"},
+            temperature=temperature,
+            max_tokens=4096,
+        )
+
     return json.loads(response.choices[0].message.content)
 
 def get_response_mistral(client, model, temperature, system_prompt, user_prompt):
@@ -332,15 +511,15 @@ def get_response_mistral(client, model, temperature, system_prompt, user_prompt)
             - reason: string. The reason for the detection or non-detection of the threat.
     """
     response = client.chat(
-			model=model,
-			response_format={"type": "json_object"},
-			messages=[
-				{"role":"system", "content":system_prompt},
-				{"role":"user", "content":user_prompt},
-			],
-			max_tokens=4096,
+            model=model,
+            response_format={"type": "json_object"},
+            messages=[
+                {"role":"system", "content":system_prompt},
+                {"role":"user", "content":user_prompt},
+            ],
+            max_tokens=4096,
             temperature=temperature,
-	)
+    )
 
     return json.loads(response.choices[0].message.content)
 
@@ -362,25 +541,35 @@ def get_response_google(client, temperature, system_prompt, user_prompt):
     messages = [
         {
             'role':'user',
-            'parts': system_prompt,
+            'parts': [{'text': system_prompt}],
         },
         {
             'role':'user',
-            'parts': user_prompt,
+            'parts': [{'text': user_prompt}],
         }
     ]
-    response = client.generate_content(
-        messages,
-        generation_config=genai.types.GenerationConfig(
-            response_mime_type="application/json",
-            max_output_tokens=4096,
-            temperature=temperature,
-        ),
-    )
+    try:
+        response = client.generate_content(
+            messages,
+            generation_config=genai.types.GenerationConfig(
+                response_mime_type="application/json",
+                max_output_tokens=4096,
+                temperature=temperature,
+            ),
+        )
+        
+        # Check if response has content
+        if response and response.candidates and response.candidates[0].content and response.candidates[0].content.parts:
+            return json.loads(response.candidates[0].content.parts[0].text)
+        else:
+            # Return a default response if no valid content is found
+            return {"reply": False, "reason": "Google API response was empty or invalid."} 
+    except Exception as e:
+        # Handle any exceptions that might occur
+        print(f"Error with Google Gemini API: {str(e)}")
+        return {"reply": False, "reason": f"Error processing with Google API: {str(e)}"}
 
-    return json.loads(response.candidates[0].content.parts[0].text)
-
-def judge(keys, models, previous_analysis, temperature, lmstudio=False):
+def judge(keys, models, previous_analysis, temperature, judge_provider=None, lmstudio=False, ollama=False):
     """
     This function judges the final verdict based on the previous analysis.
 
@@ -389,16 +578,34 @@ def judge(keys, models, previous_analysis, temperature, lmstudio=False):
         models (dict): The dictionary of models for the different LLM providers.
         previous_analysis (list): The list of previous analysis for the different agents.
         temperature (float): The temperature to use for the model.
+        judge_provider (str): The provider to use as judge (OpenAI API, Google AI API, Mistral API).
+        lmstudio (bool): Whether to use LM Studio.
+        ollama (bool): Whether to use Ollama.
     
     Returns:
         dict: The final verdict, with the following keys:
             - reply: boolean. Whether the threat was deemed present or not in the application by the LLM.
             - reason: string. The reason for the detection or non-detection of the threat.
     """
-    if lmstudio:
+    if ollama:
+        client = OpenAI(base_url="http://localhost:11434/v1", api_key="ollama")
+        model_name = models.get("ollama_model")  # Get the Judge model
+    elif lmstudio:
         client = OpenAI(base_url="http://localhost:1234/v1", api_key="lm-studio")
+        model_name = models.get("lmstudio_model")  # Get the Judge model
     else:
-        client = OpenAI(api_key=keys["openai_api_key"])
+        # Use specified judge provider
+        if judge_provider == "Google AI API":
+            genai.configure(api_key=keys["google_api_key"])
+            client = genai.GenerativeModel(models["google_model"])
+            model_name = models.get("google_model")
+        elif judge_provider == "Mistral API":
+            client = OpenAI(api_key=keys["mistral_api_key"])
+            model_name = models.get("mistral_model")
+        else:  # Default to OpenAI
+            client = OpenAI(api_key=keys["openai_api_key"])
+            model_name = models.get("openai_model")
+
     messages=[
         {
             "role": "system",
@@ -409,24 +616,53 @@ def judge(keys, models, previous_analysis, temperature, lmstudio=False):
             "content": LINDDUN_GO_PREVIOUS_ANALYSIS_PROMPT(previous_analysis)
         },
     ]
-    if models["openai_model"] in ["gpt-4o", "gpt-4o-mini"] or lmstudio:
+
+    if model_name in ["gpt-4o", "gpt-4o-mini"] or lmstudio:
         class Threat(BaseModel):
             reason: str
             reply: bool
         response = client.beta.chat.completions.parse(
-            model=models["openai_model"] if not lmstudio else models["lmstudio_model"],
+            model=model_name,
             response_format=Threat,
             temperature=temperature,
             messages=messages,
             max_tokens=4096,
         )
+        response_content = json.loads(response.choices[0].message.content)
+    elif judge_provider == "Google AI API":
+        google_messages = [
+            {
+                'role':'user',
+                'parts': [{'text': LINDDUN_GO_JUDGE_PROMPT}],
+            },
+            {
+                'role':'user',
+                'parts': [{'text': LINDDUN_GO_PREVIOUS_ANALYSIS_PROMPT(previous_analysis)}],
+            }
+        ]
+        try:
+            response = client.generate_content(
+                google_messages,
+                generation_config=genai.types.GenerationConfig(
+                    response_mime_type="application/json",
+                    max_output_tokens=4096,
+                    temperature=temperature,
+                ),
+            )
+            if response and response.candidates and response.candidates[0].content and response.candidates[0].content.parts:
+                response_content = json.loads(response.candidates[0].content.parts[0].text)
+            else:
+                response_content = {"reply": False, "reason": "Google API judge response was empty or invalid."}
+        except Exception as e:
+            print(f"Error with Google Gemini API in judge: {str(e)}")
+            response_content = {"reply": False, "reason": f"Error processing with Google API judge: {str(e)}"}
     else:
         response = client.chat.completions.create(
-            model=models["openai_model"] if not lmstudio else models["lmstudio_model"],
+            model=model_name,
             messages=messages,
             response_format={"type": "json_object"},
             temperature=temperature,
             max_tokens=4096,
         )
-    response_content=json.loads(response.choices[0].message.content)
+        response_content = json.loads(response.choices[0].message.content)
     return response_content

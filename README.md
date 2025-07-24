@@ -38,8 +38,20 @@ as some features only work with it (for now). You can find more information on
 how to get an API key in the [OpenAI
 website](https://platform.openai.com/account/api-keys). Other supported LLM
 providers are [MistralAI](https://console.mistral.ai/api-keys) and [Google
-Gemini](https://makersuite.google.com/app/apikey). If you would like to see
-more LLM providers supported, feel free to open an issue or a pull request.
+Gemini](https://makersuite.google.com/app/apikey). 
+
+### Using Local Models
+
+**PILLAR** also supports local models through Ollama and LM Studio. To enable these options:
+
+1. In the `sidebar.py` file, uncomment the local model options in the `model_options` list.
+
+2. Alternatively, create a `.streamlit/secrets.toml` file to control which local models are available.  
+   The absence of `disable_local_lm_studio` and `disable_local_ollama` settings will enable these providers.
+
+For Ollama, you'll need to set up an SSH tunnel if using a remote instance.
+For LM Studio, you need to have it installed and running locally with models downloaded.
+
 
 
 ## Features
@@ -48,14 +60,14 @@ more LLM providers supported, feel free to open an issue or a pull request.
 application, specifying the type (e.g., mobile app, web app), the data it
 collects, and the data policy.
 - **Data Flow Diagram (DFD) Management**: Upload, edit, generate from an image
-or description, and download a Data Flow Diagram (DFD) of the application to
+or description, and download a Data Flow Diagram (DFD) of the application to 
 identify privacy threats.
 - **LINDDUN Analysis**: Perform a simple LINDDUN analysis of the application in
 the Threat Model tab.
-- **LINDDUN Go Simulation**: Conduct a [LINDDUN
-Go](https://linddun.org/linddun-go/) simulation for the application in the
-LINDDUN Go tab, utilizing one or multiple LLM agents.
-- **LINDDUN Pro Methodology**: Use the [LINDDUN
+- **LINDDUN GO Simulation**: Conduct a [LINDDUN
+GO](https://linddun.org/linddun-go/) simulation for the application in the
+LINDDUN GO tab, utilizing one or multiple LLM agents.
+- **LINDDUN PRO Methodology**: Use the [LINDDUN
 Pro](https://linddun.org/linddun-pro/) methodology with the provided DFD to
 identify precise privacy threats in the LINDDUN Pro tab.
 - **Impact Assessment and Control Measures**: Assess the impact of identified
@@ -69,11 +81,19 @@ modeling of the application.
 
 Here’s an outline of our upcoming features and enhancements for **PILLAR**:
 
+- [x] **Locally Hosted Models** by implementing support for locally hosted models, such as **Ollama** and **LM Studio**, to give users more control over privacy and security when running AI models.
+
+- [x] **Enhanced DFD Management** by improving the DFD functionality to support multiple trust boundaries and manage them, color-coded visualization, and different graph functions.
+
+- [ ] **Improve Risk Assessment Methodology and Control Suggestions** by integrating frameworks/methodologies in the state-of-the-art. 
+ 
+- [ ] **Models' Performance Evaluation** by defining a comprehensive benchmarking methodology focused on measuring and comparing different LLMs' effectiveness in privacy threat modeling tasks.
+
+- [ ] **Prompt Engineering Optimization** by experimenting with different prompt techniques, structures, and tactics to analyze their impact on threat elicitation accuracy, comprehensiveness, and overall performance across various threat elicitation variants in PILLAR. 
+
 - [ ] **Support for Open Threat Modeling (OTM) Format** by adding the ability to export threat modeling results in the widely-adopted OTM format to enhance compatibility with other tools.
 
-- [ ] **Locally Hosted Models** by implementing support for locally hosted models, such as **Ollama**, to give users more control over privacy and security when running AI models.
 
-- [ ] **Integration with OWASP DFD Generation Framework** by exploring integration with the **OWASP DFD generating framework (pytm)** to improve and extend PILLAR's DFD generation capabilities.
 
 ---
 

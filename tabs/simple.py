@@ -13,7 +13,7 @@
 # limitations under the License.
 
 import streamlit as st
-from llms.threat_model import (
+from llms.simple import (
     get_threat_model_openai,
     get_threat_model_google,
     get_threat_model_mistral,
@@ -25,26 +25,23 @@ from llms.prompts import THREAT_MODEL_USER_PROMPT
 def threat_model():
 
     st.markdown("""
-A [LINDDUN](https://linddun.org/) privacy threat model helps identify and
-evaluate potential privacy threats to applications / systems. It provides a
-systematic approach to understanding possible privacy threats, classifying each
-threat in one of the seven categories which compose the LINDDUN acronym. Use
-this tab to generate a simple threat model with the LLM, which will provide a
-list of potential threats to your application, classified by LINDDUN category.
+    It is a basic zero-shot threat elicitation where the selected LLM uses the system description provided 
+    and identifies threats with a focus on each of LINDDUN’s threat categories. 
+    Use this tab to generate a simple threat model with the LLM, which will provide a
+    list of potential threats to your application, classified by LINDDUN category.
 
----
-""")
+    ---
+    """)
 
-    # Create a submit button for Threat Modelling
     threat_model_submit_button = st.button(
-        label="Generate Threat Model", 
+        label="Generate Threats", 
         disabled= not st.session_state["input"]["app_description"] and not st.session_state["dfd_only"], 
-        help="Generate a privacy threat model for the application."
+        help="Generate privacy threats for the application."
     )
 
     model_provider = st.session_state["model_provider"]
-    
-    # If the Generate Threat Model button is clicked and the user has provided
+
+    # If the Generate Threats button is clicked and the user has provided
     # an application description or a DFD in dfd_only mode, generate the threat
     # model
     if threat_model_submit_button and (st.session_state["input"]["app_description"] or st.session_state["dfd_only"]):
@@ -54,7 +51,6 @@ list of potential threats to your application, classified by LINDDUN category.
             inputs
         )
 
-        # Show a spinner while generating the threat model
         with st.spinner("Analysing potential threats..."):
             max_retries = 3
             retry_count = 0
@@ -91,15 +87,24 @@ list of potential threats to your application, classified by LINDDUN category.
                                 st.session_state["temperature"],
                                 lmstudio=True,
                             )
+                    elif model_provider == "Ollama":
+                        if st.session_state.get("ollama_loaded"):
+                            model_output = get_threat_model_openai(
+                                api_key="ollama",
+                                model_name=st.session_state["ollama_model"],
+                                prompt=threat_model_prompt,
+                                temperature=st.session_state["temperature"],
+                                ollama=True
+                            )
                         else:
-                            raise Exception("No model loaded from LMStudio, use the sidebar to load one.")
+                            raise Exception("No Ollama model loaded. Please load a model from the sidebar first.")
 
                     # Access the threat model from the parsed content, or set it to an empty list if not found
                     threat_model = model_output.get("threat_model", [])
 
                     # Save the threat model to the session state for later use.
                     st.session_state["threat_model_threats"] = threat_model
-                    break  # Exit the loop if successful
+                    break  
                 except Exception as e:
                     retry_count += 1
                     if retry_count == max_retries:
@@ -116,16 +121,12 @@ list of potential threats to your application, classified by LINDDUN category.
         markdown_output = threat_model_gen_markdown(threat_model)
         st.session_state["threat_model_output"] = markdown_output
 
-
-    # If present, display the threat model output
     if st.session_state["threat_model_output"] != "":
-        st.markdown("# Privacy threat model")
-        # Display the threat model in Markdown
+        st.markdown("# Privacy Threats")
         st.markdown(st.session_state["threat_model_output"], unsafe_allow_html=True)
-        # Add a button to allow the user to download the output as a Markdown file
         st.download_button(
-            label="Download Threat Model",
-            data=st.session_state["threat_model_output"],  # Use the Markdown output
+            label="Download",
+            data=st.session_state["threat_model_output"],  
             file_name="privacy_threat_model.md",
             mime="text/markdown",
         )
