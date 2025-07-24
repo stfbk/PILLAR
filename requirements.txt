@@ -11,4 +11,4 @@ pdfkit>=1.0.0
 urllib3>=1.26.20
 pydantic>=2.10.6
 lmstudio>=1.2.0
-wkhtmltopdf >=0.12.6
+# wkhtmltopdf >=0.12.6
