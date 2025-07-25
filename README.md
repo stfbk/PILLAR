@@ -63,13 +63,13 @@ collects, and the data policy.
 or description, and download a Data Flow Diagram (DFD) of the application to 
 identify privacy threats.
 - **LINDDUN Analysis**: Perform a simple LINDDUN analysis of the application in
-the Threat Model tab.
+the SIMPLE tab.
 - **LINDDUN GO Simulation**: Conduct a [LINDDUN
 GO](https://linddun.org/linddun-go/) simulation for the application in the
 LINDDUN GO tab, utilizing one or multiple LLM agents.
 - **LINDDUN PRO Methodology**: Use the [LINDDUN
-Pro](https://linddun.org/linddun-pro/) methodology with the provided DFD to
-identify precise privacy threats in the LINDDUN Pro tab.
+PRO](https://linddun.org/linddun-pro/) methodology with the provided DFD to
+identify precise privacy threats in the LINDDUN PRO tab.
 - **Impact Assessment and Control Measures**: Assess the impact of identified
 privacy threats and suggest control measures based on the [privacy
 patterns](https://privacypatterns.org/) website.
