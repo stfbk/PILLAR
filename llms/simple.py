@@ -14,7 +14,7 @@
 import json
 from llms.config import OLLAMA_CONFIG, LMSTUDIO_CONFIG
 import google.generativeai as genai
-from mistralai import Mistral, UserMessage
+from mistralai import Mistral
 from openai import OpenAI
 from misc.utils import (
 		match_color,
@@ -140,7 +140,7 @@ def get_threat_model_mistral(mistral_api_key, mistral_model, prompt, temperature
         model=mistral_model,
         response_format={"type": "json_object"},
         messages=[
-            UserMessage(content=combined_prompt)
+            {"role": "user", "content": combined_prompt}
         ],
         temperature=temperature
     )

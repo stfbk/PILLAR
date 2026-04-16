@@ -25,7 +25,7 @@ from llms.prompts import (
     LINDDUN_PRO_USER_PROMPT,
 )
 from pydantic import BaseModel
-from mistralai import Mistral, UserMessage
+from mistralai import Mistral
 import google.generativeai as genai
 def linddun_pro_gen_markdown(threats):
     """
@@ -355,7 +355,7 @@ def get_linddun_pro_mistral(api_key, model, dfd, edge, category, boundaries, tem
         model=model,
         response_format={"type": "json_object"},
         messages=[
-            UserMessage(content=combined_prompt)
+            {"role": "user", "content": combined_prompt}
         ],
         temperature=temperature
     )

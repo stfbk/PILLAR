@@ -20,7 +20,7 @@ from misc.utils import (
 )
 from openai import OpenAI
 import google.generativeai as genai
-from mistralai import Mistral, UserMessage
+from mistralai import Mistral
 import requests
 def assessment_gen_markdown(assessment):
     """
@@ -180,7 +180,7 @@ THREAT: {threat}
             model=model,
             response_format={"type": "json_object"},
             messages=[
-                UserMessage(content=combined_prompt)
+                {"role": "user", "content": combined_prompt}
             ],
             max_tokens=4096,
             temperature=temperature,
