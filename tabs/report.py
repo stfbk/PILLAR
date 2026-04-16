@@ -15,11 +15,9 @@ import streamlit as st
 import streamlit.components.v1 as components
 import base64
 import markdown 
-import pdfkit
 import urllib.parse
 import graphviz
 import os
-import platform
 from misc.utils import (
     match_color,
     match_number_color,
@@ -102,36 +100,9 @@ def download_file():
             download_html,
             height=0,
         )
-    except OSError as e:
-        if "wkhtmltopdf" in str(e):
-            st.error("""
-            **PDF Generation Failed: wkhtmltopdf not installed**
-            
-            To generate PDF reports, you need to install wkhtmltopdf on your system:
-            
-            **Windows:**
-            1. Download the installer from: https://wkhtmltopdf.org/downloads.html
-            2. Run the installer and follow the setup wizard
-            3. Restart this application
-            
-            **macOS:**
-            ```bash
-            brew install wkhtmltopdf
-            ```
-            
-            **Linux (Ubuntu/Debian):**
-            ```bash
-            sudo apt-get install wkhtmltopdf
-            ```
-            
-            **Linux (CentOS/RHEL):**
-            ```bash
-            sudo yum install wkhtmltopdf
-            ```
-            
-            For detailed installation instructions, visit: https://github.com/JazzCore/python-pdfkit/wiki/Installing-wkhtmltopdf
-            """)
-        elif "graphviz" in str(e).lower() or "dot" in str(e):
+    except Exception as e:
+        error_msg = str(e)
+        if "graphviz" in error_msg.lower() or ("dot" in error_msg and "failed to execute" in error_msg):
             st.error("""
             **PDF Generation Failed: Graphviz not available**
             
@@ -143,24 +114,7 @@ def download_file():
             3. **For cloud deployment**: Add Graphviz to your system requirements or use the tabular format
             """)
         else:
-            st.error(f"Error generating PDF: {str(e)}")
-    except Exception as e:
-        if "failed to execute" in str(e) and ("dot" in str(e) or "PosixPath" in str(e)):
-            st.error("""
-            **PDF Generation Failed: Graphviz not available in deployment environment**
-            
-            This appears to be a cloud deployment where Graphviz is not installed.
-            
-            **Quick Fix:** Uncheck "Include DFD graph in the report" above and try again. 
-            This will generate a PDF report with a tabular representation of your DFD instead of a graphical one.
-            
-            **For developers:** To enable graphical DFDs in cloud deployments, you'll need to:
-            1. Add Graphviz to your system dependencies
-            2. For Streamlit Cloud: Add `graphviz` to your `packages.txt` file
-            3. For other platforms: Install Graphviz through your platform's package manager
-            """)
-        else:
-            st.error(f"Unexpected error generating report: {str(e)}")
+            st.error(f"Error generating PDF report: {error_msg}")
     
 def generate_report():
     """
@@ -169,25 +123,40 @@ def generate_report():
         PDF file: The PDF file with the report.
     """
     try:
-        # Try to find wkhtmltopdf automatically
-        wkhtmltopdf_path = find_wkhtmltopdf()
-        
-        # Start the markdown text with the general information
-        text="""# Privacy Threat Modeling and Risk Assessment Report\n"""
-        text += "## Report Details \n\n"
-        
-        # Make this into a variable, because it is later used in the replace function to add CSS styles to the table
-        description_message = "High-level Description"
+        # Build the Report Details table directly as HTML so xhtml2pdf renders it correctly
+        details_html = """<h1>Privacy Threat Modeling and Risk Assessment Report</h1>
+<h2>Report Details</h2>
+<table style="width:100%; border-collapse:collapse;">
+  <tr>
+    <td style="width:15%; font-weight:bold; border:1px solid black; padding:8px;">Application Name</td>
+    <td style="width:35%; border:1px solid black; padding:8px;">{app_name}</td>
+    <td style="width:15%; font-weight:bold; border:1px solid black; padding:8px;">Application Version</td>
+    <td style="width:35%; border:1px solid black; padding:8px;">{app_version}</td>
+  </tr>
+  <tr>
+    <td style="font-weight:bold; border:1px solid black; padding:8px;">Report Author</td>
+    <td style="border:1px solid black; padding:8px;">{author}</td>
+    <td style="font-weight:bold; border:1px solid black; padding:8px;">Date</td>
+    <td style="border:1px solid black; padding:8px;">{date}</td>
+  </tr>{desc_row}
+</table>
+""".format(
+            app_name=st.session_state['app_name'],
+            app_version=st.session_state['app_version'],
+            author=st.session_state['author'],
+            date=st.session_state['date'],
+            desc_row=(
+                """
+  <tr>
+    <td style="font-weight:bold; border:1px solid black; padding:8px;">High-level Description</td>
+    <td colspan="3" style="border:1px solid black; padding:8px;">{desc}</td>
+  </tr>""".format(desc=st.session_state['high_level_description'])
+                if st.session_state["high_level_description"] else ""
+            ),
+        )
 
-        # Add the general information to the report as a table
-        text += f"| | | | |\n"
-        text += f"|------|-------|-----|-----|\n"
-        text += f"| **Application Name** | {st.session_state['app_name']} | **Application Version** | {st.session_state['app_version']} |\n"
-        text += f"| **Report author** | {st.session_state['author']} | **Date** | {st.session_state['date']} |\n"
-        if st.session_state["high_level_description"]: # the high-level description is optional
-            text += f"| **{description_message}** | {st.session_state['high_level_description']} | | |\n\n"
-        else:
-            text += f"\n\n"
+        # Build the rest of the content as markdown and convert to HTML
+        text = ""
 
             
             
@@ -255,36 +224,31 @@ def generate_report():
         elif st.session_state["threat_source"] == "linddun_pro":
             text = from_linddun_pro(text)
         
-        # Convert the markdown text to HTML
-        html = markdown.markdown(text, extensions=["markdown.extensions.tables"])
-        
-        
-        
-        column_widths = [10, 40, 10, 40]
-        colgroup_html = "<colgroup>" + "".join([f"<col style='width: {width}%;'>" for width in column_widths]) + "</colgroup>"
-        html = html.replace("<table>", f"<table table-layout='fixed'>{colgroup_html}", 1)
-        html = html.replace(f"<td><strong>{description_message}</strong></td>\n<td>{st.session_state['high_level_description']}</td>\n<td></td>\n<td></td>", 
-                            f"<td><strong>{description_message}</strong></td>\n<td colspan='3'>{st.session_state['high_level_description']}</td>\n", 1)
-
+        # Convert the markdown threat content to HTML
+        threats_html = markdown.markdown(text, extensions=["markdown.extensions.tables"])
 
         # Add the CSS styles to the HTML
         html_with_style = f"""
     <html>
     <head>
     <style type="text/css">
+    @page {{
+        size: Letter;
+        margin: 0.75in;
+    }}
     body {{
         font-family: {st.session_state["font"]};
         font-size: {st.session_state["font_size"]}px;
     }}
     table {{
         width: 100%;
+        border-collapse: collapse;
     }}
     table, th, td {{
         border: 1px solid black;
-        border-collapse: collapse;
     }}
     th, td {{
-        padding: 10px;
+        padding: 8px;
         text-align: left;
     }}
     th {{
@@ -293,39 +257,26 @@ def generate_report():
     </style>
     </head>
     <body>
-        {colgroup_html}
-        {html}
+        {details_html}
+        {threats_html}
     </body>
     </html>
         """
         
-        options = {
-            'page-size': 'Letter',
-            'margin-top': '0.75in',
-            'margin-right': '0.75in',
-            'margin-bottom': '0.75in',
-            'margin-left': '0.75in',
-            'encoding': "UTF-8",
-            'no-outline': None,
-        }
+        # Generate the PDF report using xhtml2pdf (pure Python, no native dependencies)
+        try:
+            from xhtml2pdf import pisa
+            import io
+        except ImportError as e:
+            raise OSError(f"xhtml2pdf is not installed. Run: pip install xhtml2pdf\nDetails: {e}")
+        pdf_buffer = io.BytesIO()
+        status = pisa.CreatePDF(html_with_style, dest=pdf_buffer)
+        if status.err:
+            raise Exception("xhtml2pdf reported errors during PDF generation.")
+        return pdf_buffer.getvalue()
 
-        # Configure pdfkit with the found path if available
-        config = None
-        if wkhtmltopdf_path:
-            import pdfkit
-            config = pdfkit.configuration(wkhtmltopdf=wkhtmltopdf_path)
-
-        # Generate the PDF report with the styled HTML content and the specified options
-        if config:
-            return pdfkit.from_string(html_with_style, False, options=options, configuration=config)
-        else:
-            return pdfkit.from_string(html_with_style, False, options=options)
-        
-    except OSError as e:
-        if "wkhtmltopdf" in str(e):
-            raise OSError("wkhtmltopdf executable not found. Please install wkhtmltopdf to generate PDF reports.")
-        else:
-            raise e
+    except OSError:
+        raise
     except Exception as e:
         raise Exception(f"Error generating PDF report: {str(e)}")
 
@@ -397,46 +348,6 @@ def from_linddun_pro(text):
                 text += f"**Suggested control measures**: \n\n{measures_gen_markdown(st.session_state['control_measures'][i])}\n\n"
 
     return text
-
-def find_wkhtmltopdf():
-    """
-    Try to find wkhtmltopdf executable in common installation paths
-    """
-    system = platform.system().lower()
-    
-    if system == "windows":
-        # Common Windows installation paths
-        common_paths = [
-            r"C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe",
-            r"C:\Program Files (x86)\wkhtmltopdf\bin\wkhtmltopdf.exe",
-            r"C:\wkhtmltopdf\bin\wkhtmltopdf.exe",
-        ]
-        
-        for path in common_paths:
-            if os.path.exists(path):
-                return path
-                
-    elif system == "darwin":  # macOS
-        common_paths = [
-            "/usr/local/bin/wkhtmltopdf",
-            "/opt/homebrew/bin/wkhtmltopdf",
-        ]
-        
-        for path in common_paths:
-            if os.path.exists(path):
-                return path
-                
-    elif system == "linux":
-        common_paths = [
-            "/usr/bin/wkhtmltopdf",
-            "/usr/local/bin/wkhtmltopdf",
-        ]
-        
-        for path in common_paths:
-            if os.path.exists(path):
-                return path
-    
-    return None
 
 def is_cloud_environment():
     """
