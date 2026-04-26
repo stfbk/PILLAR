@@ -102,7 +102,7 @@ Here’s an outline of our upcoming features and enhancements for **PILLAR**:
 
 If you use **PILLAR** in your research or project, please cite our papers as follows:
 
-```bash
+```bibtex
 @inproceedings{pillar,
 title={PILLAR: LINDDUN Privacy Threat Modeling using LLMs},
 author={Mollaeefar, Majid, Bissoli, Andrea, Van Landuyt, Dimitri and Ranise, Silvio},
