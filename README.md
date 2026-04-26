@@ -84,10 +84,10 @@ Here’s an outline of our upcoming features and enhancements for **PILLAR**:
 - [x] **Locally Hosted Models** by implementing support for locally hosted models, such as **Ollama** and **LM Studio**, to give users more control over privacy and security when running AI models.
 
 - [x] **Enhanced DFD Management** by improving the DFD functionality to support multiple trust boundaries and manage them, color-coded visualization, and different graph functions.
+ 
+- [x] **Models' Performance Evaluation** by defining a comprehensive benchmarking methodology focused on measuring and comparing different LLMs' effectiveness in privacy threat modeling tasks. (For more details please review our benchmarking [paper](https://doi.org/10.1016/j.jisa.2026.104489))
 
 - [ ] **Improve Risk Assessment Methodology and Control Suggestions** by integrating frameworks/methodologies in the state-of-the-art. 
- 
-- [ ] **Models' Performance Evaluation** by defining a comprehensive benchmarking methodology focused on measuring and comparing different LLMs' effectiveness in privacy threat modeling tasks.
 
 - [ ] **Prompt Engineering Optimization** by experimenting with different prompt techniques, structures, and tactics to analyze their impact on threat elicitation accuracy, comprehensiveness, and overall performance across various threat elicitation variants in PILLAR. 
 
@@ -100,7 +100,7 @@ Here’s an outline of our upcoming features and enhancements for **PILLAR**:
 
 ## Citation
 
-If you use **PILLAR** in your research or project, please cite our [paper](https://arxiv.org/abs/2410.08755) as follows:
+If you use **PILLAR** in your research or project, please cite our papers as follows:
 
 ```bash
 @inproceedings{pillar,
@@ -108,6 +108,16 @@ title={PILLAR: LINDDUN Privacy Threat Modeling using LLMs},
 author={Mollaeefar, Majid, Bissoli, Andrea, Van Landuyt, Dimitri and Ranise, Silvio},
 journal={International Workshop on Privacy Engineering (IWPE25)},
 year={2025}
+}
+
+@article{pillar-benchmark,
+title = {Benchmarking the effectiveness of multi-agent LLMs in collaborative privacy threat modeling with LINDDUN GO},
+author = {Andrea Bissoli, Majid Mollaeefar, Dimitri Van Landuyt, and Silvio Ranise},
+journal = {Journal of Information Security and Applications},
+volume = {100},
+pages = {104489},
+year = {2026},
+doi = {https://doi.org/10.1016/j.jisa.2026.104489},
 }
 ```
 
