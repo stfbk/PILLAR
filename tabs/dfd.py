@@ -66,11 +66,20 @@ def synchronize_boundaries_from_csv(dfd_list):
         # Build a dictionary for quick lookup using boundary ID as key
         boundary_dict = {b["id"]: b for b in current_boundaries}
 
-        # Extract unique boundary IDs from the CSV DFD data
+        # Extract unique boundary IDs from trusted CSV edges only.
         csv_boundaries = set()
         for edge in dfd_list:
-            if "boundary" in edge and edge["boundary"]:
-                csv_boundaries.add(edge["boundary"])
+            trusted_value = edge.get("trusted", True)
+            if isinstance(trusted_value, str):
+                trusted_value = trusted_value.strip().lower() == "true"
+
+            boundary_id = str(edge.get("boundary", "")).strip()
+            if not trusted_value:
+                continue
+            if not boundary_id or boundary_id.lower() == "no_boundary":
+                continue
+
+            csv_boundaries.add(boundary_id)
 
         # For each boundary ID found in CSV, add it if missing
         for b_id in csv_boundaries:

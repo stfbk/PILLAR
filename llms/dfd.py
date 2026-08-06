@@ -282,6 +282,14 @@ def get_node_shape(component_type):
         return "cylinder"
     return "rectangle"  # default shape
 
+
+def is_real_boundary(boundary_id):
+    """Return True only for concrete trust-boundary ids."""
+    if boundary_id is None:
+        return False
+    normalized = str(boundary_id).strip().lower()
+    return normalized not in {"", "no_boundary", "none", "null"}
+
 def update_graph():
     """Updates the DFD visualization with color-coded arrows for trust boundaries."""
     if "input" not in st.session_state or "dfd" not in st.session_state["input"]:
@@ -323,6 +331,7 @@ def update_graph():
         # Map to track component types and their boundaries
         component_types = {}
         component_boundaries = {}
+        all_components = set()
         
         # Collect all components and their types
         for edge in st.session_state["input"]["dfd"]:
@@ -330,14 +339,23 @@ def update_graph():
             to_component = edge["to"]
             from_type = edge["typefrom"]
             to_type = edge["typeto"]
+
+            edge_boundary = edge.get("boundary", "")
+            edge_trusted = edge.get("trusted", True)
+            if isinstance(edge_trusted, str):
+                edge_trusted = edge_trusted.strip().lower() == "true"
+            edge_has_real_boundary = is_real_boundary(edge_boundary)
+
+            all_components.add(from_component)
+            all_components.add(to_component)
             
             # Record component types - ensure we record BOTH from and to types
             component_types[from_component] = from_type
             component_types[to_component] = to_type
             
             # Record component boundaries
-            if from_component not in component_boundaries:
-                component_boundaries[from_component] = edge["boundary"]
+            if from_component not in component_boundaries and edge_trusted and edge_has_real_boundary:
+                component_boundaries[from_component] = edge_boundary
             
             # For destination, we need to determine its boundary
             # First check if it's already assigned to a boundary
@@ -345,21 +363,28 @@ def update_graph():
                 # Look for this component as source in other edges
                 for other_edge in st.session_state["input"]["dfd"]:
                     if other_edge["from"] == to_component:
-                        component_boundaries[to_component] = other_edge.get("boundary", "boundary_1")
-                        break
+                        other_boundary = other_edge.get("boundary", "")
+                        other_trusted = other_edge.get("trusted", True)
+                        if isinstance(other_trusted, str):
+                            other_trusted = other_trusted.strip().lower() == "true"
+                        if other_trusted and is_real_boundary(other_boundary):
+                            component_boundaries[to_component] = other_boundary
+                            break
                 else:
-                    # If not found as source, assign to the same boundary as the source of this edge
-                    component_boundaries[to_component] = edge["boundary"]
+                    # If not found as source, keep destination unbounded unless this edge is trusted in a real boundary
+                    if edge_trusted and edge_has_real_boundary:
+                        component_boundaries[to_component] = edge_boundary
             
             # Add components to their boundaries
-            if edge["boundary"] in boundary_components:
-                boundary_components[edge["boundary"]].add(from_component)
+            if edge_trusted and edge_has_real_boundary and edge_boundary in boundary_components:
+                boundary_components[edge_boundary].add(from_component)
             
-            to_boundary = component_boundaries[to_component]
+            to_boundary = component_boundaries.get(to_component)
             if to_boundary in boundary_components:
                 boundary_components[to_boundary].add(to_component)
         
         # Create subgraphs for each boundary with its components
+        rendered_nodes = set()
         for boundary in boundaries:
             boundary_id = boundary["id"]
             components = boundary_components.get(boundary_id, set())
@@ -407,6 +432,39 @@ def update_graph():
                             height="0.6",
                             width="1.2"
                         )
+                        rendered_nodes.add(component)
+
+        # Render components that are outside any trust boundary without dashed boundary boxes.
+        for component in all_components:
+            if component in rendered_nodes:
+                continue
+
+            component_type = component_types.get(component)
+            if not component_type:
+                continue
+
+            shape = get_node_shape(component_type)
+            node_color = "#555555"
+            if component_type == "Entity":
+                fillcolor = "#e1f5fe"
+            elif component_type == "Process":
+                fillcolor = "#e8f5e9"
+            elif component_type == "Data store":
+                fillcolor = "#fff3e0"
+            else:
+                fillcolor = "#f5f5f5"
+
+            graph.node(
+                component,
+                shape=shape,
+                style="filled",
+                fillcolor=fillcolor,
+                color=node_color,
+                fontcolor="#333333",
+                fontsize="12",
+                height="0.6",
+                width="1.2"
+            )
         
         # Track parallel edges between the same nodes
         edge_counts = {}
